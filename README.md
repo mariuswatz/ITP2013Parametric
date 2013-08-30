@@ -7,9 +7,10 @@ Class hours: Mondays 6:00pm – 8:55pm
 
 ## Aug 30 
 
-Posted code for Modelbuilder-0020, which is compatible with Processing 1.5.1. We will eventually migrate to Processing 2.0, but for now 1.5.1 is a more stable platform and many of the Modelbuilder examples have not been updated to be compatible.
+Posted code for Modelbuilder-0020, which is compatible with Processing 1.5.1. We will eventually migrate to Processing 2.0, but for now 1.5.1 is a more stable platform and many of the Modelbuilder examples have not been updated to be compatible. This build uses ControlP5 0.5.4 by Andreas Schlegel, which can be [downloaded from his repository](https://code.google.com/p/controlp5/downloads/detail?name=controlP5_0.5.4.zip&can=2&q=).
 
-Many examples require ControlP5 0.5.4 by Andreas Schlegel, which can be [downloaded from his repository](https://code.google.com/p/controlp5/downloads/detail?name=controlP5_0.5.4.zip&can=2&q=).
+Modelbuilder is in bad need of restructuring. It currently suffers from an abundanc of ad hoc hackery and some poor design decisions, hardly surprising given that is my first serious attempt at writing a comprehensive geometry library. I plan to rewrite it from scratch as part of teaching this class.
+
 
 ## Code resources + tutorials
 
