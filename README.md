@@ -5,6 +5,10 @@ See the Code & Form blog for a detailed description](http://workshop.evolutionzo
 Contact e-mail: marius at mariuswatz dot com
 Class hours: Mondays 6:00pm – 8:55pm
 
+## Sept 5
+
+Added ProcessingData library, which is a hack to make the Processing 2.0 Data API available for use in Processing 1.5.1.
+
 ## Aug 30 
 
 Posted code for Modelbuilder-0020, which is compatible with Processing 1.5.1. We will eventually migrate to Processing 2.0, but for now 1.5.1 is a more stable platform and many of the Modelbuilder examples have not been updated to be compatible. This build uses ControlP5 0.5.4 by Andreas Schlegel, which can be [downloaded from his repository](https://code.google.com/p/controlp5/downloads/detail?name=controlP5_0.5.4.zip&can=2&q=).
