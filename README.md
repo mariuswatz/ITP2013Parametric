@@ -5,6 +5,10 @@ See the Code & Form blog for a detailed description](http://workshop.evolutionzo
 Contact e-mail: marius at mariuswatz dot com
 Class hours: Mondays 6:00pm – 8:55pm
 
+## Sept 6
+
+Added first version of ModelbuilderMk2, which is a complete rewrite of Modelbuilder. Currently implemented (but incomplete): UVertex, UVertexLists, UGeo - basic features for mesh creation. STL output is not included yet.
+
 ## Sept 5
 
 Added ProcessingData library, which is a hack to make the Processing 2.0 Data API available for use in Processing 1.5.1.
