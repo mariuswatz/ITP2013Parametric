@@ -5,7 +5,7 @@ See the Code & Form blog for a detailed description](http://workshop.evolutionzo
 Contact e-mail: marius at mariuswatz dot com
 Class hours: Mondays 6:00pm – 8:55pm
 
-## Sept 6
+## Sept 7
 
 ModelbuilderMk2: Added STL export and file utilities (UFile). The current code works with 2.0 and 1.5.1, but I'm not doing a packaged Processing-ready release just yet. If you're working in Eclipse or similar IDE you can download the code and plug it in.
 
