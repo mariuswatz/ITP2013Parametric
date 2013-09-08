@@ -18,7 +18,6 @@ public class UGeoIO {
     
     try {
       if(!filename.toLowerCase().endsWith("stl")) filename+=".stl";
-//      FileOutputStream out=(FileOutputStream)IO.getOutputStream(filename);
       FileOutputStream out=(FileOutputStream)UFile.getOutputStream(filename);
 
       buf = ByteBuffer.allocate(200);
