@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import processing.core.PApplet;
 import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
+import unlekker.mb2.geo.UGeoIO;
 import unlekker.mb2.geo.UVertexList;
+import unlekker.mb2.util.UFile;
 
 public class UGeoTest extends PApplet {
   ArrayList<UVertexList> vvl;
@@ -26,61 +28,75 @@ public class UGeoTest extends PApplet {
     vl.add(0,100,0);
     vl.add(0,0,0);
     
-    println(""+vl.centroid(true).str()+" "+vl.str());
-
+    // vertices were added clock-wise, so reverse
+    vl.reverse(); 
+    
     vl.translate(-50, -150, 0);
-    for(int i=0; i<6; i++) {
-      vl.rotX(radians(60)).translate(0, 0, 20);
-      vvl.add(vl.copy());
+    for(int i=0; i<30; i++) {
+      // chained commands:
+      // #1 copy vertex list
+      // #2 rotate and translate copy
+      // #3 add copy to vvl
+      // Remember: The original "vl" is left unchanged
+      vvl.add(vl.copy().rotX(radians(10*i)).translate(0, 0, 20));
       
       println(vl.str());
     }
 
     geo=new UGeo();
-    geo.enable(geo.COLORFACE);
+    
+    // make quadstrips of all vertex lists in vvl
     geo.quadstrip(vvl);
-    geo.triangleFan(vvl.get(0));
+    
+    // fill first and last vertex lists w/ triangle fans
     geo.triangleFan(vvl.get(vvl.size()-1));
     
-    geo.translate(200,0,0);
-    geo.rotY(HALF_PI*0.5f);
+    // the first fan needs to have its order reversed to face
+    // the right way
+    geo.triangleFan(vvl.get(0),true);
     
-    int n=geo.getFaces().size();
     
-    int id=0;
-    
-    ArrayList<String> ss=new ArrayList<String>();
-    
+    // randomize face colors
+    int id=0,n=geo.getFaces().size();           
     for(UFace f:geo.getFaces()) {
       float v=map(id++,0,n-1,0,255);
       f.setColor(v*255,v*100,0);
-      f.getVertices()[0].add(random(-15,15),0,0);
-      ss.add(f.hex(f.col));
     }
 
-    println(UGeo.str(ss));
-    vl.log(""+vl.size()+" "+vl.allowCopy()+" "+vl.allowDupl());
+    geo.enable(geo.COLORFACE); // per-face coloring
+    println(geo.optionStr()); // print options string
     
-    geo.enable(geo.COLORFACE);
-    println(geo.optionStr());
+    // write STL using incremental file naming
+    // "data/" is the root dir, "test" is the file prefix
+    UGeoIO.writeSTL(UFile.nextFilename("data\\", "test"), geo);
   }
 
   public void draw() {
     background(0);
     
     translate(width/2,height/2);
-    rotateY(radians(frameCount));
-    stroke(255);
-    noFill();
-    vl.draw();
-    
     lights();
+    
+    float ry=map(width/2-mouseX,-width/2,width/2, PI,-PI);
+    float rx=map(height/2-mouseY,-height/2,height/2, PI,-PI);
+    
+    rotateY(ry+radians(frameCount));
+    rotateX(rx);
+    
+    
+    stroke(255);
     fill(255);
+    
     geo.draw();
   }
 
   static public void main(String args[]) {
-    PApplet.main(new String[] { "--bgcolor=#F0F0F0", "unlekker.mb2.test.UGeoTest" });
+    String sk[]=new String[] {
+        "UGeoTest",
+        "UFileTest"
+    };
+    
+    PApplet.main(new String[] {"unlekker.mb2.test."+sk[0]});
   }
 
   

@@ -51,8 +51,13 @@ public class UFace extends UBasic  {
 
   }
 
+  public UVertex[] getVertices(boolean force) {
+    if(force) v=null;
+    return getVertices();
+  }
+
   public UVertex[] getVertices() {
-    if(parent==null) return v;
+    if(parent==null || v!=null) return v;
     
     if(v==null) v=new UVertex[3];
  
@@ -90,5 +95,15 @@ public class UFace extends UBasic  {
 
   public UFace setColor(float a,float b,float c) {
     return setColor(color(a,b,c));
+  }
+
+  public UVertex normal() {
+    getVertices();
+    
+    normal=UVertex.cross(
+        UVertex.delta(v[1],v[0]), 
+        UVertex.delta(v[2],v[0]));
+    
+    return normal;
   }
 }

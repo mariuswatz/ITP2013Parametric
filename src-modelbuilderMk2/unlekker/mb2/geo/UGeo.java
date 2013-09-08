@@ -33,23 +33,41 @@ public class UGeo extends UBasic  {
    return this;
   }
 
+  public int sizeF() {
+    return faces.size();
+  }
+
+  public int sizeV() {
+    return vl.size();
+  }
+
   public ArrayList<UFace> getFaces() {
     return faces;
   }
-  
-  public void draw(UVertex v[]) {
-    for(UVertex vv:v) g.vertex(vv.x,vv.y,vv.z);
+
+  public void draw(UVertex vv) {
+    if(checkGraphicsSet()) {
+      g.vertex(vv.x,vv.y,vv.z);
+    }
+  }
+
+  public void draw(UVertex varr[]) {
+    if(checkGraphicsSet()) {
+      for(UVertex vv:varr) g.vertex(vv.x,vv.y,vv.z);
+    }
   }
   
   public void draw() {
-    g.beginShape(TRIANGLES);
-    
-    int opt=(enabled(COLORFACE) ? COLORFACE : 0);
-    for(UFace f:faces) {
-      if(opt==COLORFACE) g.fill(f.col);
-      draw(f.getVertices());
+    if(checkGraphicsSet()) {
+      g.beginShape(TRIANGLES);
+      
+      int opt=(enabled(COLORFACE) ? COLORFACE : 0);
+      for(UFace f:faces) {
+        if(opt==COLORFACE) g.fill(f.col);
+        draw(f.getVertices());
+      }
+      g.endShape();
     }
-    g.endShape();
   }
   
   public UGeo translate(float mx,float my,float mz) {
@@ -222,7 +240,7 @@ public class UGeo extends UBasic  {
    */
   public UGeo vertex(UVertexList vvl,boolean reverseOrder) {
     if(reverseOrder) {
-      for(int i=vl.size()-1; i>-1; i--) vertex(vvl.get(i));
+      for(int i=vvl.size()-1; i>-1; i--) vertex(vvl.get(i));
     }
     else {
       for(UVertex vv:vvl) vertex(vv);
@@ -249,7 +267,7 @@ public class UGeo extends UBasic  {
   }
 
   public UGeo quadstrip(ArrayList<UVertexList> vl2) {
-    UVertexList last=null;
+    UVertexList last=null;  
     for(UVertexList vvl:vl2) {
       if(last!=null) quadstrip(last,vvl);
       last=vvl;
@@ -258,6 +276,10 @@ public class UGeo extends UBasic  {
   }
 
   public UGeo triangleFan(UVertexList vl) {
+    return triangleFan(vl,false);
+  }
+
+  public UGeo triangleFan(UVertexList vl,boolean reverse) {
     boolean omit=vl.last().equals(vl.first());
     log("omit "+omit);
     UVertex c=vl.centroid(omit);
@@ -265,7 +287,7 @@ public class UGeo extends UBasic  {
     
     beginShape(TRIANGLE_FAN);
     vertex(c);
-    vertex(vl);
+    vertex(vl,reverse);
     endShape();
     
     return this;
@@ -284,4 +306,7 @@ public class UGeo extends UBasic  {
     
     return this;
   }
+  
+  
+  
 }

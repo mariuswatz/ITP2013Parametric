@@ -1,6 +1,7 @@
 package unlekker.mb2.geo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import processing.core.PGraphics3D;
@@ -34,9 +35,12 @@ public class UVertexList extends UBasic implements Iterable<UVertex> {
   }
   
   public void draw() {
-    g.beginShape();
-    for(UVertex vv:v) g.vertex(vv.x,vv.y,vv.z);
-    g.endShape();
+    if(checkGraphicsSet()) {
+      g.beginShape();
+      for(UVertex vv:v) g.vertex(vv.x,vv.y,vv.z);
+      g.endShape();
+    }
+
   }
 
   public UVertex centroid(boolean omitLast) {
@@ -143,7 +147,6 @@ public class UVertexList extends UBasic implements Iterable<UVertex> {
   }
 
   
-  @Override
   public Iterator<UVertex> iterator() {
     // TODO Auto-generated method stub
     return v.iterator();
@@ -169,8 +172,44 @@ public class UVertexList extends UBasic implements Iterable<UVertex> {
     
   }
 
+  public UVertexList setULinear() {
+    int id=0,n=size()-1;
+    for(UVertex vv:v) vv.U=map(id++,0,n,0,1);
+    return this;
+  }
+
+  public UVertexList setU(float U) {
+    for(UVertex vv:v) vv.U=U;
+    return this;
+  }
+
+  public UVertexList setV(float V) {
+    for(UVertex vv:v) vv.V=V;
+    return this;
+  }
+
+  public UVertexList setColor(int c) {
+    for(UVertex vv:v) vv.setColor(c);
+    return this;
+  }
+
+  public UVertexList setColor(int c, int a) {
+    setColor(color(c, a));
+    return this;
+  }
+
+  public UVertexList setColor(float a,float b,float c) {
+    return setColor(color(a,b,c));
+  }
+
   public String str() {
     return "["+size()+TAB+str(v)+"]";
+  }
+
+  public UVertexList reverse() {
+    Collections.reverse(v);
+    return this;
+    
   }
 
 }

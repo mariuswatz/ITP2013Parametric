@@ -15,7 +15,10 @@ public interface UConst extends processing.core.PConstants {
   public static final int YZX=2, YXZ=3,ZXY=5, ZYX=6;
 
   public static final char TAB='\t',COMMA=',',SPACE=' ';
-  public static final char DIRCHAR='/';
+  public static final char DIRCHAR='/',DIRCHARDOS='\\',NEWLN='\n';      
+  public static final String DIRSTR="/",DIRSTRDOS="\\";      
+  public static final String ENCLSQ="[]",ENCLTAG="<>";
+  public static final String LOGDIVIDER="----------------";
   
   public static final int SMOOTHSTEP=0;
   

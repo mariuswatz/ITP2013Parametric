@@ -3,6 +3,7 @@ package unlekker.mb2.util;
 import java.lang.Character.Subset;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -15,7 +16,17 @@ public class UBasic implements UConst {
   private static String[] optionNames;
   
   
-  protected static PGraphics3D g;
+  protected static PGraphics g;
+  protected static PGraphics3D g3d;
+  protected static int gErrorCnt=0;
+
+  public UBasic ptranslate(UVertex v) {
+    if(checkGraphicsSet()) {
+      g.translate(v.x, v.y,v.z);
+    }
+    
+    return this;
+  }
 
   public void setOptions(int opt) {
     options=opt;
@@ -130,7 +141,9 @@ public class UBasic implements UConst {
 
   //////////////////////////////////////////
   // MATH
-
+  // map,lerp,max,constrain code taken from processing.core.PApplet
+  
+  
   static public final float abs(float n) {
     return (n < 0) ? -n : n;
   }
@@ -155,6 +168,50 @@ public class UBasic implements UConst {
     return (a > b) ? a : b;
   }
 
+  static public final float map(float value,
+      float ostart, float ostop) {
+        return ostart + (ostop - ostart) * (value);
+  }
+  
+  static public final float map(float value,
+      float istart, float istop,
+      float ostart, float ostop) {
+        return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+  }
+
+  static public final int constrain(int amt, int low, int high) {
+    return (amt < low) ? low : ((amt > high) ? high : amt);
+  }
+
+  static public final float constrain(float amt, float low, float high) {
+    return (amt < low) ? low : ((amt > high) ? high : amt);
+  }
+
+  static public final float lerp(float start, float stop, float amt) {
+    return start + (stop-start) * amt;
+  }
+
+  
+  // extended versions
+  
+  static public final float mod(float a, float b) { // code from David Bollinger
+    return (a%b+b)%b; 
+  }
+
+  static public final float max(ArrayList<Float> val) {
+    float theMax=Float.MIN_VALUE;
+    
+    for(float v:val) theMax=(v>theMax ? v : theMax);
+    return theMax;
+  }
+
+  static public final float min(ArrayList<Float> val) {
+    float theMin=Float.MAX_VALUE;
+    
+    for(float v:val) theMin=(v>theMin ? v : theMin);
+    return theMin;
+  }
+
   static public final float max(float val[]) {
     float theMax=val[0];
     for(float v:val) theMax=(v>theMax ? v : theMax);
@@ -167,6 +224,38 @@ public class UBasic implements UConst {
     return theMax;
   }
 
+
+  static public final double mapDbl(double value,
+      double istart, double istop,
+      double ostart, double ostop) {
+        return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+  }
+
+
+  //////////////////////////////////////////
+  // PARSING VALUES
+
+  public static int parseInt(String s) {
+    if(s==null) return Integer.MIN_VALUE;
+    return Integer.parseInt(s.trim());
+  }
+
+  public static float parseFloat(String s) {
+    if(s==null) return Float.NaN;
+    return Float.parseFloat(s.trim());
+  }
+
+  public static float[] parseFloat(String s[]) {
+    if(s==null) return null;
+    
+    float f[]=new float[s.length];
+    int id=0;
+    for(String ss:s) f[id++]=parseFloat(ss);
+    
+    return f;
+  }
+
+  
   //////////////////////////////////////////
   // RANDOM VALUES
 
@@ -221,12 +310,25 @@ public class UBasic implements UConst {
    }
   
   
+  public static boolean checkGraphicsSet() {
+    if(g==null) {
+      if(gErrorCnt%100==0) logErr("ModelbuilderMk2: No PGraphics set. Use UGeo.setGraphics(PApplet).");
+      gErrorCnt++;
+    }
+    return true;
+  }
+  
   public static PGraphics3D getGraphics() {
-    return g;
+    return g3d;
   }
 
-  public static void setGraphics(PGraphics g2) {
-    UBasic.g=(PGraphics3D)g2;
+  public static void setGraphics(PApplet papplet) {
+    setGraphics(papplet.g);
+  }
+
+  public static void setGraphics(PGraphics gg) {
+    UBasic.g=gg;
+    UBasic.g3d=(PGraphics3D)gg;
   }
 
   //////////////////////////////////////////
@@ -235,6 +337,27 @@ public class UBasic implements UConst {
   public static void log(String s) {
     System.out.println(s);
   }
+
+  public static void log(int i) {
+    System.out.println(i);
+  }
+
+  public static void log(float f) {
+    System.out.println(f);
+  }
+
+  public static void logErr(String s) {
+    System.err.println(s);
+  }
+
+  public static void logDivider() {
+    System.out.println(LOGDIVIDER);
+  }
+
+  public static void logDivider(String s) {
+    System.out.println(LOGDIVIDER+' '+s);
+  }
+
   
   //////////////////////////////////////////
   // NUMBER FORMATTING
@@ -320,19 +443,26 @@ public class UBasic implements UConst {
     return s;
   }
   
-  
+
   public static <T> String str(ArrayList<T> o) {
-    if(o==null) return "[null]";
-    if(o.size()<1) return "[]";
-    
-    
+    return str(o,NEWLN,null);
+  }
+
+  public static <T> String str(ArrayList<T> o, char delim,String enclosure) {
     StringBuffer buf=strBufGet();
+    if(o==null) buf.append("null");
+    else {
+      int id=0;
+      for(T oo:o) {
+        if(buf.length()>0) buf.append(delim); 
+//        buf.append(id++).append(' ');
+        buf.append(oo.toString());
+      }
+    }
     
-    int id=0;
-    for(T oo:o) {
-      if(buf.length()>0) buf.append(","); 
-//      buf.append(id++).append(' ');
-      buf.append(oo.toString());
+    if(enclosure!=null) {
+      buf.insert(0, enclosure.charAt(0));
+      buf.append(enclosure.charAt(1));
     }
     
     return strBufDispose(buf);

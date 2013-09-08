@@ -34,6 +34,13 @@ public class UVertex extends UBasic implements Comparable {
     return new UVertex(this);
   }
 
+  
+  public void draw() {
+    if(checkGraphicsSet()) {
+      g.vertex(x,y,z);
+    }
+  }
+  
   public UVertex set(float xx,float yy,float zz) {
     x=xx;
     y=yy;
@@ -241,7 +248,11 @@ public class UVertex extends UBasic implements Comparable {
   public UVertex delta(UVertex vGoal) {
     return new UVertex(vGoal).sub(this);
   }
-  
+
+  public static UVertex delta(UVertex v1,UVertex v2) {
+    return new UVertex(v2).sub(v1);
+  }
+
   public UVertex rotAxis(int axis,float deg) {
     double sindeg,cosdeg;
     double a,b;
@@ -283,7 +294,6 @@ public class UVertex extends UBasic implements Comparable {
     return rotAxis(Z,deg);
   }
 
-  @Override
   public int compareTo(Object o) {
     UVertex v=(UVertex)o;
     if(equals(v)) return 0;
@@ -291,8 +301,13 @@ public class UVertex extends UBasic implements Comparable {
     return (int)((v.x-x)*100f);
   }
 
-  public UVertex setColor(int a) {
-    col=a;
+  public UVertex setColor(int c) {
+    col=c;
+    return this;
+  }
+
+  public UVertex setColor(int c, int a) {
+    setColor(color(c, a));
     return this;
   }
 
