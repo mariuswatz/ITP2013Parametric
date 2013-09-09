@@ -4,7 +4,7 @@ import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import unlekker.mb2.util.UBasic;
+import unlekker.mb2.util.UBase;
 import unlekker.mb2.util.UFile;
 
 
@@ -35,14 +35,14 @@ public class UGeoIO {
       out.write(header,0,4);
       buf.rewind();
       
-      UBasic.logDivider("Writing STL '"+filename+"' "+faceNum);
+      UBase.logDivider("Writing STL '"+filename+"' "+faceNum);
 
       buf.clear();
       header=new byte[50];
 //      if(bb!=null) UUtil.log(bb.toString());
       
       for(UFace f:model.getFaces()) {
-        UVertex v[]=f.getVertices();
+        UVertex v[]=f.getV();
         UVertex fn=f.normal();
         
         buf.rewind();
@@ -63,8 +63,9 @@ public class UGeoIO {
 
       out.flush();
       out.close();
-      UBasic.log("Closing '"+filename+"'. "+faceNum+" triangles written.\n");
+      UBase.log("Closing '"+filename+"'. "+faceNum+" triangles written.\n");
     } catch (Exception e) {
+      res=false;
       e.printStackTrace();
     }
     

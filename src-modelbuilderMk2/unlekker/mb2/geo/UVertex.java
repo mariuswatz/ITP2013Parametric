@@ -1,9 +1,9 @@
 package unlekker.mb2.geo;
 
 import processing.core.PVector;
-import unlekker.mb2.util.UBasic;
+import unlekker.mb2.util.UBase;
 
-public class UVertex extends UBasic implements Comparable {
+public class UVertex extends UBase implements Comparable {
   public static int globalID;
 
   public int ID;  
@@ -15,6 +15,10 @@ public class UVertex extends UBasic implements Comparable {
   
   public UVertex() {
     this(0,0,0);
+  }
+
+  public UVertex(float xx,float yy) {
+    this(xx,yy,0);
   }
 
   public UVertex(float xx,float yy,float zz) {
@@ -40,7 +44,13 @@ public class UVertex extends UBasic implements Comparable {
       g.vertex(x,y,z);
     }
   }
-  
+
+  public UVertex set(float xx,float yy) {
+    x=xx;
+    y=yy;
+    return this;
+  }
+
   public UVertex set(float xx,float yy,float zz) {
     x=xx;
     y=yy;
@@ -299,6 +309,12 @@ public class UVertex extends UBasic implements Comparable {
     if(equals(v)) return 0;
     
     return (int)((v.x-x)*100f);
+  }
+
+  public UVertex setUV(float UU,float VV) {
+    U=UU;
+    V=VV;
+    return this;
   }
 
   public UVertex setColor(int c) {

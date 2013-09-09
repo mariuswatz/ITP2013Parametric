@@ -2,11 +2,11 @@ package unlekker.mb2.geo;
 
 import java.util.ArrayList;
 
-import unlekker.mb2.util.UBasic;
+import unlekker.mb2.util.UBase;
 
 import java.util.*;
 
-public class UGeo extends UBasic  {
+public class UGeo extends UBase  {
   public UVertexList vl;
   
   private UVertexList vltmp;
@@ -64,7 +64,7 @@ public class UGeo extends UBasic  {
       int opt=(enabled(COLORFACE) ? COLORFACE : 0);
       for(UFace f:faces) {
         if(opt==COLORFACE) g.fill(f.col);
-        draw(f.getVertices());
+        draw(f.getV());
       }
       g.endShape();
     }
@@ -203,9 +203,21 @@ public class UGeo extends UBasic  {
     return this;
 
   }
+
+  public UGeo add(UVertexList v1) {
+    vl.add(v1);    
+    return this;
+  }
+
+  public UGeo add(UVertex v1) {
+    vl.add(v1);    
+    return this;
+  }
   
-  private void addFace(UVertex v1, UVertex v2, UVertex v3) {
+  
+  public UGeo addFace(UVertex v1, UVertex v2, UVertex v3) {
     faces.add(new UFace(this, v1,v2,v3));    
+    return this;
   }
 
   /**
@@ -258,6 +270,26 @@ public class UGeo extends UBasic  {
     return vertex(vvl, false);
   }
 
+  public int[] getVID(UVertex vv[],int vid[]) {    
+    return vl.getVID(vv,vid);
+  }
+
+  public int getVID(UVertex vv) {    
+    return vl.getVID(vv);
+  }
+
+  public UVertexList getVL() {
+    return vl;
+  }
+  
+  public UVertex[] getV(int vID[]) {
+    return vl.get(vID);
+  }
+  
+  public UVertex[] getV(int vID[],UVertex tmp[]) {
+    return vl.get(vID,tmp);
+  }
+
   public UVertex getVertex(int vID) {    
     return vl.get(vID);
   }
@@ -308,5 +340,8 @@ public class UGeo extends UBasic  {
   }
   
   
+  public boolean writeSTL(String filename) {
+    return UGeoIO.writeSTL(filename, this);
+  }
   
 }

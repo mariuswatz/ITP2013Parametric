@@ -11,7 +11,7 @@ import processing.core.PGraphics3D;
 import unlekker.mb2.geo.UGeo;
 import unlekker.mb2.geo.UVertex;
 
-public class UBasic implements UConst {
+public class UBase implements UConst {
   public int options;
   private static String[] optionNames;
   
@@ -20,7 +20,7 @@ public class UBasic implements UConst {
   protected static PGraphics3D g3d;
   protected static int gErrorCnt=0;
 
-  public UBasic ptranslate(UVertex v) {
+  public UBase ptranslate(UVertex v) {
     if(checkGraphicsSet()) {
       g.translate(v.x, v.y,v.z);
     }
@@ -168,6 +168,15 @@ public class UBasic implements UConst {
     return (a > b) ? a : b;
   }
 
+  static public final int min(int a, int b) {
+    return (a < b) ? a : b;
+  }
+
+  static public final float min(float a, float b) {
+    return (a < b) ? a : b;
+  }
+
+  
   static public final float map(float value,
       float ostart, float ostop) {
         return ostart + (ostop - ostart) * (value);
@@ -310,6 +319,9 @@ public class UBasic implements UConst {
    }
   
   
+  //////////////////////////////////////////
+  // SET / GET PGRAPHICS 
+  
   public static boolean checkGraphicsSet() {
     if(g==null) {
       if(gErrorCnt%100==0) logErr("ModelbuilderMk2: No PGraphics set. Use UGeo.setGraphics(PApplet).");
@@ -327,8 +339,8 @@ public class UBasic implements UConst {
   }
 
   public static void setGraphics(PGraphics gg) {
-    UBasic.g=gg;
-    UBasic.g3d=(PGraphics3D)gg;
+    UBase.g=gg;
+    UBase.g3d=(PGraphics3D)gg;
   }
 
   //////////////////////////////////////////
@@ -358,6 +370,17 @@ public class UBasic implements UConst {
     System.out.println(LOGDIVIDER+' '+s);
   }
 
+  
+  //////////////////////////////////////////
+  // FILE TOOLS
+  
+  public static String nextFile(String path,String pre) {
+    return nextFilename(path, pre,null);
+  }
+
+  public static String nextFilename(String path,String pre,String ext) {
+    return UFile.nextFile(path, pre, ext);
+  }
   
   //////////////////////////////////////////
   // NUMBER FORMATTING

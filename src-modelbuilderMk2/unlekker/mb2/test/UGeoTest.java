@@ -6,6 +6,7 @@ import processing.core.PApplet;
 import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
 import unlekker.mb2.geo.UGeoIO;
+import unlekker.mb2.geo.UVertex;
 import unlekker.mb2.geo.UVertexList;
 import unlekker.mb2.util.UFile;
 
@@ -24,8 +25,10 @@ public class UGeoTest extends PApplet {
     vl=new UVertexList();
     vl.add(0,0,0);
     vl.add(100,0,0);
+    vl.add(125,50,0);
     vl.add(100,100,0);
     vl.add(0,100,0);
+    vl.add(-25,50,0);
     vl.add(0,0,0);
     
     // vertices were added clock-wise, so reverse
@@ -45,6 +48,8 @@ public class UGeoTest extends PApplet {
 
     geo=new UGeo();
     
+    
+    UVertexList.setUV(vvl);
     // make quadstrips of all vertex lists in vvl
     geo.quadstrip(vvl);
     
@@ -59,8 +64,8 @@ public class UGeoTest extends PApplet {
     // randomize face colors
     int id=0,n=geo.getFaces().size();           
     for(UFace f:geo.getFaces()) {
-      float v=map(id++,0,n-1,0,255);
-      f.setColor(v*255,v*100,0);
+      UVertex fv[]=f.getV();
+      f.setColor(fv[0].U*255,fv[0].V*155+100,fv[0].V*255);
     }
 
     geo.enable(geo.COLORFACE); // per-face coloring

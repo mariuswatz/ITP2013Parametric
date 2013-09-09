@@ -1,9 +1,11 @@
 package unlekker.mb2.geo;
 
-import unlekker.mb2.util.UBasic;
+import java.util.Arrays;
 
-public class UFace extends UBasic  {
-  public static int globalID;
+import unlekker.mb2.util.UBase;
+
+public class UFace extends UBase  {
+  public static int globalID=0;
 
   public UGeo parent;
   public int ID;  
@@ -51,12 +53,12 @@ public class UFace extends UBasic  {
 
   }
 
-  public UVertex[] getVertices(boolean force) {
+  public UVertex[] getV(boolean force) {
     if(force) v=null;
-    return getVertices();
+    return getV();
   }
 
-  public UVertex[] getVertices() {
+  public UVertex[] getV() {
     if(parent==null || v!=null) return v;
     
     if(v==null) v=new UVertex[3];
@@ -98,7 +100,7 @@ public class UFace extends UBasic  {
   }
 
   public UVertex normal() {
-    getVertices();
+    getV();
     
     normal=UVertex.cross(
         UVertex.delta(v[1],v[0]), 
