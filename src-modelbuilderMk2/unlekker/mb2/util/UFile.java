@@ -11,7 +11,6 @@ import java.util.zip.GZIPOutputStream;
 import processing.core.PApplet;
 
 public class UFile implements UConst {
-  protected static PApplet papplet;
   public static String currDir;
   
   /**
@@ -36,20 +35,13 @@ public class UFile implements UConst {
   // PApplet methods
   
   /**
-   * Set PApplet reference to get access to dataPath and sketchPath
-   * @param papplet
-   */
-  public static void setPApplet(PApplet papplet) {
-    UFile.papplet=papplet;
-  }
-
-  /**
    * Returns path prefixed with dataPath from PApplet reference if set,
    * if not returns path unmodified.  
    * @param path
    * @return
    */
   public static String dataPath(String path) {
+    PApplet papplet=UBase.getPApplet();
     if(papplet!=null) return papplet.dataPath(path);
     return path;
   }
@@ -61,6 +53,7 @@ public class UFile implements UConst {
    * @return
    */
   public static String sketchPath(String path) {
+    PApplet papplet=UBase.getPApplet();
     if(papplet!=null) return papplet.sketchPath(path);
     return path;
   }
@@ -180,7 +173,7 @@ public class UFile implements UConst {
       
       
       UBase.logDivider(filename);
-      new File(getPath(filename)).mkdirs();
+//      new File(getPath(filename)).mkdirs();
       
       if(filename.endsWith("gz")) {
         out=new GZIPOutputStream(new FileOutputStream(filename));
@@ -224,7 +217,7 @@ public class UFile implements UConst {
   /**
    * Fixes path String: DOS-style '\' becomes '/', also appends '/'
    * if string does not aready have one.
-   * @param name
+   * @param path
    * @return
    */
   public static String fixPath(String path) {
@@ -250,10 +243,10 @@ public class UFile implements UConst {
   public static String getPath(String path) {
     if(path==null) return null;
 
-    if(path.indexOf(DIRCHAR)==-1 && path.indexOf(DIRCHARDOS)==-1) return ""; 
+//    if(path.indexOf(DIRCHAR)==-1 && path.indexOf(DIRCHARDOS)==-1) return ""; 
 
     path=path.replace(DIRCHARDOS, DIRCHAR);
-    path=path.substring(0,path.indexOf(DIRCHAR)-1);
+    path=path.substring(0,path.lastIndexOf(DIRCHAR));
     
     return path;
   }
@@ -290,25 +283,30 @@ public class UFile implements UConst {
     return name.substring(pos+1);
   }
   
-  /**
-   * Finds the canonical path of the current directory.
-   * @return Name of current directoy
-   */
   public static String getAbsolutePath(String name) {
-    File f=new File(name);    
-    if(f.isAbsolute()) return name;
+    PApplet papplet=UBase.getPApplet();
 
-    if(papplet!=null) {
-      name=papplet.sketchPath(name);
-      name=fixPath(name);
-    }
-    else {
-      if(currDir==null) currDir=getCurrentDir();
-      name=currDir+DIRCHAR+name;
+    String path=fixPath(getPath(name));
+    name=noPath(name);
+    
+    File f=new File(path+name);    
+    
+    if(!f.isAbsolute()) {
+      if(papplet!=null) {
+        path=papplet.sketchPath(path);
+      }
+      else {
+        if(currDir==null) currDir=getCurrentDir();
+        path=currDir+DIRCHAR+path;
+      }
     }
 
+    File ff=new File(path);
+    ff.mkdirs();
+    UBase.log("ff "+ff.getAbsolutePath()+" "+name);
+//    ff.
 //    if(debugLevel>2) Util.log("IO.getAbsolutePath "+s);
-    return name;
+    return path+name;
   }
 
 

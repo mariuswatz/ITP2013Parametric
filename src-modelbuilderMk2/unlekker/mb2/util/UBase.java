@@ -7,41 +7,86 @@ import java.util.Iterator;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
-import processing.core.PGraphics3D;
 import unlekker.mb2.geo.UGeo;
 import unlekker.mb2.geo.UVertex;
 
+/**
+ * 
+ * UBase is the base class for most of the classes in ModelbuilderMk2, meaning that
+ * they all extend this class and thus inherit the capabilities it provides. This
+ * includes a host of convenient tools for common tasks such as math and string formatting.
+ *  
+ *  It also provides the <code>setGraphics()</code> mechanism for designating a shared PApplet / PGraphics instance,
+ *  so that geometry can be drawn directly to PGraphics. 
+ * 
+ * @author <a href="https://github.com/mariuswatz">Marius Watz</a>
+ *
+ */
 public class UBase implements UConst {
+
+  /**
+   * Options like <code>NODUPL</code>, <code>NOCOPY</code> etc. encoded as bit flags stored as an int. Options can be
+   * toggled and checked with <code>enable()</code> and <code>isEnabled()</code>
+   */
   public int options;
+  
   private static String[] optionNames;
   
   
+  protected static PApplet papplet=null;
   protected static PGraphics g;
-  protected static PGraphics3D g3d;
   protected static int gErrorCnt=0;
 
   public UBase ptranslate(UVertex v) {
-    if(checkGraphicsSet()) {
-      g.translate(v.x, v.y,v.z);
-    }
-    
+    if(checkGraphicsSet()) g.translate(v.x, v.y,v.z);
     return this;
   }
 
-  public void setOptions(int opt) {
+  public UBase pvertex(UVertex v) {
+    if(checkGraphicsSet()) g.vertex(v.x, v.y,v.z);
+    return this;
+  }
+
+  public UBase pfill(int col) {
+    if(checkGraphicsSet()) g.fill(col);
+    return this;
+  }
+
+  public UBase pstroke(int col) {
+    if(checkGraphicsSet()) g.stroke(col);
+    return this;
+  }
+
+  public UBase pnoFill() {
+    if(checkGraphicsSet()) g.noFill();
+    return this;
+  }
+
+  public UBase pnoStroke() {
+    if(checkGraphicsSet()) g.noStroke();
+    return this;
+  }
+
+  public UBase setOptions(int opt) {
     options=opt;
+//    log(optionStr());
+    return this;
   }
 
-  public void enable(int opt) {
+  public UBase enable(int opt) {
     options=options|opt;
+//    log(optionStr());
+    return this;
   }
 
-  public boolean enabled(int opt) {
+  public boolean isEnabled(int opt) {
     return (options & opt)==opt;
   }
 
-  public void disable(int opt) {
+  public UBase disable(int opt) {
     options=options  & (~opt);
+//    log(optionStr());
+    return this;
   }
   
   public String optionStr() {
@@ -54,10 +99,10 @@ public class UBase implements UConst {
     }
     
     StringBuffer buf=new StringBuffer();
-    if(enabled(NODUPL)) buf.append(optionNames[NODUPL]).append(TAB);
-    if(enabled(NOCOPY)) buf.append(optionNames[NOCOPY]).append(TAB);
-    if(enabled(COLORFACE)) buf.append(optionNames[COLORFACE]).append(TAB);
-    if(enabled(COLORVERTEX)) buf.append(optionNames[COLORVERTEX]).append(TAB);
+    if(isEnabled(NODUPL)) buf.append(optionNames[NODUPL]).append(TAB);
+    if(isEnabled(NOCOPY)) buf.append(optionNames[NOCOPY]).append(TAB);
+    if(isEnabled(COLORFACE)) buf.append(optionNames[COLORFACE]).append(TAB);
+    if(isEnabled(COLORVERTEX)) buf.append(optionNames[COLORVERTEX]).append(TAB);
 
     if(buf.length()>0) {
       buf.deleteCharAt(buf.length()-1);
@@ -85,13 +130,8 @@ public class UBase implements UConst {
     String s="",tmp;
     
     int a=(col >> 24) & 0xff;
-    if(a<255) {
-      tmp=Integer.toHexString(a);
-      if(tmp.length()<2) s+="0"+tmp;
-      else s+=tmp;
-    }
-  
-    char ZERO='0';
+    if(a<255) s+=strPad(Integer.toHexString(a),2,ZERO);
+    
     s+=strPad(Integer.toHexString((col>>16)&0xff),2,ZERO);
     s+=strPad(Integer.toHexString((col>>8)&0xff),2,ZERO);
     s+=strPad(Integer.toHexString((col)&0xff),2,ZERO);
@@ -114,7 +154,7 @@ public class UBase implements UConst {
     else for(int i=0; ok && i<hex.length(); i++) {
       char ch=hex.charAt(i);
       if(!(
-          Character.isAlphabetic(ch) ||
+          Character.isLetter(ch) ||
               Character.isDigit(ch)
               )) ok=false;
     }
@@ -320,27 +360,37 @@ public class UBase implements UConst {
   
   
   //////////////////////////////////////////
-  // SET / GET PGRAPHICS 
-  
+  // SET + GET PAPPLET AND PGRAPHICS 
+
+  public static void setPApplet(PApplet papplet) {
+    UBase.papplet=papplet;    
+  }
+
+  public static PApplet  getPApplet() {
+    return UBase.papplet;    
+  }
+
   public static boolean checkGraphicsSet() {
     if(g==null) {
       if(gErrorCnt%100==0) logErr("ModelbuilderMk2: No PGraphics set. Use UGeo.setGraphics(PApplet).");
       gErrorCnt++;
+      return false;
     }
     return true;
   }
   
-  public static PGraphics3D getGraphics() {
-    return g3d;
+  public static PGraphics getGraphics() {
+    return g;
   }
 
   public static void setGraphics(PApplet papplet) {
+    UBase.papplet=papplet;
     setGraphics(papplet.g);
   }
 
   public static void setGraphics(PGraphics gg) {
     UBase.g=gg;
-    UBase.g3d=(PGraphics3D)gg;
+//    UBase.g3d=(PGraphics3D)gg;
   }
 
   //////////////////////////////////////////
@@ -404,7 +454,7 @@ public class UBase implements UConst {
    *          Number to format
    * @param lead
    *          Minimum number of leading digits
-   * @param digits
+   * @param decimal
    *          Number of decimal digits to show
    * @return Formatted number string
    */

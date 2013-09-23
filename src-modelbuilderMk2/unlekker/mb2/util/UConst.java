@@ -1,6 +1,8 @@
 package unlekker.mb2.util;
 
 public interface UConst extends processing.core.PConstants {
+  public static final int NOCOPY=1,NODUPL=2;
+  
   /**
    * Version identifier for this release of the Modelbuilder library
    */
@@ -14,7 +16,7 @@ public interface UConst extends processing.core.PConstants {
   public static final int XYZ=0,XZY=1;
   public static final int YZX=2, YXZ=3,ZXY=5, ZYX=6;
 
-  public static final char TAB='\t',COMMA=',',SPACE=' ';
+  public static final char TAB='\t',COMMA=',',SPACE=' ',ZERO='0';
   public static final char DIRCHAR='/',DIRCHARDOS='\\',NEWLN='\n';      
   public static final String DIRSTR="/",DIRSTRDOS="\\";      
   public static final String ENCLSQ="[]",ENCLTAG="<>";
@@ -30,5 +32,4 @@ public interface UConst extends processing.core.PConstants {
   public static final int VIDWQXGAW=2560,VIDWQXGAH=1600;
   
   public static final int COLORVERTEX=8,COLORFACE=4;
-  public static final int NOCOPY=1,NODUPL=2;
 }

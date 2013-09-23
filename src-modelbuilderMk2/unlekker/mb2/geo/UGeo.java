@@ -25,12 +25,30 @@ public class UGeo extends UBase  {
     set(v);
   }
 
+  public UGeo add(UGeo model) {
+    for(UFace ff:model.getFaces()) {
+      UVertex vv[]=ff.getV();
+      addFace(vv);
+    }
+    return this;
+    
+  }
+
   public UGeo copy() {
     return new UGeo(this);
   }
 
   public UGeo set(UGeo v) {
+    for(UFace ff:v.faces) {
+      addFace(ff.getV());
+    }
    return this;
+  }
+
+  public static int sizeF(ArrayList<UGeo> models) {
+    int n=0;
+    for(UGeo gg:models) if(gg!=null) n+=gg.sizeF();
+    return n;
   }
 
   public int sizeF() {
@@ -61,7 +79,7 @@ public class UGeo extends UBase  {
     if(checkGraphicsSet()) {
       g.beginShape(TRIANGLES);
       
-      int opt=(enabled(COLORFACE) ? COLORFACE : 0);
+      int opt=(isEnabled(COLORFACE) ? COLORFACE : 0);
       for(UFace f:faces) {
         if(opt==COLORFACE) g.fill(f.col);
         draw(f.getV());
@@ -214,6 +232,9 @@ public class UGeo extends UBase  {
     return this;
   }
   
+  public UGeo addFace(UVertex vv[]) {
+    return addFace(vv[0], vv[1], vv[2]);
+  }
   
   public UGeo addFace(UVertex v1, UVertex v2, UVertex v3) {
     faces.add(new UFace(this, v1,v2,v3));    
@@ -246,9 +267,9 @@ public class UGeo extends UBase  {
   /**
    * Add vertex list to shape being built by <code>beginShape() / endShape()</code>. 
    * All vertices are copied, leaving the original instances unchanged.
-   * @param vl 
+   * @param vvl Vertex list
    * @param reverseOrder Add in reverse order?
-   * @return 
+   * @return UGeo
    */
   public UGeo vertex(UVertexList vvl,boolean reverseOrder) {
     if(reverseOrder) {
@@ -307,10 +328,36 @@ public class UGeo extends UBase  {
     return this;
   }
 
+  public UGeo triangleFan(UVertex c,UVertexList vl) {
+    return triangleFan(c, vl,false);
+  }
+
+  public UGeo triangleFan(UVertex c,UVertexList vl,boolean reverse) {
+    beginShape(TRIANGLE_FAN);
+    vertex(c);
+    vertex(vl,reverse);
+    endShape();
+    
+    return this;
+  }
+
+  /**
+   * Add triangle fan using the vertices in <code>vl</code>, with the centroid of
+   * <code>vl</code> as the central vertex.
+   * @param vl
+   * @return
+   */
   public UGeo triangleFan(UVertexList vl) {
     return triangleFan(vl,false);
   }
 
+  /**
+   * Add triangle fan using the vertices in <code>vl</code>, with the centroid of
+   * <code>vl</code> as the central vertex. 
+   * @param vl
+   * @param reverse Flag to indicate whether vertices should be added in reverse order
+   * @return
+   */
   public UGeo triangleFan(UVertexList vl,boolean reverse) {
     boolean omit=vl.last().equals(vl.first());
     log("omit "+omit);

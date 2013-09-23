@@ -4,6 +4,7 @@ ModelbuilderMk2 - TODO
 + UVertexList and UGeo: Support NODUPL/NOCOPY options
 + UVertexList: enable(NODUPL) should remove duplicate vertices
 + Implement bounding box UBB
++ UPrimitive - static generator of common geometric objects
 + Clarify methods related to UV for UVertexList and UVertex
 + UGeo: Add UGeo meshes to each other
 + UGeo: Remove faces

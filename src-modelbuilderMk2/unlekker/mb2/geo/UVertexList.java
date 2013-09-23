@@ -9,9 +9,16 @@ import processing.core.PGraphics3D;
 import unlekker.mb2.util.UBase;
 
 /**
+ * 
+ * Auto-growing list of UVertex objects that are internally stored as an <code>ArrayList<UVertex></code>.. 
+ * The default behavior is to add vertices by copy rather than reference, without checking for duplicate vertices. 
+ * This is convenient for most cases but can cause problems for per-vertex transformations and STL output.
+ * 
+ * Adding by reference can be activated by calling <code>enable(NOCOPY);</code>, duplicate checking is activated by
+ * <code>enable(NODUPL);</code> 
+ * 
  * TODO
- * - No dupl / no copy
- * - addID
+ * - NODUPL / NOCOPY is not consistently implemented.
  * 
  * @author marius
  *
@@ -24,6 +31,8 @@ public class UVertexList extends UBase implements Iterable<UVertex> {
   
   public UVertexList() {
     v=new ArrayList<UVertex>();
+    disable(NOCOPY);
+    disable(NODUPL);
   }
 
   public UVertexList(int options) {
@@ -96,14 +105,6 @@ public class UVertexList extends UBase implements Iterable<UVertex> {
     return centroid(false);
   }
   
-  public boolean allowDupl() {
-    return !((options & NODUPL)==NODUPL);
-  }
-
-  public boolean allowCopy() {
-    return !((options & NOCOPY)==NOCOPY);
-  }
-  
   public UVertexList clear() {
     v.clear();
     return this;
@@ -156,9 +157,14 @@ public class UVertexList extends UBase implements Iterable<UVertex> {
   }
 
   public UVertexList add(UVertex v1) {
-    v.add(allowCopy() ? v1.copy() : v1);
-    
+    if(isEnabled(NODUPL) && v.contains(v1)) {
+      log("Duplicate: "+v1+" "+ v.contains(v1));
+      return this;
+    }
+
+    v.add(isEnabled(NOCOPY) ? v1 : v1.copy());      
     bb=null;
+
     return this;
   }
 
@@ -186,7 +192,7 @@ public class UVertexList extends UBase implements Iterable<UVertex> {
 //    add(v);    
     bb=null;
     
-    v1=allowCopy() ? v1.copy() : v1;
+    v1=isEnabled(NOCOPY) ? v1 : v1.copy();
     v.add(v1);
 
     return indexOf(v1);
@@ -243,9 +249,29 @@ public class UVertexList extends UBase implements Iterable<UVertex> {
 
   public UVertexList close() {
     return add(first());
-    
   }
 
+  public UVertexList removeDupl(boolean doRemove) {
+    int id=0;
+    
+    while(id<v.size()) {
+      int index=indexOf(v.get(id));
+      if(index<id) {
+        
+        if(doRemove) { // REMOVE FROM LIST
+          v.remove(id);
+          id--;
+        }
+        else { // REPLACE WITH DUPLICATE OBJECT
+          v.set(id, v.get(index));
+        }
+      }
+      id++;
+    }    
+    
+    return this;
+  }
+  
   //////////////////////////////////////////
   // UV methods
 
@@ -326,7 +352,20 @@ public class UVertexList extends UBase implements Iterable<UVertex> {
   }
 
   public String str() {
-    return "["+size()+TAB+str(v)+"]";
+    return "["+size()+TAB+str(v,TAB,null)+"]";
+  }
+
+  public String strWithID() {
+    StringBuffer buf=strBufGet();
+    buf.append(size()).append(TAB);
+    for(UVertex vv:v) {
+      if(vv!=null) buf.append(vv.ID).append('=').append(vv.str()).append(TAB);
+      else buf.append("NULL").append(TAB);
+    }
+    
+    if(size()>0) buf.deleteCharAt(buf.length()-1);
+    
+    return "["+strBufDispose(buf)+"]";
   }
 
   public UVertexList reverse() {

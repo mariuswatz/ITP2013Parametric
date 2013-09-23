@@ -3,7 +3,7 @@ package unlekker.mb2.geo;
 import processing.core.PVector;
 import unlekker.mb2.util.UBase;
 
-public class UVertex extends UBase implements Comparable {
+public class UVertex extends UBase  {
   public static int globalID;
 
   public int ID;  
@@ -82,7 +82,8 @@ public class UVertex extends UBase implements Comparable {
     return set(Math.cos(angle),Math.sin(angle),0);
   }
 
-  public boolean equals(UVertex v) {
+  public boolean equals(Object o) {
+    UVertex v=(UVertex)o;
     if(this==v || v.ID==ID) return true;
     if(distSimple(v)<EPSILON) return true;
     return false;
@@ -329,6 +330,20 @@ public class UVertex extends UBase implements Comparable {
 
   public UVertex setColor(float a,float b,float c) {
     return setColor(color(a,b,c));
+  }
+
+  public static UVertex centroid(UVertex[] v2) {
+    if(v2==null || v2.length==0) return null;
+    
+    UVertex tmp=new UVertex();
+    
+    int cnt=0;
+    for(UVertex vv:v2) if(vv!=null) {
+      tmp.add(vv);
+      cnt++;
+    }
+    
+    return tmp.div(cnt);    
   }
   
 }

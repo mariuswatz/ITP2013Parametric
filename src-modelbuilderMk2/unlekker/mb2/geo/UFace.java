@@ -4,6 +4,13 @@ import java.util.Arrays;
 
 import unlekker.mb2.util.UBase;
 
+/**
+ * TODO  
+ * - UFace.equals(Object o)
+ * 
+ * @author marius
+ *
+ */
 public class UFace extends UBase  {
   public static int globalID=0;
 
@@ -13,7 +20,7 @@ public class UFace extends UBase  {
   public UVertex v[];
   
   public int col;
-  public UVertex normal;
+  public UVertex normal,centroid;
   
   public UFace() {
     ID=globalID++;
@@ -97,6 +104,13 @@ public class UFace extends UBase  {
 
   public UFace setColor(float a,float b,float c) {
     return setColor(color(a,b,c));
+  }
+
+  public UVertex centroid() {
+    getV();
+    centroid=UVertex.centroid(v);
+    
+    return centroid;
   }
 
   public UVertex normal() {

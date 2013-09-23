@@ -38,9 +38,7 @@ public class URnd implements Serializable {
     
     /**
      * Randomly returns true or false.
-     * @see #rand
-     * @see #randInt
-     * @see #prob   * @return boolean
+     * @return boolean
      *
      **/
 
@@ -66,11 +64,8 @@ public class URnd implements Serializable {
     }
 
     /**
-     * Returns true if random00) returns a result greater than the parameter "chance".
-     * @param chance double
-     * @see #rand
-     * @see #randInt
-     * @see #randBool
+     * Returns true if random(chance) returns a result greater than the parameter "chance".
+     * @param chance Probability in range [0..100]
      * @return boolean
      */
 
@@ -79,12 +74,10 @@ public class URnd implements Serializable {
     }
 
     /**
-     * Returns a rand value in the ranges [0..1&gt;, [0..range&gt; or [min..max&gt; depending on the version used.
-     * @see #randInt 
-     * @see #randBool
-     * @see #probprob @return float
-     * */
-
+     * Returns a random value in the ranges [0..1&gt;, [0..range&gt; or [min..max&gt; depending on the version used.
+     * @return float
+     * 
+     */
     public float random() {
       return mt.nextFloat();
     }
@@ -98,12 +91,8 @@ public class URnd implements Serializable {
     }
 
     /**
-     * Returns a rand integer value in the range [0..range-1&gt; or [min..max-1&gt;.
      * @param range 
-     * @see #rand
-     * @see #randBool
-     * @see #prob
-  probturn int
+     * @return int Random integer value in the range [0..range-1&gt; or [min..max-1&gt;.
      */
 
     public int integer(int range) {

@@ -2,6 +2,7 @@ todo/
 nosync/
 lib/
 *.xml
+sketchbook/
 
 #################
 ## Eclipse
