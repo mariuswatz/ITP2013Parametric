@@ -63,7 +63,7 @@ public class UNav3D extends UMbMk2 {
     theKeyEvent=ev;
     
     if(ev.getAction() == KeyEvent.PRESS) keyPressed(ev);
-//    else if(ev.getAction() == KeyEvent.RELEASE) keyReleased(ev);
+    else if(ev.getAction() == KeyEvent.RELEASE) keyReleased(ev);
   }
   
   public void keyReleased(KeyEvent ev) {
