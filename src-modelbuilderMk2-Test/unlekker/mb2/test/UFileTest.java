@@ -1,3 +1,6 @@
+/*
+ * modelbuilderMk2
+ */
 package unlekker.mb2.test;
 
 import java.util.ArrayList;
@@ -6,7 +9,7 @@ import processing.core.PApplet;
 import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
 import unlekker.mb2.geo.UVertexList;
-import unlekker.mb2.util.UBase;
+import unlekker.mb2.util.UMbMk2;
 import unlekker.mb2.util.UFile;
 
 public class UFileTest extends PApplet {
@@ -19,16 +22,16 @@ public class UFileTest extends PApplet {
     println(path);
     
 //    UBasic.log(UBasic.str(UFile.list(path)));
-    UBase.logDivider(path);
-    UBase.log(UBase.str(UFile.list(path,"NovoShards")));
-    UBase.logDivider(path);
-    UBase.log(UBase.str(UFile.listByExtension(path, "gz")));
+    UMbMk2.logDivider(path);
+    UMbMk2.log(UMbMk2.str(UFile.list(path,"NovoShards")));
+    UMbMk2.logDivider(path);
+    UMbMk2.log(UMbMk2.str(UFile.listByExtension(path, "gz")));
     
-    UBase.logDivider(path);
-    UBase.log(UFile.last(path, "NovoFinal04A-G","gz"));
-    UBase.log(UFile.noExt(UFile.last(path, "NovoFinal04A-G","gz")));
-    UBase.log(UFile.lastIndex(path, "NovoFinal04A-G"));
-    UBase.log(UFile.nextFilename(path, "NovoFinal04A-G"));
+    UMbMk2.logDivider(path);
+    UMbMk2.log(UFile.last(path, "NovoFinal04A-G","gz"));
+    UMbMk2.log(UFile.noExt(UFile.last(path, "NovoFinal04A-G","gz")));
+    UMbMk2.log(UFile.lastIndex(path, "NovoFinal04A-G"));
+    UMbMk2.log(UFile.nextFilename(path, "NovoFinal04A-G"));
   }
 
   public void draw() {

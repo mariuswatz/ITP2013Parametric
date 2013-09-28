@@ -1,3 +1,6 @@
+/*
+ * modelbuilderMk2
+ */
 package unlekker.mb2.test;
 
 import java.util.ArrayList;
@@ -62,8 +65,8 @@ public class UGeoTestSTL extends PApplet {
     
     
     // randomize face colors
-    int id=0,n=geo.getFaces().size();           
-    for(UFace f:geo.getFaces()) {
+    int id=0,n=geo.getF().size();           
+    for(UFace f:geo.getF()) {
       UVertex fv[]=f.getV();
       f.setColor(fv[0].U*255,fv[0].V*155+100,fv[0].V*255);
     }
