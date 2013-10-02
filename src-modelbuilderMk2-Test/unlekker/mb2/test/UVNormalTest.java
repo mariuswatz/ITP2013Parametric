@@ -10,7 +10,7 @@ import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
 import unlekker.mb2.geo.UVertex;
 import unlekker.mb2.geo.UVertexList;
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
 public class UVNormalTest extends PApplet {
   ArrayList<UVertexList> vvl;
@@ -21,7 +21,7 @@ public class UVNormalTest extends PApplet {
   public void setup() {
     size(600,600,OPENGL);
     
-    UMbMk2.setPApplet(this);
+    UMB.setPApplet(this);
     UVertexList tri=new UVertexList();
     UVertex v=new UVertex(200,0,0);
     

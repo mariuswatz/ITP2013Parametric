@@ -7,13 +7,13 @@ String dir;
 
 void getFilelist() {
   if (dir==null) dir=sketchPath("data")+"/";
-  UBase.logDivider(dir);
+  UMB.logDivider(dir);
 
   // get list of .svg files in "data" folder
   filenames=UFile.list(dir, null, "svg");
 
   // print file list
-  UBase.log(UBase.str(filenames));
+  UMB.log(UMB.str(filenames));
 }
 
 void randomSVG() {

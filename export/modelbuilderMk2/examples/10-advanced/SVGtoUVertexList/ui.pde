@@ -9,7 +9,7 @@ void drawCredit() {
 
   fill(255);
   textAlign(RIGHT);
-  text(UBase.version()+" + Geomerative", width-5, 15);
+  text(UMB.version()+" + Geomerative", width-5, 15);
   textAlign(LEFT);
   text(this.getClass().getSimpleName(), 5, 15);
 }

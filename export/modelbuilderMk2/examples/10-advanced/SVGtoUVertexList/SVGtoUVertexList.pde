@@ -28,7 +28,7 @@ UVertexList vl;
 
 void setup() {
   size(600, 600, P3D);
-  UBase.setPApplet(this);
+  UMB.setPApplet(this);
 
   // get list of SVG files in "data" folder
   getFilelist();

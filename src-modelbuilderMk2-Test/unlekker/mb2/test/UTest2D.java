@@ -7,7 +7,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import unlekker.mb2.geo.UVertex;
 import unlekker.mb2.geo.UVertexList;
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
 public class UTest2D extends UTest {
   PGraphics gg;
@@ -15,7 +15,7 @@ public class UTest2D extends UTest {
   
   public void init() {
     gg=p.createGraphics(600, 600,JAVA2D);
-    UMbMk2.setGraphics(gg);
+    UMB.setGraphics(gg);
 
     vl=new UVertexList();
     for(int i=0; i<12; i++) {
@@ -30,8 +30,8 @@ public class UTest2D extends UTest {
   public void draw() {
     gg.beginDraw();
     gg.background(100);
-    UMbMk2.pstroke(255).pnoFill();
-    UMbMk2.ptranslate(p.width/2, p.height/2);
+    UMB.pstroke(255).pnoFill();
+    UMB.ptranslate(p.width/2, p.height/2);
     vl.draw();
     vl.bb().draw();
     gg.endDraw();

@@ -2,7 +2,7 @@ void build() {
   vl=new UVertexList();
   UVertex v=new UVertex(100, 0);
   
-  int n=UBase.rndInt(10,50);
+  int n=UMB.rndInt(10,50);
   
   for (int i=0; i<n; i++) {
     vl.add(v.copy().rotZ(map(i, 0, n, 0, TWO_PI)).

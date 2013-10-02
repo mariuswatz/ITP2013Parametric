@@ -16,7 +16,7 @@ UNav3D nav;
 
 public void setup() {
   size(600, 600, OPENGL);
-  UBase.setPApplet(this);
+  UMB.setPApplet(this);
   nav=new UNav3D();
   nav.rot.set(radians(15),radians(30),0);
 

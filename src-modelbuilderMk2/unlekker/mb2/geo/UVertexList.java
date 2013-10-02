@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import processing.core.PVector;
 import processing.opengl.*;
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
 /**
  * 
@@ -24,7 +24,7 @@ import unlekker.mb2.util.UMbMk2;
  * @author marius
  *
  */
-public class UVertexList extends UMbMk2 implements Iterable<UVertex> {
+public class UVertexList extends UMB implements Iterable<UVertex> {
   public ArrayList<UVertex> v;
   public int options;
   public UBB bb;
@@ -45,6 +45,38 @@ public class UVertexList extends UMbMk2 implements Iterable<UVertex> {
     UVertexList cvl=new UVertexList();
     for(UVertex vv:v) cvl.add(vv);
     return cvl;
+  }
+
+  public UVertexList copyNoDupl() {
+    UVertexList cvl=new UVertexList();
+    cvl.enable(NODUPL);
+    for(UVertex vv:v) cvl.add(vv);
+    return cvl;
+  }
+
+  /**
+   * Returns a new UVertexList that resamples the vertex data of 
+   * this list to a specified number of vertices. Resampling is 
+   * currently done by simple interpolation, using {@see #point(float)}. 
+   * @param n Number of points in the new list.
+   * @return
+   */
+  public UVertexList resample(int n) {
+    UVertexList cvl=new UVertexList();
+    for(int i=0; i<n; i++)
+      cvl.add(point(map(i,0,n-1,0,1)));
+    return cvl;
+  }
+  
+  public UVertex point(float t) {
+    if(t<EPSILON) return v.get(0);
+    if(t>1-EPSILON) return last();
+    
+    t*=(float)size();
+    int id=(int)Math.floor(t);
+    t=t-(float)id;
+    
+    return UVertex.lerp(t, v.get(id), v.get(id+1));
   }
   
   /**
@@ -137,6 +169,19 @@ public class UVertexList extends UMbMk2 implements Iterable<UVertex> {
     return bb().dim;
   }
 
+  /**
+   * Returns UVertex instance where x,y,z represent the
+   * size of this mesh in the X,Y,Z dimensions.  
+   * @return
+   */
+  public UVertex dim() {
+    return bb().dim;
+  }
+
+  public float dimX() {return dim().x;}
+  public float dimY() {return dim().y;}
+  public float dimZ() {return dim().z;}
+
   public UVertex centroid() {
     bb();
     return bb.centroid;
@@ -224,6 +269,11 @@ public class UVertexList extends UMbMk2 implements Iterable<UVertex> {
   }
 
   public UVertexList add(UVertex v1) {
+    if(v1==null) {
+      v.add(null);
+      return this;
+    }
+    
     if(isEnabled(NODUPL) && v.contains(v1)) {
       log("Duplicate: "+v1+" "+ v.contains(v1));
       return this;
@@ -268,6 +318,17 @@ public class UVertexList extends UMbMk2 implements Iterable<UVertex> {
     v.add(v1);
 
     return indexOf(v1);
+  }
+
+  public UVertexList remove(int id) {
+    v.remove(id);
+    return this;
+  }
+
+  public UVertexList remove(int id1,int id2) {
+    int n=id2-id1;
+    while((n--)>0) v.remove(id1);
+    return this;
   }
 
   public UVertexList scale(float mx,float my,float mz) {

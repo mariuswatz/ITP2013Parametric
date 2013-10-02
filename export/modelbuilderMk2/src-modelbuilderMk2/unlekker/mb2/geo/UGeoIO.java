@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 import unlekker.mb2.util.UFile;
 
 
@@ -27,7 +27,7 @@ public class UGeoIO {
 
       out.flush();
       out.close();
-      UMbMk2.log("Closing '"+filename+"'. "+faceNum+" triangles written.\n");
+      UMB.log("Closing '"+filename+"'. "+faceNum+" triangles written.\n");
     } catch (Exception e) {
       res=false;
       e.printStackTrace();
@@ -46,7 +46,7 @@ public class UGeoIO {
 
       out.flush();
       out.close();
-      UMbMk2.log("Closing '"+filename+"'. "+faceNum+" triangles written.\n");
+      UMB.log("Closing '"+filename+"'. "+faceNum+" triangles written.\n");
     } catch (Exception e) {
       res=false;
       e.printStackTrace();
@@ -61,7 +61,7 @@ public class UGeoIO {
 
     out=(FileOutputStream)UFile.getOutputStream(filename);
     writeSTLHeader(faceNum);
-    UMbMk2.logDivider("Writing STL '"+filename+"' "+faceNum);
+    UMB.logDivider("Writing STL '"+filename+"' "+faceNum);
     
     return filename;
   }

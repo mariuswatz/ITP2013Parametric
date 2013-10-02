@@ -9,7 +9,7 @@ void build() {
   UVertexList.setGraphics(g);
   vl=new UVertexList();
 
-  int n=UBase.rndInt(4, 9)*2;
+  int n=UMb.rndInt(4, 9)*2;
   for (int i=0; i<n; i++) {
     float w=25+(i%2)*50;
     vl.add(new UVertex(w, 0, 0).

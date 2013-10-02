@@ -7,9 +7,9 @@ import java.awt.event.MouseWheelListener;
 
 import processing.event.MouseEvent;
 import processing.event.KeyEvent;
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
-public class UNav3D extends UMbMk2 {
+public class UNav3D extends UMB {
   public UVertex trans,rot;
   public float guiSpeed=5;
   public boolean enabled=true;

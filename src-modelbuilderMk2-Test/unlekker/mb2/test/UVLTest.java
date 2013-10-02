@@ -12,7 +12,7 @@ import unlekker.mb2.geo.UGeoIO;
 import unlekker.mb2.geo.UNav3D;
 import unlekker.mb2.geo.UVertex;
 import unlekker.mb2.geo.UVertexList;
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 import unlekker.mb2.util.UFile;
 
 public class UVLTest extends PApplet {
@@ -24,7 +24,7 @@ public class UVLTest extends PApplet {
   
   public void setup() {
     size(600,600, OPENGL);
-    UMbMk2.setPApplet(this);
+    UMB.setPApplet(this);
     
     // create navigation tool
     nav=new UNav3D();

@@ -5,7 +5,7 @@ package unlekker.mb2.geo;
 
 import java.util.Arrays;
 
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
 /**
  * TODO  
@@ -14,7 +14,7 @@ import unlekker.mb2.util.UMbMk2;
  * @author marius
  *
  */
-public class UFace extends UMbMk2  {
+public class UFace extends UMB  {
   public static int globalID=0;
 
   public UGeo parent;
@@ -45,6 +45,12 @@ public class UFace extends UMbMk2  {
 //    log("F "+ID+" "+vID[0]+" "+vID[1]+" "+vID[2]);
   }
 
+  public UFace(UGeo model, int[] ID) {
+    this();
+    parent=model;
+    vID=new int[] {ID[0],ID[1],ID[2]};
+  }
+
   public UFace set(UVertex v1, UVertex v2, UVertex v3) {
     if(parent!=null) {
       vID[0]=parent.addVertex(v1);
@@ -61,8 +67,35 @@ public class UFace extends UMbMk2  {
    
     return this;
   }
-  
-  public void draw() {
+
+  public UFace drawNormal(float len) {
+    return drawNormal(len,true);
+  }
+
+  public UFace drawNormal(float len,boolean centerOnly) {
+    if(checkGraphicsSet()) {  
+      UVertex n=normal();
+      
+      if(centerOnly) {
+        ppush().ptranslate(centroid());
+        g.line(0, 0, 0, n.x*len,n.y*len,n.z*len);
+        ppop();
+      }
+      else {
+        getV();
+        for(UVertex vert:v) {
+          ppush().ptranslate(vert);
+          g.line(0, 0, 0, n.x*len,n.y*len,n.z*len);
+          ppop();
+        }
+
+      }
+    }
+
+    return this;
+  }
+
+  public UFace draw() {
     if(checkGraphicsSet()) {
       if(col!=Integer.MAX_VALUE) g.fill(col);
       if(v==null) getV();
@@ -70,6 +103,8 @@ public class UFace extends UMbMk2  {
       pvertex(v);
       g.endShape();
     }
+    
+    return this;
   }
 
   public UVertex[] getV(boolean force) {
@@ -122,14 +157,35 @@ public class UFace extends UMbMk2  {
     if(centroid==null) {
       getV();
       centroid=new UVertex().
-          add(v[0]).add(v[1]).add(v[2]).div(3);
+          add(v[0]).add(v[1]).add(v[2]);
+      log(UVertex.str(v)+" -> "+centroid.str());
+      centroid.div(3);
     }
     
     return centroid;
   }
 
-  public UVertex normal() {
+  public UFace reverse() {
+    if(parent!=null) {
+      vID=new int[] {vID[0],vID[2],vID[1]};
+      v=null;
+    }
+    else {
+      UVertex v2=v[2];
+      v[2]=v[1];
+      v[1]=v2;
+    }
+    
+    if(normal!=null) {
+      normal=null;
+      normal();
+    }
+    return this;
+  }
   
+  public UVertex normal() {
+    if(normal!=null) return normal;
+        
     getV();
     
     normal=UVertex.cross(

@@ -7,7 +7,7 @@ import ec.util.*;
   
   public void setup() {
     size(600,600, OPENGL);
-    UBase.setGraphics(this);
+    UMB.setGraphics(this);
 
     build();    
   }
@@ -84,5 +84,5 @@ void build() {
 
     
     vl2=vl.copy();
-    for(UVertex vv:vl2) vv.z=UBase.rndSigned(50,100);
+    for(UVertex vv:vl2) vv.z=UMB.rndSigned(50,100);
 }

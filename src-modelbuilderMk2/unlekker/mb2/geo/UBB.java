@@ -3,9 +3,9 @@
  */
 package unlekker.mb2.geo;
 
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
-public class UBB extends UMbMk2 {
+public class UBB extends UMB {
   public UVertex centroid,min,max,dim;
   private UVertexList vl;
   

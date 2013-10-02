@@ -5,9 +5,15 @@ package unlekker.mb2.geo;
 
 import java.util.ArrayList;
 
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
-public class UEdge extends UMbMk2 {
+
+/**
+ * WORK IN PROGRESS - NOT FUNCTIONAL
+ * @author marius
+ *
+ */
+public class UEdge extends UMB {
   public static int globalID=0;
 
   public UGeo parent;
@@ -33,6 +39,8 @@ public class UEdge extends UMbMk2 {
     if(model!=null) parent=model;
     
     set(v1,v2);
+    
+//    UVertex.cross(v, v2)
   }
 
   public UEdge set(int id1,int id2) { 

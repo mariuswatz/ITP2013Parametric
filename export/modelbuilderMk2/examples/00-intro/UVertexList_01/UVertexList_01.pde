@@ -8,8 +8,8 @@ UGeo geo;
 public void setup() {
   size(600, 600, OPENGL);
 
-  // pass this PApplet instance to UBase for easy drawing
-  UBase.setGraphics(this);
+  // pass this PApplet instance to UMB for easy drawing
+  UMB.setGraphics(this);
 
   build();
 }

@@ -6,9 +6,15 @@ package unlekker.mb2.geo;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
-public class UEdgeList extends UMbMk2 implements Iterable<UEdge> {
+
+/**
+ * WORK IN PROGRESS - NOT FUNCTIONAL
+ * @author marius
+ *
+ */
+public class UEdgeList extends UMB implements Iterable<UEdge> {
   public UGeo parent;
   ArrayList<UEdge> edges;
   

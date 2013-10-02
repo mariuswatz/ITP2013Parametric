@@ -20,7 +20,7 @@ public void setup() {
   size(800, 600);
 
   // set PApplet reference
-  UBase.setPApplet(this);
+  UMB.setPApplet(this);
 
   importData();
   build();

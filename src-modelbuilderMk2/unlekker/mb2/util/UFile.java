@@ -41,7 +41,7 @@ public class UFile implements UConst {
    * @return
    */
   public static String dataPath(String path) {
-    PApplet papplet=UMbMk2.getPApplet();
+    PApplet papplet=UMB.getPApplet();
     if(papplet!=null) return papplet.dataPath(path);
     return path;
   }
@@ -53,7 +53,7 @@ public class UFile implements UConst {
    * @return
    */
   public static String sketchPath(String path) {
-    PApplet papplet=UMbMk2.getPApplet();
+    PApplet papplet=UMB.getPApplet();
     if(papplet!=null) return papplet.sketchPath(path);
     return path;
   }
@@ -96,7 +96,7 @@ public class UFile implements UConst {
       }
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      UMbMk2.log(e.getMessage());
+      UMB.log(e.getMessage());
       e.printStackTrace();
     }
     
@@ -135,7 +135,7 @@ public class UFile implements UConst {
     
     int last=lastIndex(path, prefix, ext)+1;
     
-    String s=fixPath(path)+prefix.trim()+" "+UMbMk2.nf(last,4);
+    String s=fixPath(path)+prefix.trim()+" "+UMB.nf(last,4);
     
     if(ext!=null) {
       if(!ext.startsWith(".")) ext="."+ext;
@@ -168,7 +168,7 @@ public class UFile implements UConst {
         
       s=noExt(l.get(l.size()-1));
       s=s.substring(s.indexOf(' '));
-      i=UMbMk2.parseInt(s);
+      i=UMB.parseInt(s);
       
     } catch (Exception e) {
       // TODO Auto-generated catch block
@@ -195,7 +195,7 @@ public class UFile implements UConst {
       filename=getAbsolutePath(filename);   
       
       
-      UMbMk2.logDivider(filename);
+      UMB.logDivider(filename);
 //      new File(getPath(filename)).mkdirs();
       
       if(filename.endsWith("gz")) {
@@ -204,7 +204,7 @@ public class UFile implements UConst {
       else out=new FileOutputStream(filename,append);
     } catch (Exception e) {   
       e.printStackTrace();
-      UMbMk2.logErr("getOutputStream - "+e.toString());
+      UMB.logErr("getOutputStream - "+e.toString());
     }
     return out;
   }
@@ -307,7 +307,7 @@ public class UFile implements UConst {
   }
   
   public static String getAbsolutePath(String name) {
-    PApplet papplet=UMbMk2.getPApplet();
+    PApplet papplet=UMB.getPApplet();
 
     String path=fixPath(getPath(name));
     name=noPath(name);
@@ -326,7 +326,7 @@ public class UFile implements UConst {
 
     File ff=new File(path);
     ff.mkdirs();
-    UMbMk2.log("ff "+ff.getAbsolutePath()+" "+name);
+    UMB.log("ff "+ff.getAbsolutePath()+" "+name);
 //    ff.
 //    if(debugLevel>2) Util.log("IO.getAbsolutePath "+s);
     return path+name;

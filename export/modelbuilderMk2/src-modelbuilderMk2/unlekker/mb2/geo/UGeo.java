@@ -5,11 +5,11 @@ package unlekker.mb2.geo;
 
 import java.util.ArrayList;
 
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
 import java.util.*;
 
-public class UGeo extends UMbMk2  {
+public class UGeo extends UMB  {
   /**
    * Master vertex list, contains all vertices for the face geometry
    * contained in the UGeo instance. Use <code>enable(NODUPL)</code>
@@ -36,15 +36,47 @@ public class UGeo extends UMbMk2  {
     this();
     set(v);
   }
-  
+
+  /** Returns a copy of this UGeo instance.
+   *  
+   * @return
+   */
   public UGeo copy() {
     return new UGeo(this);
   }
 
-  public UGeo set(UGeo v) {
-    for(UFace ff:v.faces) {
-      addFace(ff.getV());
-    }
+  public UGeo setOptions(int opt) {
+    super.setOptions(opt);
+    return this;
+  }
+
+  public UGeo enable(int opt) {
+    super.setOptions(opt);
+    return this;
+  }
+
+  public UGeo disable(int opt) {
+    super.disable(opt);
+    return this;
+  }
+
+  /**
+   * Copies the mesh data contained <code>model</code> to this UGeo instance,
+   * replacing any existing data. The <code>model.vl</code> vertex list
+   * is copied using {@see UVertexList#copy()}, then face data is copied
+   * by creating new UFace instances using the {@see UFace#vID} vertex indices. 
+   *  
+   * @param model
+   * @return
+   */
+  public UGeo set(UGeo model) {
+   vl=model.getV().copy();
+   faces=new ArrayList<UFace>();
+   for(UFace ff:model.getF()) {
+     UFace newFace=new UFace(this,ff.vID);
+     newFace.setColor(ff.col);
+     addFace(newFace);
+   }
    return this;
   }
 
@@ -152,6 +184,20 @@ public class UGeo extends UMbMk2  {
     return bb().dim;
   }
 
+  /**
+   * Returns UVertex instance where x,y,z represent the
+   * size of this mesh in the X,Y,Z dimensions.  
+   * @return
+   */
+  public UVertex dim() {
+    return bb().dim;
+  }
+
+  public float dimX() {return bb().dimX();}
+  public float dimY() {return bb().dimY();}
+  public float dimZ() {return bb().dimZ();}
+
+
   //////////////////////////////////////////
   // LIST TOOLS
 
@@ -193,31 +239,25 @@ public class UGeo extends UMbMk2  {
     return vl;
   }
 
-  public void draw(UVertex vv) {
-    if(checkGraphicsSet()) {
-      g.vertex(vv.x,vv.y,vv.z);
-    }
+  public UGeo draw() {
+    return draw(options);
   }
 
-  public void draw(UVertex varr[]) {
-    if(checkGraphicsSet()) {
-      for(UVertex vv:varr) g.vertex(vv.x,vv.y,vv.z);
-    }
-  }
-  
-  public void draw() {
+  public UGeo draw(int theOptions) {
     if(checkGraphicsSet()) {
       g.beginShape(TRIANGLES);
       
-      int opt=(isEnabled(COLORFACE) ? COLORFACE : 0);
+      
+      int opt=(isEnabled(theOptions,COLORFACE) ? COLORFACE : 0);
       for(UFace f:faces) {
         if(opt==COLORFACE) g.fill(f.col);
         draw(f.getV());
       }
       g.endShape();
     }
+    return this;
   }
-  
+
   ///////////////////////////////////////////////////
   // BEGINSHAPE / ENDSHAPE METHODS
   
@@ -346,6 +386,16 @@ public class UGeo extends UMbMk2  {
   public UGeo addFace(UVertex vv[]) {
     return addFace(vv[0], vv[1], vv[2]);
   }
+
+  public UGeo addFace(UFace f) {
+    faces.add(f);
+    return this;
+  }
+
+  public UGeo addFace(int vID[]) {
+    faces.add(new UFace(this,vID));
+    return this;
+  }
   
   public UGeo addFace(UVertex v1, UVertex v2, UVertex v3) {
     faces.add(new UFace(this, v1,v2,v3));    
@@ -447,6 +497,37 @@ public class UGeo extends UMbMk2  {
       if(last!=null) quadstrip(last,vvl);
       last=vvl;
     }
+    return this;
+  }
+
+  /**
+   * Add faces representing a triangulation of the provided
+   * vertex list. Primarily useful for meshing irregular
+   * polygons and point sets representing 2.5D topologies,
+   * as well as filling holes in meshes (for instance "capping" 
+   * cylindrical structures.) 
+   * 
+   * The triangulation logic acts in a 2D plane, hence point clouds 
+   * representing true 3D volumes will give poor results, requiring
+   * convex hull or other re-meshing strategies.
+   *  
+   *  See {@link UTriangulate} for details. 
+   * @param vl
+   * @return
+   */
+  public UGeo triangulation(UVertexList vl) {
+    return triangulation(vl,false);
+  }
+
+  public UGeo triangulation(UVertexList vl,boolean reverse) {
+    int oldSize=sizeF();
+    new UTriangulate(this, vl);
+
+    if(reverse) {
+      // reverse all new faces
+      for(int i=oldSize; i<sizeF(); i++) faces.get(i).reverse();      
+    }
+    
     return this;
   }
 

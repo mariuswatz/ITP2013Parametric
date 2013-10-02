@@ -10,7 +10,7 @@ import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
 import unlekker.mb2.geo.UNav3D;
 import unlekker.mb2.geo.UVertexList;
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 import unlekker.mb2.util.UFile;
 
 public class UTestMain extends PApplet {
@@ -25,9 +25,11 @@ public class UTestMain extends PApplet {
     UTest.p=this;
     UTest.main=this;
     
-    UMbMk2.setPApplet(this);
+    UMB.setPApplet(this);
 
     tests=new ArrayList<UTest>();
+    tests.add(new UTestResample());
+    tests.add(new UTestIntersection());
     tests.add(new UTestTriangulate());
     tests.add(new UTest2D());
     
@@ -42,6 +44,15 @@ public class UTestMain extends PApplet {
     theTest.draw();
     
     
+  }
+  
+  public void keyPressed() {
+    if(key!=CODED) {
+//      if(keyCode==java.awt.event.KeyEvent.VK_N)     
+        theTest.init();
+
+    }
+
   }
 
   static public void main(String args[]) {

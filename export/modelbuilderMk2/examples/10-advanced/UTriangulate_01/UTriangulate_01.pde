@@ -42,7 +42,7 @@ public void setup() {
   size(600, 600, OPENGL);
 
   // set PApplet reference
-  UBase.setPApplet(this);
+  UMB.setPApplet(this);
 
   // create navigation tool
   nav=new UNav3D();

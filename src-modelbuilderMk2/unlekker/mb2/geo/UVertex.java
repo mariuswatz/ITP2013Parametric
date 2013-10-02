@@ -3,9 +3,9 @@ package unlekker.mb2.geo;
 import java.util.ArrayList;
 
 import processing.core.PVector;
-import unlekker.mb2.util.UMbMk2;
+import unlekker.mb2.util.UMB;
 
-public class UVertex extends UMbMk2  {
+public class UVertex extends UMB  {
   public static int globalID;
 
   public int ID;  
@@ -233,6 +233,18 @@ public class UVertex extends UMbMk2  {
     return pv;
   }
 
+  public static String str(UVertex vv[]) {
+    StringBuffer buf=strBufGet();
+    
+    int id=0,n=vv.length;
+    for(UVertex vert:vv) {
+      if(id++>0) buf.append(TAB);
+      buf.append(vert.str());
+    }
+    
+    return "["+strBufDispose(buf)+"]";
+  }
+  
   public String str() {
     return toString(2);
   }
@@ -334,6 +346,39 @@ public class UVertex extends UMbMk2  {
     
     return this;
   }
+
+  public static void rotX(UVertex vv[],float deg) {
+    for(UVertex vert:vv) vert.rotX(deg);
+  }
+
+  public static void rotY(UVertex vv[],float deg) {
+    for(UVertex vert:vv) vert.rotY(deg);
+  }
+
+  public static void rotZ(UVertex vv[],float deg) {
+    for(UVertex vert:vv) vert.rotZ(deg);
+  }
+
+  public static void scale(UVertex vv[],float m) {
+    scale(vv,m,m,m);
+  }
+
+  public static void scale(UVertex vv[],float mx,float my,float mz) {
+    for(UVertex vert:vv) vert.mult(mx,my,mz);
+  }
+  
+  public static void translate(UVertex vv[],UVertex vt) {
+    translate(vv,vt.x,vt.y,vt.z);
+  }
+  
+  public static void translate(UVertex vv[],float mx,float my) {
+    translate(vv,mx,my,0);
+  }
+  
+  public static void translate(UVertex vv[],float mx,float my,float mz) {
+    for(UVertex vert:vv) vert.add(mx,my,mz);    
+  }
+  
   
   public UVertex rotX(float deg) {
     return rotAxis(X,deg);

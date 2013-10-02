@@ -60,13 +60,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import processing.core.PApplet;
-import unlekker.mb2.util.UConst;
+import unlekker.mb2.util.*;
 
 public class UTriangulate implements UConst {
   public UGeo mesh;
   public ArrayList<Edge> edges;
   public ArrayList<Triangle> tri;
-  
+
+  public UTriangulate(UGeo geo,UVertexList vl) {
+//    mesh=geo;
+    build(vl);
+    geo.add(mesh);
+  }
+
   public UTriangulate(UVertexList vl) {
     build(vl);
   }
@@ -92,8 +98,15 @@ public class UTriangulate implements UConst {
     else if(biggest==2) vl=vl.copy().rotY(HALF_PI);
     
     tri=triangulate(vl);
-    mesh=new UGeo();
-    mesh.getV().add(vl);
+    
+    if(mesh==null) {
+      mesh=new UGeo();
+      mesh.getV().add(vl);
+    }
+    else {
+      UVertexList meshVL=mesh.getV();
+      for(UVertex vv:vl) if(!meshVL.contains(vv)) mesh.addVertex(vv);
+    }
     
     for(Triangle t:tri) {
       mesh.addFace(t.p1, t.p2, t.p3);
