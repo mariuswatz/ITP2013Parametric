@@ -29,6 +29,7 @@ public class UGeo extends UMB  {
   
   public UGeo() {
     vl=new UVertexList();
+    setOptions(NODUPL);
     faces=new ArrayList<UFace>();
   }
 
@@ -47,11 +48,13 @@ public class UGeo extends UMB  {
 
   public UGeo setOptions(int opt) {
     super.setOptions(opt);
+    if(vl!=null) vl.setOptions(opt);
     return this;
   }
 
   public UGeo enable(int opt) {
     super.setOptions(opt);
+    vl.setOptions(opt);
     return this;
   }
 
@@ -241,6 +244,11 @@ public class UGeo extends UMB  {
 
   public UGeo draw() {
     return draw(options);
+  }
+
+  public UGeo drawNormals(float w) {
+    for(UFace ff:faces) ff.drawNormal(w);
+    return this;
   }
 
   public UGeo draw(int theOptions) {
@@ -488,7 +496,9 @@ public class UGeo extends UMB  {
   }
 
   public int addVertex(UVertex v1) {    
-    return vl.addID(v1);
+    int id=vl.indexOf(v1);
+    if(id<0) id=vl.addID(v1);
+    return id;
   }
 
   public UGeo quadstrip(ArrayList<UVertexList> vl2) {
@@ -614,4 +624,72 @@ public class UGeo extends UMB  {
     return UGeoIO.writeSTL(filename, this);
   }
   
+  public String str() {return str(false);}
+  
+  public String str(boolean complete) {
+    StringBuffer buf=strBufGet();
+    
+    buf.append(UGEO).append(TAB).append("f="+sizeF());
+    buf.append(TAB).append("v="+sizeV());      
+
+    if(complete) {
+      buf.append(NEWLN).append(vl.str());
+      
+      buf.append(NEWLN).append("Face ID\t");
+      int cnt=0;
+      for(UFace ff:faces) {
+        if(cnt++>0) buf.append(TAB);
+        buf.append(ff.vID[0]).append(TAB);
+        buf.append(ff.vID[1]).append(TAB);
+        buf.append(ff.vID[2]);
+      }
+    }
+      
+    
+    return "["+strBufDispose(buf)+"]";
+  }
+
+  public static UGeo box(float w,float h,float d) {
+    return box(1).scale(w,h,d);
+  }
+
+  public static UGeo box(float w) {
+    UGeo geo=null;
+    
+    w*=0.5f;
+    UVertexList vl,vl2;
+    vl=new UVertexList().add(-w,-w).add(w,-w).
+        add(w,w).add(-w,w);
+    vl2=vl.copy().translate(0,0,w);
+    vl.translate(0,0,-w);
+    
+    geo=new UGeo().quadstrip(vl.close(),vl2.close());
+    geo.beginShape(QUAD_STRIP).
+    vertex(vl.get(3)).vertex(vl.get(0)).
+    vertex(vl.get(2)).vertex(vl.get(1)).endShape();
+    geo.beginShape(QUAD_STRIP).
+      vertex(vl2.get(2)).vertex(vl2.get(1)).
+      vertex(vl2.get(3)).vertex(vl2.get(0)).endShape();
+    return geo;
+  }
+  
+  public static UGeo cyl(float w,float h,int steps) {
+    w*=0.5f;
+    h*=0.5f;
+    
+    UGeo geo=null;
+    UVertexList vl,vl2;
+    vl=new UVertexList();
+    for(int i=0; i<steps; i++) {
+      float deg=-map(i,0,steps,0,TWO_PI);
+      vl.add(new UVertex(w,0).rotY(deg));
+    }
+    
+    vl2=vl.copy().translate(0,h,0).close();
+    vl.translate(0,-h,0).close();
+    geo=new UGeo().quadstrip(vl,vl2).triangleFan(vl,true).triangleFan(vl2);
+    return geo;
+  }
+
+    
 }

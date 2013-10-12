@@ -19,7 +19,7 @@ public interface UConst extends processing.core.PConstants {
 
   public static final float EPSILON=1.1920928955078125E-7f;
 
-  
+  public static final int KB=1024,MB=KB*KB;
   public static final int XY=0,XZ=1,YZ=2;
   
   public static final int XYZ=0,XZY=1;
@@ -30,7 +30,7 @@ public interface UConst extends processing.core.PConstants {
   public static final String DIRSTR="/",DIRSTRDOS="\\";      
   public static final String ENCLSQ="[]",ENCLTAG="<>";
   public static final String LOGDIVIDER="----------------";
-  
+  public static final String UGEO="UG",UVERTEXLIST="UVL",UVERTEX="UV",UFACE="UF";
   public static final int SMOOTHSTEP=0;
   
   public static final float PTCM=72f/2.54f,PTMM=72f/25.4f,PTINCH=72f;

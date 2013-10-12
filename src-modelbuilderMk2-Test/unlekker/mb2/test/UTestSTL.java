@@ -3,28 +3,36 @@
  */
 package unlekker.mb2.test;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import processing.core.PApplet;
 import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
 import unlekker.mb2.geo.UGeoIO;
+import unlekker.mb2.geo.UNav3D;
 import unlekker.mb2.geo.UVertex;
 import unlekker.mb2.geo.UVertexList;
 import unlekker.mb2.util.UFile;
+import unlekker.mb2.util.UMB;
 
-public class UGeoTestSTL extends PApplet {
+public class UTestSTL extends UTest {
   ArrayList<UVertexList> vvl;
   
   UVertexList vl,vl2;
   UGeo geo;
   
-  public void setup() {
-    size(600,600, OPENGL);
+  public void init() {
     
     vvl=new ArrayList<UVertexList>();
     
-    UVertexList.setGraphics(g);
     vl=new UVertexList();
     vl.add(0,0,0);
     vl.add(100,0,0);
@@ -44,9 +52,9 @@ public class UGeoTestSTL extends PApplet {
       // #2 rotate and translate copy
       // #3 add copy to vvl
       // Remember: The original "vl" is left unchanged
-      vvl.add(vl.copy().rotX(radians(10*i)).translate(0, 0, 20));
+      vvl.add(vl.copy().rotX(p.radians(10*i)).translate(0, 0, 20));
       
-      println(vl.str());
+      p.println(vl.str());
     }
 
     geo=new UGeo();
@@ -63,17 +71,6 @@ public class UGeoTestSTL extends PApplet {
     // the right way
     geo.triangleFan(vvl.get(0),true);
     
-    
-    // randomize face colors
-    int id=0,n=geo.getF().size();           
-    for(UFace f:geo.getF()) {
-      UVertex fv[]=f.getV();
-      f.setColor(fv[0].U*255,fv[0].V*155+100,fv[0].V*255);
-    }
-
-    geo.enable(geo.COLORFACE); // per-face coloring
-    println(geo.optionStr()); // print options string
-    
     ArrayList<UGeo> gl=new ArrayList<UGeo>();
     gl.add(geo);
     
@@ -88,28 +85,22 @@ public class UGeoTestSTL extends PApplet {
     UGeoIO.writeSTL(UFile.nextFilename("data/", "test"), geo);
     
     
-    String filename="C:/Users/Marius/Dropbox/40 Teaching/2013 ITP/ITP-Parametric - Resources/Models";
-    filename=filename+"/dodecahedron.stl";
-    geo=UGeoIO.readSTL(this, filename);
-    geo.center().scale(4);
+    String filename="C:/Users/marius/Dropbox/05 Makerbot/";
+    filename=filename+"testAsc.stl";
+    geo=UGeoIO.readSTL(filename);
+    geo.center().scale(200f/geo.dimX());
+//    geo.getV().removeDupl(true);
+    geo.log(geo.getV().str());
     
+    if(main.nav==null) main.nav=new UNav3D();
   }
 
   public void draw() {
-    background(0);
-    
-    translate(width/2,height/2);
-    lights();
-    
-    float ry=map(width/2-mouseX,-width/2,width/2, PI,-PI);
-    float rx=map(height/2-mouseY,-height/2,height/2, PI,-PI);
-    
-    rotateY(ry+radians(frameCount));
-    rotateX(rx);
-    
-    
-    stroke(255);
-    fill(255);
+    p.translate(p.width/2, p.height/2);
+    p.lights();
+    main.nav.doTransforms();
+
+    UMB.pstroke(p.color(255)).pfill(p.color(255));
     
     geo.draw();
   }

@@ -122,6 +122,17 @@ public class UFace extends UMB  {
     
     return v;
   }
+
+  public UFace resetVertexID(UVertexList vl) {
+    getV();
+    int index=0;
+    for(UVertex vv:v) {
+      int id=vl.getVID(vv);
+      if(id<0) id=vl.addID(vv);
+      vID[index++]=id;
+    }
+    return reset();
+  }
   
   public UFace copy() {
     return new UFace(this);
@@ -182,7 +193,29 @@ public class UFace extends UMB  {
     }
     return this;
   }
-  
+
+  /**
+   * Returns face normal, with the option to force re-calculation  
+   * @param force
+   * @return
+   */
+  public UVertex normal(boolean force) {
+    if(force) reset();    
+    return normal();
+  }
+
+  /**
+   * Resets internal data for this face, specifically {@see #normal}, {@see UFace#centroid} and {@see UFace#v} (provided {@see UFace#vID} is not null). 
+   *
+   * @return the u face
+   */
+  public UFace reset() {
+    normal=null;
+    v=null;
+    centroid=null;
+    return this;
+  }
+
   public UVertex normal() {
     if(normal!=null) return normal;
         

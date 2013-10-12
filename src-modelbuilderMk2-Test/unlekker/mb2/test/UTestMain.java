@@ -28,6 +28,10 @@ public class UTestMain extends PApplet {
     UMB.setPApplet(this);
 
     tests=new ArrayList<UTest>();
+    
+    tests.add(new UTestCurve());
+    tests.add(new UTestSTL());
+    tests.add(new UTestPrimitives());
     tests.add(new UTestResample());
     tests.add(new UTestIntersection());
     tests.add(new UTestTriangulate());
@@ -47,7 +51,7 @@ public class UTestMain extends PApplet {
   }
   
   public void keyPressed() {
-    if(key!=CODED) {
+    if(key!=CODED && key!=ESC) {
 //      if(keyCode==java.awt.event.KeyEvent.VK_N)     
         theTest.init();
 

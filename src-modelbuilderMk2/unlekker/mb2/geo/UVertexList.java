@@ -251,8 +251,36 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return v.indexOf(v2);
   }
 
+  /**
+   * Returns vertices [n1..n2] from this UVertexList, producing (n2-n1)+1 vertices.
+   * Vertices are copied by reference, not value, meaning that the vertices in the 
+   * array refer to the same instances as the ones in this list.  
+   * @param n1 First vertex ID
+   * @param n2 Final vertex ID (inclusive)
+   * @return
+   */
+  public UVertex[] extractArray(int n1,int n2) {
+    n2++;
+    UVertex[] l=new UVertex[n2-n1];
+    
+    int cnt=0;
+    for(int i=n1; i<n2; i++) l[cnt++]=get(i);
+    return l;
+  }
+
+  /**
+   * Returns a new vertex list containing vertices [n1..n2] of this UVertexList, 
+   * producing (n2-n1)+1 vertices.
+   * The new vertex list is initialized with the options set for the current UVertexList,
+   * so if NOCOPY is enabled the vertices are copied by reference and not by value.  
+   * @param n1 First vertex ID
+   * @param n2 Final vertex ID (inclusive)
+   * @return
+   */
   public UVertexList extract(int n1,int n2) {
     UVertexList l=new UVertexList();
+    l.setOptions(options);
+    n2++;
     for(int i=n1; i<n2; i++) l.add(v.get(i));
     return l;
   }

@@ -1,5 +1,6 @@
 package unlekker.mb2.util;
 
+import java.io.File;
 import java.lang.Character.Subset;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -44,6 +45,9 @@ public class UMB implements UConst {
   protected static boolean isGraphics3D;
   
   protected static int gErrorCnt=0;
+  
+  protected static long timerData[]=new long[300];
+  
 
   protected static boolean libraryPrinted=false;
   static {
@@ -56,6 +60,28 @@ public class UMB implements UConst {
     }
   }
   
+  public static long timerStart(int id) {
+    long t=System.currentTimeMillis();
+    id*=3;
+    timerData[id]=t;
+    return t;
+  }
+  
+  public static long timerElapsed(int id) {
+    long t=System.currentTimeMillis();
+    id*=3;
+    
+    return t-timerData[id];
+  }
+  
+
+  public static long timerEnd(int id) {
+    long t=System.currentTimeMillis();
+    id*=3;
+    timerData[id+1]=t;
+    timerData[id+2]=t-timerData[id];
+    return timerData[id+2];
+  }
 
   public static String version() {
     return VERSION;
@@ -616,13 +642,22 @@ public class UMB implements UConst {
 
   public static boolean checkGraphicsSet() {
     if(g==null) {
-      if(gErrorCnt%100==0) logErr("ModelbuilderMk2: No PGraphics set. Use UGeo.setGraphics(PApplet).");
+      if(gErrorCnt%100==0) logErr("ModelbuilderMk2: No PGraphics set. Use UMB.setGraphics(PApplet).");
       gErrorCnt++;
       return false;
     }
     return true;
   }
-  
+
+  public static boolean checkPAppletSet() {
+    if(papplet==null) {
+      if(gErrorCnt%100==0) logErr("ModelbuilderMk2: No PApplet set. Use UMB.setPApplet(PApplet).");
+      gErrorCnt++;
+      return false;
+    }
+    return true;
+  }
+
   public static PGraphics getGraphics() {
     return g;
   }
@@ -649,6 +684,15 @@ public class UMB implements UConst {
   
   public static void log(String s) {
     System.out.println(s);
+  }
+
+  public static void log(String s[]) {
+    StringBuffer buf=strBufGet();
+    for(String ss:s) {
+      if(buf.length()>0) buf.append(COMMA);
+      buf.append(ss);
+    }
+    log("["+strBufDispose(buf)+"]");
   }
 
   public static void log(int i) {
@@ -760,6 +804,15 @@ public class UMB implements UConst {
     return formatInt.format(num);
   }
 
+  public static String fileSizeStr(File f) {
+    long l=f.length();
+    String str=null;
+    if(l>MB) str=nf((float)l/(float)MB,1,1)+" MB";
+    else if(l>KB) str=nf((float)l/(float)KB,1,1)+" KB";
+    else str=l+"b";
+    return str;
+  }
+  
   public static String strPad(String s,int len,char c) {
     len-=s.length();
     while(len>0) {
