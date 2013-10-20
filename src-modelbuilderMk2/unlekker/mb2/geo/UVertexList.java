@@ -46,6 +46,11 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     for(UVertex vv:v) cvl.add(vv);
     return cvl;
   }
+  
+  public UVertexList set(UVertexList vl) {
+    clear();
+    return add(vl);
+  }
 
   public UVertexList copyNoDupl() {
     UVertexList cvl=new UVertexList();
@@ -53,6 +58,46 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     for(UVertex vv:v) cvl.add(vv);
     return cvl;
   }
+
+  /**
+   * Produces a new UVertexList containing the delta vector for each position in this
+   * list, so that for a given index==[0..n-2] the delta equals <code>get(index+1).copy().sub(get(index));</code>
+   * For <code>index==n-1</code> the delta is the same as for <code>index==n-2</code>.
+   * @return
+   */
+  public UVertexList calcDelta() {
+    return calcDelta(-1);
+  }
+
+  /**
+   * Produces a new UVertexList containing the delta vector for each position in this
+   * list, so that for a given index==[0..n-2] the delta equals <code>get(index+1).copy().sub(get(index));</code>
+   * For <code>index==n-1</code> the delta is the same as for <code>index==n-2</code>. The damping parameters
+   * causes damping between the previous and current delta, so that the previous value is weighted by
+   * <code>(1.0-damping)</code> and the new value by <code>damping</code>. This is useful to "slow down" changes
+   * in the heading along a path.  
+   * @param damping
+   * @return
+   */
+  public UVertexList calcDelta(float damping) {
+    UVertexList dl=new UVertexList();
+    for(int i=0; i<size(); i++) {
+      if(i<size()-1) dl.add(get(i+1).copy().sub(get(i)));
+      else dl.add(dl.last().copy());
+    }
+    
+    if(damping>0) {
+      damping=damping>1 ? 1:1;
+      UVertex last=null;
+      for(UVertex vv:dl) {
+        if(last!=null) vv.mult(damping).add(last.copy().mult(1-damping));
+        last=vv;
+      }
+    }
+    
+    return dl;
+  }
+
 
   /**
    * Returns a new UVertexList that resamples the vertex data of 
@@ -109,6 +154,23 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return res;
   }
 
+
+  public static UVertexList circle(float w,int nn) {
+    UVertexList cl=new UVertexList();
+    for(int i=0; i<nn; i++) {
+      float t=map(i,0,nn,0,TWO_PI);
+      cl.add(new UVertex(w,0,0).rotZ(t));
+    }
+    return cl.close();
+  }
+
+  
+  public static UVertexList rect(float w,float h) {
+    return new UVertexList().
+        add(0,0).add(1,0).
+        add(1,1).add(0,1).center().scale(w,h,1).close();
+  }
+  
   /**
    * Generates an ArrayList containing a series of <code>n</code> vertex lists that
    * are linear interpolations of <code>l1</code> and <code>l2</code>. 
@@ -129,7 +191,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return l;
   }
 
-  public void draw() {
+  public UVertexList draw() {
     if(checkGraphicsSet()) {
       g.beginShape();
       if(isGraphics3D) {
@@ -140,6 +202,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
       }
       g.endShape();
     }
+    return this;
 
   }
 
@@ -178,9 +241,50 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return bb().dim;
   }
 
+  
+  /**
+   * Returns new UVertexList containing a list of the delta vectors for each vertex in the
+   * current list (calculated by <code>deltaN=this.get(N+1).sub(this.get(N))</code> etc.) Since
+   * there is no valid delta vector for the last position in the list, a copy of the delta vector for the
+   * penultimate position is given instead.
+   * @return
+   */
+  public UVertexList deltaVectors() {
+    return deltaVectors(-1);
+  }
+
+  /**
+   * Returns new UVertexList containing a list of the delta vectors for each vertex in the
+   * current list. Values are dampened (interpolated) with the value of the previous vertex as specified
+   * by the <code>damper</code> parameter, providing control of the rate of change. The calculation
+   * is given by <code>deltaN=this.get(N+1).sub(this.get(N)).mult(damper).add(deltaPrev.copy().mult(1-damper));</code>. 
+   * 
+   * @param damper
+   * @return
+   */
+  public UVertexList deltaVectors(float damper) {
+    UVertexList dl=new UVertexList();
+    for(int i=0; i<size(); i++) {
+      if(i<size()-1) dl.add(get(i+1).copy().sub(get(i)));
+      else dl.add(dl.last().copy());
+    }
+
+    if(damper>0) {
+      damper=constrain(damper, 0, 1);
+      UVertex last=null;
+      for(UVertex vv:dl) {
+        if(last!=null) vv.mult(damper).add(last.copy().mult(1-damper));
+        last=vv;
+      }
+    }
+    
+    return dl;
+  }
+
   public float dimX() {return dim().x;}
   public float dimY() {return dim().y;}
   public float dimZ() {return dim().z;}
+  public float dimMax() {return bb().dimMax();}
 
   public UVertex centroid() {
     bb();
@@ -207,6 +311,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   }
 
   public UVertexList clear() {
+    bb=null;
     v.clear();
     return this;
   }

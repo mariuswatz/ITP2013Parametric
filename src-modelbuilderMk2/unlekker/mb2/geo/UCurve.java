@@ -43,6 +43,20 @@ public class UCurve extends UMB {
     return a*t1sq*t1 + 3*b*t*t1sq + 3*c*tsq*t1 + d*t*tsq;
   }
 
+  
+  public static UVertexList bezier(UVertexList cp,int n) {
+    UVertexList res=new UVertexList();
+    int nseg=(cp.size()-1)/3;
+    
+    for(int i=0; i<nseg; i++) {
+      UVertexList tmp=bezier(cp.extractArray(i*3,i*3+3),n);
+      if(i<nseg-1) tmp.remove(tmp.size()-1);
+      res.add(tmp);
+    }
+    
+    return res;
+  }
+
   public static UVertexList bezier(UVertex v[],int n) {
     UVertexList l=new UVertexList();
     

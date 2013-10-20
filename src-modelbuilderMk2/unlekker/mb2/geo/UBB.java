@@ -41,6 +41,10 @@ public class UBB extends UMB {
   public float dimY() {return dim.y;}
   public float dimZ() {return dim.z;}
 
+  public float dimMax() {
+    return max(dim.x,max(dim.y,dim.z));
+  }
+
   public UBB calc() {
     dim.set(max).sub(min);
     centroid.set(max).add(min).mult(0.5f);

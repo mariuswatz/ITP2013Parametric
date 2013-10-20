@@ -1,6 +1,7 @@
 todo/
 nosync/
 lib/
+build/
 *.xml
 sketchbook/
 

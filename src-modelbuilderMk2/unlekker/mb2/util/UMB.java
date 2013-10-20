@@ -193,6 +193,19 @@ public class UMB implements UConst {
   }
 
   /**
+   * Static conveniece method to call PGraphics.line() between the origin and
+   * a single UVertex instance.  
+   */
+  public static UMB pline(UVertex v) {
+    if (checkGraphicsSet()) {
+      if(isGraphics3D)
+        g.line(0,0,0, v.x, v.y, v.z);
+      else g.line(0,0,v.x, v.y);
+    }
+    return UMB.UMB;
+  }
+
+  /**
    * Static conveniece method to call both <code>PGraphics.pushMatrix()</code>
    * <code>PGraphics.pushStyle()</code>
    */
@@ -686,11 +699,11 @@ public class UMB implements UConst {
     System.out.println(s);
   }
 
-  public static void log(String s[]) {
+  public static <T> void log(T s[]) {
     StringBuffer buf=strBufGet();
-    for(String ss:s) {
+    for(T ss:s) {
       if(buf.length()>0) buf.append(COMMA);
-      buf.append(ss);
+      buf.append(ss.toString());
     }
     log("["+strBufDispose(buf)+"]");
   }
@@ -848,6 +861,26 @@ public class UMB implements UConst {
     return strBufDispose(buf);
   }
   
+  public static <T> String str(T[] o, char delim,String enclosure) {
+    StringBuffer buf=strBufGet();
+    if(o==null) buf.append("null");
+    else {
+      int id=0;
+      for(T oo:o) {
+        if(buf.length()>0) buf.append(delim); 
+//        buf.append(id++).append(' ');
+        buf.append(oo==null ? NULLSTR : oo.toString());
+      }
+    }
+    
+    if(enclosure!=null) {
+      buf.insert(0, enclosure.charAt(0));
+      buf.append(enclosure.charAt(1));
+    }
+    
+    return strBufDispose(buf);
+  }
+
   
   //////////////////////////////////////////
   // STRING BUFFER POOL

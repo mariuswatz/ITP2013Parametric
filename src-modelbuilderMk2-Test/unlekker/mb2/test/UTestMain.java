@@ -26,16 +26,20 @@ public class UTestMain extends PApplet {
     UTest.main=this;
     
     UMB.setPApplet(this);
-
+    
     tests=new ArrayList<UTest>();
     
+    
+    tests.add(new UTestHeading03());
+    tests.add(new UTestHeading02());
+    tests.add(new UTestHeading01());
+//    tests.add(new UTestSTL()); 
     tests.add(new UTestCurve());
-    tests.add(new UTestSTL());
     tests.add(new UTestPrimitives());
     tests.add(new UTestResample());
     tests.add(new UTestIntersection());
     tests.add(new UTestTriangulate());
-    tests.add(new UTest2D());
+    tests.add(new UTest2D()); 
     
     theTest=tests.get(0);
     theTest.init();
@@ -43,18 +47,31 @@ public class UTestMain extends PApplet {
 
   public void draw() {
     background(0);
-    fill(255);
-    text(theTest.getClass().getSimpleName(),10,20);
+    fill(255); 
+    drawCredit();
     theTest.draw();
     
     
   }
   
+  void drawCredit() {
+    if(frameCount<2)   textFont(createFont("courier", 11, false));
+
+    fill(255);
+    textAlign(RIGHT);
+    text(UMB.version(), width-5, 15);
+    textAlign(LEFT);
+    text(theTest.getClass().getSimpleName(), 5, 15);
+  }
   public void keyPressed() {
-    if(key!=CODED && key!=ESC) {
+    if(key=='s') {
+      String filename=UFile.nextFile(sketchPath, theTest.getClass().getSimpleName(), "png");
+      println(filename);
+      saveFrame(filename);
+    }
+    else if(key!=CODED) {
 //      if(keyCode==java.awt.event.KeyEvent.VK_N)     
         theTest.init();
-
     }
 
   }

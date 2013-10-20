@@ -15,7 +15,7 @@ public interface UConst extends processing.core.PConstants {
    */
   public static final String CREDIT="Marius Watz - http://workshop.evolutionzone.com/";
   
-  public final static String VERSION = "ModelbuilderMk2-0002a";
+  public final static String VERSION = "ModelbuilderMk2-0002c";
 
   public static final float EPSILON=1.1920928955078125E-7f;
 
@@ -27,7 +27,7 @@ public interface UConst extends processing.core.PConstants {
 
   public static final char TAB='\t',COMMA=',',SPACE=' ',ZERO='0';
   public static final char DIRCHAR='/',DIRCHARDOS='\\',NEWLN='\n';      
-  public static final String DIRSTR="/",DIRSTRDOS="\\";      
+  public static final String DIRSTR="/",DIRSTRDOS="\\",NULLSTR="null";      
   public static final String ENCLSQ="[]",ENCLTAG="<>";
   public static final String LOGDIVIDER="----------------";
   public static final String UGEO="UG",UVERTEXLIST="UVL",UVERTEX="UV",UFACE="UF";

@@ -122,6 +122,54 @@ public class UFace extends UMB  {
     
     return v;
   }
+  
+  public UFace translate(UVertex v1) {    
+    return translate(v1.x,v1.y,v1.z);    
+  }
+
+  public UFace translate(float mx,float my) {
+    return translate(mx,my,0);
+  }
+  
+  public UFace translate(float mx,float my,float mz) {
+    getV()[0].add(mx,my,mz);
+    v[1].add(mx,my,mz);
+    v[2].add(mx,my,mz);
+    return reset();
+  }
+  
+  public UFace rotX(float deg) {
+    getV()[0].rotX(deg);
+    v[1].rotX(deg);
+    v[2].rotX(deg);
+    return reset();
+  }
+
+  public UFace rotY(float deg) {
+    getV()[0].rotY(deg);
+    v[1].rotY(deg);
+    v[2].rotY(deg);
+    return reset();
+  }
+
+  public UFace rotZ(float deg) {
+    getV();
+    v[0].rotZ(deg);
+    v[1].rotZ(deg);
+    v[2].rotZ(deg);
+    return reset();
+  }
+
+
+  public UFace scale(float m) {return scale(m,m,m);}
+
+  public UFace scale(float mx,float my,float mz) {
+    getV()[0].mult(mx,my,mz);
+    v[1].mult(mx,my,mz);
+    v[2].mult(mx,my,mz);
+    return reset();
+  }
+
 
   public UFace resetVertexID(UVertexList vl) {
     getV();
@@ -211,7 +259,7 @@ public class UFace extends UMB  {
    */
   public UFace reset() {
     normal=null;
-    v=null;
+    if(parent!=null) v=null;
     centroid=null;
     return this;
   }

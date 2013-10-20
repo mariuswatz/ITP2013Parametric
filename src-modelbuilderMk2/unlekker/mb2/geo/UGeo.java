@@ -170,6 +170,10 @@ public class UGeo extends UMB  {
     return this;
   }
 
+  public UGeo scaleToDim(float max) {
+    float m=max/bb().dimMax();
+    return scale(m,m,m);
+  }
 
   public UGeo scale(float m) {return scale(m,m,m);}
 
@@ -183,22 +187,15 @@ public class UGeo extends UMB  {
    * size of this mesh in the X,Y,Z dimensions.  
    * @return
    */
-  public UVertex dimensions() {
-    return bb().dim;
-  }
-
-  /**
-   * Returns UVertex instance where x,y,z represent the
-   * size of this mesh in the X,Y,Z dimensions.  
-   * @return
-   */
   public UVertex dim() {
     return bb().dim;
   }
 
+
   public float dimX() {return bb().dimX();}
   public float dimY() {return bb().dimY();}
   public float dimZ() {return bb().dimZ();}
+  public float dimMax() {return bb().dimMax();}
 
 
   //////////////////////////////////////////

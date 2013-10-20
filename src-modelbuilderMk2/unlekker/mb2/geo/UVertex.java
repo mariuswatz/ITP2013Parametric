@@ -23,6 +23,10 @@ public class UVertex extends UMB  {
     this(xx,yy,0);
   }
 
+  public UVertex(double xx,double yy,double zz) {
+    this((float)xx,(float)yy,(float)zz);
+  }
+
   public UVertex(float xx,float yy,float zz) {
     ID=globalID++;
     
@@ -196,6 +200,29 @@ public class UVertex extends UMB  {
     return v2.x*v.x+v2.y*v.y+v2.z*v.z;
   }
 
+  /**
+   * Simplistic calculation of a vector's heading. Based on
+   * Euler angles and  
+   * @return Representation of rotations required to produce the heading. 
+   * code>x</code> is rotation around Z, <code>y</code> 
+   * the rotation around the Y axis. Rotations must be 
+   * performed in the Z-then-Y order.
+   */
+ public UVertex heading3D() {
+    float a, b;
+
+    UVertex v2=copy();
+
+    // Y rotation
+    a=(float)Math.atan2(v2.z, v2.x);
+    v2.rotY(-a);
+    // Z rotation
+    b=(float)Math.atan2(v2.y, v2.x);
+
+    v2.set(b, a, 0);
+    return v2;
+  }
+
   public UVertex abs() {
     x=abs(x);
     y=abs(y);
@@ -248,7 +275,17 @@ public class UVertex extends UMB  {
   public String str() {
     return toString(2);
   }
-  
+
+  public String strData() {
+    return toString(4);
+  }
+
+  public String strDeg() {
+    return String.format("<%s,%s,%s>",
+        nf(x*RAD_TO_DEG,1),
+        nf(y*RAD_TO_DEG,1),
+        nf(z*RAD_TO_DEG,1));  }
+
   public String toString() {
     return toString(2);
   }
