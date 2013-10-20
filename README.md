@@ -5,6 +5,14 @@ See the Code & Form blog for a detailed description](http://workshop.evolutionzo
 Contact e-mail: marius at mariuswatz dot com
 Class hours: Mondays 6:00pm – 8:55pm
 
+## October 20
+
+Plenty of incremental updates and fixes, notably the new UHeading class which supports aligning geometry and vertex lists to heading vectors given by two vertices. That piece of code is based on the [Apache Commons Mathematics Library](http://commons.apache.org/proper/commons-math),
+specifically the org.apache.commons.math.geometry package. 
+
+STL import has been added, see UGeoIO.readSTL().
+
+
 ## Sept 28
 
 ModelbuilderMk2: The core functionality of the library is now in place, offering a full replacement for the old Modelbuilder's geometry workflow. The new library design offers many subtle improvements along with some totally new tools. 
