@@ -30,16 +30,17 @@ public class UTestMain extends PApplet {
     tests=new ArrayList<UTest>();
     
     
+    tests.add(new UTestEdgeList());
     tests.add(new UTestHeading03());
+    tests.add(new UTestIntersection());
     tests.add(new UTestHeading02());
     tests.add(new UTestHeading01());
 //    tests.add(new UTestSTL()); 
     tests.add(new UTestCurve());
     tests.add(new UTestPrimitives());
     tests.add(new UTestResample());
-    tests.add(new UTestIntersection());
     tests.add(new UTestTriangulate());
-    tests.add(new UTest2D()); 
+//    tests.add(new UTest2D()); 
     
     theTest=tests.get(0);
     theTest.init();
@@ -49,8 +50,10 @@ public class UTestMain extends PApplet {
     background(0);
     fill(255); 
     drawCredit();
-    theTest.draw();
     
+    pushStyle();
+    theTest.draw();
+    popStyle();
     
   }
   
@@ -68,6 +71,11 @@ public class UTestMain extends PApplet {
       String filename=UFile.nextFile(sketchPath, theTest.getClass().getSimpleName(), "png");
       println(filename);
       saveFrame(filename);
+    }
+    else if(key==' ') {
+      int id=(tests.indexOf(theTest)+1)%tests.size();
+      theTest=tests.get(id);
+      theTest.init();
     }
     else if(key!=CODED) {
 //      if(keyCode==java.awt.event.KeyEvent.VK_N)     

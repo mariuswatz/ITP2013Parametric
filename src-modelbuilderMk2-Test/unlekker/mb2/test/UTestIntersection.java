@@ -19,7 +19,7 @@ import unlekker.mb2.util.UMB;
 
 public class UTestIntersection extends UTest {
   UVertexList vl;
-  UGeo mesh,cyl;
+  UGeo mesh,cyl,plane;
   
   UVertexList lines,inter;
   UVertex fv[];
@@ -40,33 +40,15 @@ public class UTestIntersection extends UTest {
     UVertex.rotX(f.getV(), PI/6);
     UVertex.rotZ(f.getV(),PI*0.33f);
     
-    fxz=new UFace().set(
-        v.copy().mult(10),
-        v.copy().mult(10).rotY(120*DEG_TO_RAD),
-        v.copy().mult(10).rotY(240*DEG_TO_RAD));
-
-    lines=new UVertexList();
-    inter=new UVertexList();
-    
-    for(int i=0; i<10; i++) {
-      a=new UVertex(p.random(0.5f,1)*R, 0).
-          rotY(p.random(TWO_PI)).add(0, 200);
-      b=new UVertex(20,0).
-          rotY(p.random(TWO_PI)).
-          add(a).add(0, p.random(-400, -150));
-
-//      ii=UIntersections.linePlane(a, b, f);
-
-//      ii=UIntersections.intersectLineY(a, b, 0);
-      lines.add(a).add(b);
-      inter.add(ii);
-    }
+  
     
     UMB.log(f.getV());
     f.rotX(f.rnd(TWO_PI)).rotZ(f.rnd(TWO_PI));
     fv=UIntersections.faceYPlane(f, 0);
     lines=null;
     UMB.log(UMB.str(fv,' ',null));
+    
+    plane=UGeo.meshPlane(2000, 2000, 20).rotX(HALF_PI);
   }
   
   public void draw() {
@@ -100,6 +82,8 @@ public class UTestIntersection extends UTest {
         pellipse(vv,R,R).ppop();
       }
     }
+    
+    plane.draw();
     if(lines!=null) drawLines();
     else {
       

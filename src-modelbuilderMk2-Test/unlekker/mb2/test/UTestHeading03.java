@@ -12,6 +12,7 @@ public class UTestHeading03 extends UTest {
   UGeo geo,geoColl;
   UVertex v1,v2;
   ArrayList<UVertexList> rows;
+  ArrayList<UVertexList> p1,p2;
   
   
   public void init() {
@@ -21,18 +22,28 @@ public class UTestHeading03 extends UTest {
     geo=new UGeo();
     buildRows(UMB.rndInt(6,10),20);//UMB.rndInt(5,12)*2);
     
-    UVertexList prof=UVertexList.circle(12, 12);
+    UVertexList prof=UVertexList.circle(8, 8);
 //    prof=UVertexList.rect(10, 10);
     
     UVertexList last=null;
+    int cnt=0;
     for(UVertexList row:rows) {
-      ArrayList<UVertexList> profiles=UHeading.sweep(row.close(), prof,0.08f);
-//      profiles.add(profiles.get(0));
+      row.close();
+      
+      ArrayList<UVertexList> profiles;
+      profiles=UHeading.sweep3(row, prof);
+      if(p1==null) p1=profiles;
+
       geo.add(new UGeo().quadstrip(profiles));
+      
+      profiles=UHeading.sweep(row, prof);
+      if(p2==null) p2=profiles;
+      
+      geo.add(new UGeo().quadstrip(profiles).translate(00,0,0));
       
       if(last!=null) {
         for(int i=0; i<row.size(); i++) {
-          geo.add(UHeading.boxVector(row.get(i), last.get(i), 8));
+//          geo.add(UHeading.boxVector(row.get(i), last.get(i), 8));
         }
       }
       
@@ -89,8 +100,13 @@ public class UTestHeading03 extends UTest {
     p.lights();
     main.nav.doTransforms();
 
-    p.fill(255);
-    geo.draw();
+    p.noFill();
+    p.stroke(255);
+    UMB.draw(p1);
+    UMB.draw(p2);
+    
+//    p.fill(255);
+//    geo.draw();
     
   }
 

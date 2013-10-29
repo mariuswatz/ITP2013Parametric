@@ -25,15 +25,29 @@ import unlekker.mb2.util.*;
 public class UHeading extends UMB {
   public Rotation rot;  
   public UVertex dir;
+  public boolean is2D;
+  public float angle2D;
+  
+  public UHeading(UVertex thedir,boolean is2D) {
+    this.is2D=is2D;
+    initHeading(thedir);
+  }
   
   public UHeading(UVertex thedir) {
+    initHeading(thedir);
+  }
+
+  private void initHeading(UVertex thedir) {
     this.dir=thedir.copy().norm();
+    if(is2D) {
+      angle2D=dir.angleXY();
+      return;
+    }
+    
     Vector3D v=toVector(dir);
 //    System.out.println(v.getX()+" "+v.getY()+" "+v.getZ());
     rot=new Rotation(v,new Vector3D(0,0,1));//-UConst.HALF_PI);
 //    rot=new Rotation(order,dir.x,dir.y,dir.z);
-    
-    
   }
 
   private Vector3D toVector(UVertex vv) {
@@ -75,9 +89,56 @@ public class UHeading extends UMB {
     return res;
   }
   
+  public static ArrayList<UVertexList> sweep3(UVertexList path,UVertexList prof) {
+    ArrayList<UVertexList> res=new ArrayList<UVertexList>();
+    ArrayList<UHeading> h;
+    
+//    ArrayList<UHeading> h=getHeadings(path,headingDamper);
+//    if(rndBool()) {
+////      log("getHeadings2");
+////      h=getHeadings2(path);
+//    }
+    h=getHeadings3(path);
+    int n=path.size();
+    
+    for(int i=0; i<n; i++) {
+      UVertexList tmp=h.get(i).align(prof.copy());
+      res.add(tmp.translate(path.get(i)));
+    }
+    
+    return res;
+  }
+
+  public static ArrayList<UHeading> getHeadings2D(UVertexList input) {
+    ArrayList<UHeading> h=new ArrayList<UHeading>();
+    
+    
+    
+    return h;
+
+  }
+
+  public UVertex getAngles() {
+    double[] a=null;
+    try {
+      a=rot.getAngles(RotationOrder.XYX);
+    } catch (CardanEulerSingularityException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }    
+    return new UVertex(a[0],a[1],a[2]);
+  }
+  
   public static ArrayList<UHeading> getHeadings(UVertexList input) {
     ArrayList<UHeading> h=new ArrayList<UHeading>();
     UVertexList delta=deltaVectors2(input);
+    for(UVertex hv:delta) h.add(new UHeading(hv));
+    return h;
+  }
+
+  public static ArrayList<UHeading> getHeadings3(UVertexList input) {
+    ArrayList<UHeading> h=new ArrayList<UHeading>();
+    UVertexList delta=deltaVectors3(input);
     for(UVertex hv:delta) h.add(new UHeading(hv));
     return h;
   }
@@ -105,9 +166,52 @@ public class UHeading extends UMB {
     return dl;
   }
 
-  
+  protected static UVertexList deltaVectors3(UVertexList input) {
+    UVertexList dl=new UVertexList();
+    
+    boolean isClosed=input.isClosed();
+    
+    for(int i=0; i<input.size(); i++) {
+      UVertex vv=null,vn=null,vp=null;
+      vv=input.get(i);
+      
+      if(i>0) vp=input.get(i-1);
+      if(i==0 && isClosed) vp=input.last();
 
+      if(i<input.size()-1) vn=input.get(i+1);
+      else if(isClosed) vn=input.first();
+      
+      if(vn!=null) vn=vn.copy().sub(vv);//.norm();
+      if(vp!=null) vp=vv.copy().sub(vp);//.norm();
+      
+      if(vp!=null && vn!=null) vv=vn.add(vp).mult(0.5f);
+      else if(vn==null) vv=vp;
+      else vv=vn;
+      
+      log(i+"/"+input.size()+" "+
+          isClosed+" vp="+(vp!=null)+
+          " vn="+(vn!=null)+" "+vv.str());
+      
+      dl.add(vv);
+      
+//      if(i<input.size()-1) {
+//        tmp=input.get(i+1).copy().sub(input.get(i)).norm();
+//        if(i>0) tmp.add(
+//            input.get(i).copy().sub(input.get(i-1)).norm()).mult(0.5f);
+//      }
+//      else tmp=input.get(i).copy().sub(input.get(i-1));
+//      dl.add(tmp);
+    }
+    
+    return dl;
+  }
+
+  
   public UVertex align(UVertex vv) {
+    if(is2D) {
+      return vv.rotZ(angle2D);
+    }
+    
     Vector3D v=toVector(vv);
     v=rot.applyInverseTo(v);
     return vv.set(v.getX(),v.getY(),v.getZ());
@@ -126,6 +230,11 @@ public class UHeading extends UMB {
     align(geo.getV());
     return geo;
   }
+  
+  public static UGeo align(UGeo geo,UVertex v1,UVertex v2) {
+    return align(geo,v1,v2,-1);
+  }
+
 
   /**
    * Aligns and scales a UGeo instance so that the result geometry lies along the
@@ -137,23 +246,36 @@ public class UHeading extends UMB {
    * @param v2
    * @return
    */
-  public static UGeo align(UGeo geo,UVertex v1,UVertex v2) {
+  public static UGeo align(UGeo geo,UVertex v1,UVertex v2,float extend) {
     UVertex dir=v2.copy().sub(v1);
     UHeading h=new UHeading(dir);
     
-    UMB.log(dir.mag()+" "+geo.dimZ());
-    geo.center().scale(1,1,dir.mag()/geo.dimZ());
+//    UMB.log(dir.mag()+" "+geo.dimZ());
+    float m=dir.mag();
+    if(extend>0) m+=extend*2;
+    
+    geo.center().scale(1,1,m/geo.dimZ());
+        
     h.align(geo.getV());
     geo.translate(dir.mult(0.5f).add(v1));
     return geo;
   }
 
-  public static UGeo boxVector(UVertex v1,UVertex v2,float thickness) {
-    return align(UGeo.box(thickness),v1,v2);
+  public static UGeo boxVector(UVertex v1,UVertex v2,float thickness,float extend) {
+    return align(UGeo.box(thickness),v1,v2,extend);
   }
 
+  public static UGeo boxVector(UVertex v1,UVertex v2,float thickness) {
+    return boxVector(v1, v2, thickness, -1);
+  }
+
+  
   public static UGeo cylVector(UVertex v1,UVertex v2,float thickness,int steps) {
-    return align(UGeo.cyl(thickness, 100, steps).rotX(HALF_PI),v1,v2);
+    return cylVector(v1, v2, thickness, -1,steps);
+  }
+
+  public static UGeo cylVector(UVertex v1,UVertex v2,float thickness,float extend,int steps) {
+    return align(UGeo.cyl(thickness, 100, steps).rotX(HALF_PI),v1,v2,extend);
   }
 
 }
