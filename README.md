@@ -5,6 +5,11 @@ See the Code & Form blog for a detailed description](http://workshop.evolutionzo
 Contact e-mail: marius at mariuswatz dot com
 Class hours: Mondays 6:00pm – 8:55pm
 
+## October 30
+
+Added source folder "src-itp-sketches". It contains miscellaneous code demos and ModelbuilderMk2 tutorials demonstrated in the Parametric Design class at ITP.
+
+
 ## October 20
 
 Plenty of incremental updates and fixes, notably the new UHeading class which supports aligning geometry and vertex lists to heading vectors given by two vertices. That piece of code is based on the [Apache Commons Mathematics Library](http://commons.apache.org/proper/commons-math),
