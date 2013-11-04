@@ -29,7 +29,10 @@ public class UTestMain extends PApplet {
     
     tests=new ArrayList<UTest>();
     
+    tests.add(new UTestSmooth());
     
+    tests.add(new UTestPrimitives());
+    tests.add(new UTestIntersectionCirc());
     tests.add(new UTestEdgeList());
     tests.add(new UTestHeading03());
     tests.add(new UTestIntersection());
@@ -37,7 +40,6 @@ public class UTestMain extends PApplet {
     tests.add(new UTestHeading01());
 //    tests.add(new UTestSTL()); 
     tests.add(new UTestCurve());
-    tests.add(new UTestPrimitives());
     tests.add(new UTestResample());
     tests.add(new UTestTriangulate());
 //    tests.add(new UTest2D()); 
@@ -46,9 +48,15 @@ public class UTestMain extends PApplet {
     theTest.init();
   }
 
+  public int bg=-1;
+  public void background(float c) {
+    bg=color(c);
+    super.background(bg);
+  }
+  
   public void draw() {
     background(0);
-    fill(255); 
+     
     drawCredit();
     
     pushStyle();
@@ -56,11 +64,21 @@ public class UTestMain extends PApplet {
     popStyle();
     
   }
-  
+
+  public void drawGrid() {
+    int n=width/100;
+    for(int i=1; i<n;i++) {
+      
+      line(i*100,0,i*100,height);
+      line(0,i*100,width,i*100);
+    }
+  }
+
   void drawCredit() {
     if(frameCount<2)   textFont(createFont("courier", 11, false));
 
-    fill(255);
+    if(bg>-1 && bg!=color(0)) fill(0);
+    else fill(255);
     textAlign(RIGHT);
     text(UMB.version(), width-5, 15);
     textAlign(LEFT);
@@ -77,7 +95,7 @@ public class UTestMain extends PApplet {
       theTest=tests.get(id);
       theTest.init();
     }
-    else if(key!=CODED) {
+    else if(key!=CODED && key=='n') {
 //      if(keyCode==java.awt.event.KeyEvent.VK_N)     
         theTest.init();
     }

@@ -5,6 +5,55 @@ import unlekker.mb2.util.UMB;
 public class UIntersections extends UMB {
   private static UFace planeY;
   
+  public static UVertex[] circleCircle2D(UVertex v1,float r1, UVertex v2,float r2) {
+    float dx = v1.x - v2.x;
+    float dy = v1.y - v2.y;
+    float d2 = dx*dx + dy*dy;
+    float d = sqrt( d2 );
+    
+    if ( d>r1+r2 || d<abs(r1-r2) ) return null; // no solution
+    
+    r1*=r1;
+    r2*=r2;
+    
+    float a = (r1 - r2 + d2) / (2*d);
+    float h = sqrt( r1 - a*a );
+    float x2 = v1.x + a*(v2.x - v1.x)/d;
+    float y2 = v1.y + a*(v2.y - v1.y)/d;
+    
+    float paX = x2 + h*(v2.y - v1.y)/d;
+    float paY = y2 - h*(v2.x - v1.x)/d;
+    float pbX = x2 - h*(v2.y - v1.y)/d;
+    float pbY = y2 + h*(v2.x - v1.x)/d;
+    return new UVertex[] {
+        new UVertex(paX,paY),
+        new UVertex(pbX,pbY)
+    };
+  }
+  
+  public static float[] circleCircle2DRadians(UVertex v1,float r1, UVertex v2,float r2) {
+    UVertex vv[]=circleCircle2D(v1, r1, v2, r2);
+    if(vv==null) return null;
+    
+    float a[]=new float[] {
+        vv[0].sub(v1).angleXY(),
+        vv[1].sub(v1).angleXY()
+    };
+    
+    a[0]=mod(a[0], TWO_PI);
+    a[1]=mod(a[1], TWO_PI);
+//    if(a[1]>a[0]) a[1]+=TWO_PI;
+//    if(a[0]>a[1]) a[1]=TWO_PI-a[1];
+//    if(a[0]>a[1]) {
+//      float tmp=a[0];
+//      a[0]=a[1];
+//      a[1]=tmp;
+//    }
+    
+    return a;
+  }
+  
+  
   public static UVertex[] faceYPlane(UFace f,float Y) {
 
     if(planeY==null) {

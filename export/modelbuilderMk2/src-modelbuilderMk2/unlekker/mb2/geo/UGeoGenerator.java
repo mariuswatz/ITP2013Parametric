@@ -62,7 +62,7 @@ public class UGeoGenerator extends UMB {
     return geo.groupJoinAll();
   }
 
-/*  public static UGeo roundedBox(float w,float h,float d,float r,int steps) {
+  public static UGeo roundedBox(float w,float h,float d,float r,int steps) {
     return null;
   }
   
@@ -85,5 +85,4 @@ public class UGeoGenerator extends UMB {
     
     return arc;
   }
-*/
 }

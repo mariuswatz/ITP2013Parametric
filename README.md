@@ -1,14 +1,13 @@
 # ITP, NYU Fall 2013: Parametric Design for Digital Fabrication
 
-Class for NYU ITP, Fall 2013. Instructor is [Marius Watz](http://mariuswatz.com).
-See the Code & Form blog for a detailed description](http://workshop.evolutionzone.com/itp-2013-parametric-design-for-digital-fabrication/)
-Contact e-mail: marius at mariuswatz dot com
+Class for NYU ITP, Fall 2013. Instructor is [Marius Watz](http://mariuswatz.com).<br />
+See the Code & Form blog for a [detailed description](http://workshop.evolutionzone.com/itp-2013-parametric-design-for-digital-fabrication/)<br />
+Contact e-mail: marius at mariuswatz dot com<br />
 Class hours: Mondays 6:00pm – 8:55pm
 
 ## October 30
 
-Added source folder "src-itp-sketches". It contains miscellaneous code demos and ModelbuilderMk2 tutorials demonstrated in the Parametric Design class at ITP.
-
+Added source folder "src-itp-sketches". It contains miscellaneous code demos and ModelbuilderMk2 tutorials demonstrated in the Parametric Design class at ITP. I've added some examples to the 
 
 ## October 20
 

@@ -41,6 +41,12 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     this.options=options;
   }
   
+  public UVertexList setOptions(int opt) {
+    UMB.setOptions(opt);
+    return this;
+  }
+
+  
   public UVertexList copy() {
     UVertexList cvl=new UVertexList();
     for(UVertex vv:v) cvl.add(vv);
@@ -72,10 +78,10 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   /**
    * Produces a new UVertexList containing the delta vector for each position in this
    * list, so that for a given index==[0..n-2] the delta equals <code>get(index+1).copy().sub(get(index));</code>
-   * For <code>index==n-1</code> the delta is the same as for <code>index==n-2</code>. The damping parameters
+   * <p>For <code>index==n-1</code> the delta is the same as for <code>index==n-2</code>. The damping parameters
    * causes damping between the previous and current delta, so that the previous value is weighted by
    * <code>(1.0-damping)</code> and the new value by <code>damping</code>. This is useful to "slow down" changes
-   * in the heading along a path.  
+   * in the heading along a path.</p>  
    * @param damping
    * @return
    */
@@ -112,20 +118,73 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
       cvl.add(point(map(i,0,n-1,0,1)));
     return cvl;
   }
-  
-/*  public static UVertexList smoothVL(UVertexList in, float perc) {
-    UVertexList out=new UVertexList();
 
-    for(int i=0; i<in.n; i++) {
-      UVec3 v1=UVec3.interpolate(in.v[i],in.v[(i+1)%in.n], perc);
-      UVec3 v2=UVec3.interpolate(in.v[i],in.v[(i+1)%in.n], (1-perc));
+  /**
+   * Extracts a cross section of an ArrayList<UVertexList>, creating
+   * a new list that contains vertices extracted from the ArrayList
+   * at the position indicated by <code>index</code>.     
+   * @param index Position of the vertices to extract 
+   * @param stack List of vertex lists representing a stack
+   * @return
+   */
+  public static UVertexList crossSection(int index,ArrayList<UVertexList> stack) {
+    UVertexList vl=new UVertexList().setOptions(NOCOPY);
+    
+    for(UVertexList l:stack) vl.add(l.get(index));
+    return vl;
+  }
+  
+  /**
+   * <p>Smooths a list of vertices, with the number of smoothing iterations
+   * specified by <code>smoothLevel</code>.</p>
+   * 
+   * <p>The algorithm consists of
+   * taking line segments (v1,v2) from the input vertex list, calculating 
+   * two new vertices interpolated at 33% and 66% (respectively, 
+   * <code>v1.lerp(0.33f,v2)</code> and <code>v1.lerp(0.66f,v2)</code> along each segment. 
+   * The new points are added to a new list, omitting the original vertices.</p> 
+   * 
+   * <p>If the input list is closed (<code>UVertexList.isClosed()==true</code>),
+   * the first and last segments are handled so that the interpolation "wraps",
+   * if not the original first and last vertices are added to the new list.</p>
+   *   
+   * @param in
+   * @param level
+   * @return
+   */
+  public static UVertexList smoothVL(UVertexList in, int level) {
+    float perc=0.33f;
+    UVertexList out= null;
+    
+    boolean isClosed=in.isClosed();
+    
+    for(int j=0; j<level; j++) {
+      out=new UVertexList();
+
+      int nn=(isClosed ? in.size() : in.size()-1);
+      for(int i=0; i<nn; i++) {        
+        int i2=(i+1)%in.size();
+        UVertex v1=UVertex.lerp(perc,in.get(i),in.get(i2));
+        UVertex v2=UVertex.lerp(1-perc,in.get(i),in.get(i2));
+        
+        out.add(v1).add(v2);
+      } 
+      if(!isClosed) {
+        out.insert(0,in.first());
+        out.add(in.last());
+      }
+      else {
+        
+        out.close();
+      }
       
-      out.add(v1).add(v2);
-    } 
+      log(out.str());
+      in=out;
+    }
     
     return out;
    }
-*/  
+  
   public UVertex point(float t) {
     if(t<EPSILON) return v.get(0);
     if(t>1-EPSILON) return last();
@@ -190,6 +249,15 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     UVertexList cl=new UVertexList();
     for(int i=0; i<nn; i++) {
       float t=map(i,0,nn,0,TWO_PI);
+      cl.add(new UVertex(w,0,0).rotZ(t));
+    }
+    return cl.close();
+  }
+
+  public static UVertexList arc(float w,float a,float b,int nn) {
+    UVertexList cl=new UVertexList();
+    for(int i=0; i<nn; i++) {
+      float t=map(i,0,nn-1,a,b);
       cl.add(new UVertex(w,0,0).rotZ(t));
     }
     return cl.close();
@@ -363,7 +431,11 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   }
 
   
-  public int getVID(UVertex vv) {return indexOf(vv);}
+  public int getVID(UVertex vv) {
+    int index=indexOf(vv);
+    if(index<0) index=addID(vv);
+    
+    return index;}
 
   public UVertex get(int id) {
     return (id>size() ? null : v.get(id));
@@ -405,10 +477,10 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   }
 
   /**
-   * Returns a new vertex list containing vertices [n1..n2] of this UVertexList, 
-   * producing (n2-n1)+1 vertices.
-   * The new vertex list is initialized with the options set for the current UVertexList,
-   * so if NOCOPY is enabled the vertices are copied by reference and not by value.  
+   * <p>Returns a new vertex list containing vertices [n1..n2] of this UVertexList, 
+   * producing (n2-n1)+1 vertices.</p>
+   * <p>The new vertex list is initialized with the options set for the current UVertexList,
+   * so if NOCOPY is enabled the vertices are copied by reference and not by value.</p>  
    * @param n1 First vertex ID
    * @param n2 Final vertex ID (inclusive)
    * @return
@@ -484,6 +556,13 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return indexOf(v1);
   }
 
+  public int[] addID(UVertexList vl) {
+    int[] id=new int[vl.size()];
+    for(int i=0; i<id.length; i++) id[i]=addID(vl.get(i));
+    return id;
+  }
+
+  
   public UVertexList remove(int id) {
     v.remove(id);
     return this;
@@ -551,6 +630,25 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     // TODO Auto-generated method stub
     return v.iterator();
   }
+  
+  public UVertexList rotXInPlace(float a) {
+    UVertex c=centroid();    
+    for(UVertex vv:v) vv.sub(c).rotX(a).add(c);
+    return this;    
+  }
+
+  public UVertexList rotYInPlace(float a) {
+    UVertex c=centroid();    
+    for(UVertex vv:v) vv.sub(c).rotY(a).add(c);
+    return this;    
+  }
+
+  public UVertexList rotZInPlace(float a) {
+    UVertex c=centroid();    
+    for(UVertex vv:v) vv.sub(c).rotZ(a).add(c);
+    return this;    
+  }
+
   
   public UVertexList rotX(float deg) {
     bb=null;
@@ -724,6 +822,10 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     Collections.reverse(v);
     return this;
     
+  }
+
+  public int[] getVID(UVertex[] vv) {
+    return getVID(vv,null);
   }
 
   public int[] getVID(UVertex[] vv, int[] vid) {

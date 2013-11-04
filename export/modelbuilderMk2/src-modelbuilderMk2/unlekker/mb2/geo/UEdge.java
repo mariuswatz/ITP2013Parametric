@@ -26,6 +26,7 @@ public class UEdge extends UMB {
   public UEdge() {
     ID=globalID++;
     v=new UVertex[2];
+    faces=new ArrayList<UFace>();
   }
 
   public UEdge(UVertex v1, UVertex v2) {
@@ -33,7 +34,12 @@ public class UEdge extends UMB {
     
     set(v1,v2);
   }
-  
+
+  public UEdge add(UFace ff) {
+    if(faces.indexOf(ff)<0) faces.add(ff);
+    return this;
+  }
+
   public void draw() {
     pline(v[0],v[1]);
   }

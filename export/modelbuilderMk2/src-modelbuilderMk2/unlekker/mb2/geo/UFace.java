@@ -51,9 +51,22 @@ public class UFace extends UMB  {
     vID=new int[] {ID[0],ID[1],ID[2]};
   }
 
+  public UFace set(UVertex vv[]) {
+    if(parent!=null) {
+      getVID(vv);
+      getV();
+    }
+    else {
+      if(v==null) v=new UVertex[vv.length];
+      int cnt=0;
+      for(UVertex vert:vv) v[cnt++]=vert;
+    }
+    return this;
+  }
+
   public UFace set(UVertex v1, UVertex v2, UVertex v3) {
     if(parent!=null) {
-      getVID(v1, v2, v3);
+      getVID(new UVertex[] {v1,v2,v3});
     }
     else {
       if(v==null) v=new UVertex[3];
@@ -66,16 +79,13 @@ public class UFace extends UMB  {
     return this;
   }
 
-  public UFace getVID() {
-    return getVID(v[0],v[1],v[2]);
-    
+  public int[] getVID() {
+    return getVID(v);    
   }
-  
-  private UFace getVID(UVertex v1, UVertex v2, UVertex v3) {
-    vID[0]=parent.addVertex(v1);
-    vID[1]=parent.addVertex(v2);
-    vID[2]=parent.addVertex(v3);
-    return this;
+
+  private int[] getVID(UVertex vv[]) {
+    vID=parent.getVID(vv);
+    return vID;
   }
 
   public UFace drawNormal(float len) {
@@ -125,7 +135,7 @@ public class UFace extends UMB  {
   public UVertex[] getV() {
     if(parent==null || v!=null) return v;
     
-    if(v==null) v=new UVertex[3];
+    if(v==null) v=new UVertex[vID.length];
  
     int id=0;    
     for(int vid:vID) v[id++]=parent.getVertex(vid);
@@ -142,31 +152,22 @@ public class UFace extends UMB  {
   }
   
   public UFace translate(float mx,float my,float mz) {
-    getV()[0].add(mx,my,mz);
-    v[1].add(mx,my,mz);
-    v[2].add(mx,my,mz);
+    for(UVertex vt:getV()) vt.add(mx,my,mz);
     return reset();
   }
   
   public UFace rotX(float deg) {
-    getV()[0].rotX(deg);
-    v[1].rotX(deg);
-    v[2].rotX(deg);
+    for(UVertex vt:getV()) vt.rotX(deg);
     return reset();
   }
 
   public UFace rotY(float deg) {
-    getV()[0].rotY(deg);
-    v[1].rotY(deg);
-    v[2].rotY(deg);
+    for(UVertex vt:getV()) vt.rotY(deg);
     return reset();
   }
 
   public UFace rotZ(float deg) {
-    getV();
-    v[0].rotZ(deg);
-    v[1].rotZ(deg);
-    v[2].rotZ(deg);
+    for(UVertex vt:getV()) vt.rotZ(deg);
     return reset();
   }
 
@@ -174,9 +175,7 @@ public class UFace extends UMB  {
   public UFace scale(float m) {return scale(m,m,m);}
 
   public UFace scale(float mx,float my,float mz) {
-    getV()[0].mult(mx,my,mz);
-    v[1].mult(mx,my,mz);
-    v[2].mult(mx,my,mz);
+    for(UVertex vt:getV()) vt.mult(mx,my,mz);
     return reset();
   }
 
@@ -202,7 +201,10 @@ public class UFace extends UMB  {
   }
 
   public UFace set(UFace v) {
-    vID=new int[] {v.vID[0],v.vID[1],v.vID[2]};
+    vID=new int[v.vID.length];
+    int cnt=0;
+    for(int i:v.vID) vID[cnt++]=i;
+    
     col=v.col;
     parent=v.parent;
     
@@ -224,11 +226,7 @@ public class UFace extends UMB  {
 
   public UVertex centroid() {
     if(centroid==null) {
-      getV();
-      centroid=new UVertex().
-          add(v[0]).add(v[1]).add(v[2]);
-      log(UVertex.str(v)+" -> "+centroid.str());
-      centroid.div(3);
+      centroid=UVertex.centroid(getV());
     }
     
     return centroid;

@@ -50,10 +50,14 @@ public class UVertex extends UMB  {
   }
 
   
-  public void draw() {
-    pvertex(this);
+  public UVertex draw() {
+    return (UVertex)pvertex(this);
   }
 
+  public UVertex ptranslate() {
+    return (UVertex)ptranslate(this);
+  }
+  
   public UVertex set(float xx,float yy) {
     x=xx;
     y=yy;
@@ -225,7 +229,7 @@ public class UVertex extends UMB  {
   }
 
  public float angleXY() {
-   return PApplet.atan2(-y, x);
+   return -PApplet.atan2(-y, x);
  }
 
   public UVertex abs() {
@@ -281,6 +285,10 @@ public class UVertex extends UMB  {
     return toString(2);
   }
 
+  public String str2D() {
+    return String.format(FSTRXY,nf(x,2),nf(y,2));
+  }
+
   public String strData() {
     return toString(4);
   }
@@ -295,7 +303,7 @@ public class UVertex extends UMB  {
     return toString(2);
   }
   public String toString(int prec) {
-    return String.format("<%s,%s,%s>",
+    return String.format(FSTRXYZ,
         nf(x,prec),nf(y,prec),nf(z,prec));
   }
 
@@ -469,9 +477,12 @@ public class UVertex extends UMB  {
     if(v2==null || v2.length==0) return null;
 
     UBB bb=new UBB().add(v2).calc();
-    log(bb.centroid.str());
+    log("centroid "+bb.centroid.str()+" bb "+bb.str());
+    UVertex v=new UVertex();
+    for(UVertex vv:v2) v.add(vv);
+    v.div(v2.length);
     
-    return bb.centroid;
+    return v;//bb.centroid;
   }
   
 }

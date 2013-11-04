@@ -137,6 +137,14 @@ public class UMB implements UConst {
     return prect(-r*0.5f,-r2*0.5f, r, r2);
   }
 
+  public static UMB pcross(UVertex loc,float w) {
+    return ppush().ptranslate(loc).pline(-w,0,w,0).pline(0,-w,0,w).ppop();
+  }
+  
+  public static UMB prect(UVertex loc,float r) {
+    return prect(loc,r,r);
+  }
+
   public static UMB prect(UVertex loc,float r,float r2) {
     if (checkGraphicsSet()) 
       ppush().ptranslate(loc).prect(0,0, r, r2).ppop();
@@ -148,10 +156,24 @@ public class UMB implements UConst {
     return UMB.UMB;
   }
 
+  public static UMB pquad(UVertex[] vv) {
+    if (checkGraphicsSet()) {
+      g.beginShape(QUADS);
+      pvertex(vv);
+      g.endShape();
+    }
+    return UMB.UMB;
+  }
+
+
   public static UMB pellipse(float r,float r2) {
     return pellipse(0,0, r, r2);
   }
-  
+
+  public static UMB pellipse(UVertex loc,float r) {
+    return pellipse(loc, r,r);
+  }
+
   public static UMB pellipse(UVertex loc,float r,float r2) {
     if (checkGraphicsSet()) 
       ppush().ptranslate(loc).pellipse(0,0, r, r2).ppop();
@@ -205,6 +227,13 @@ public class UMB implements UConst {
       if(isGraphics3D)
         g.line(0,0,0, v.x, v.y, v.z);
       else g.line(0,0,v.x, v.y);
+    }
+    return UMB.UMB;
+  }
+
+  public static UMB pline(float x1,float y1,float x2,float y2) {
+    if (checkGraphicsSet()) {
+      g.line(x1,y1,x2,y2);
     }
     return UMB.UMB;
   }
@@ -278,6 +307,14 @@ public class UMB implements UConst {
    */
   public static UMB pstroke(int col) {
     if (checkGraphicsSet()) g.stroke(col);
+    return UMB.UMB;
+  }
+
+  public static UMB pstroke(int col,float strokeWeight) {
+    if (checkGraphicsSet()) {
+      if(strokeWeight>0) g.strokeWeight(strokeWeight);
+      g.stroke(col);
+    }
     return UMB.UMB;
   }
 
@@ -535,6 +572,11 @@ public class UMB implements UConst {
         return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
   }
 
+  public final static float wraplerp(float a, float b, float t, float w) {
+    a += (abs(b-a) > w/2f) ? ((a < b) ? w : -w) : 0;
+    return lerp(a, b, t);
+    }
+
 
   //////////////////////////////////////////
   // PARSING VALUES
@@ -571,6 +613,10 @@ public class UMB implements UConst {
   public static void setRnd(URnd rnd) {
     UMB.rnd=rnd;
     UMB.UMB=new UMB();
+  }
+  
+  public static float sign(float in) {
+    return (in<0 ? -1 : 1);
   }
   
   /**

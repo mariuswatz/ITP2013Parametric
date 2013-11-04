@@ -16,7 +16,9 @@ public interface UConst extends processing.core.PConstants {
   public static final String CREDIT="Marius Watz - http://workshop.evolutionzone.com/";
   public static final String TIMESTR="%2d:%2d:%2d";
   public final static String VERSION = "ModelbuilderMk2-0002c";
-
+  public final static String FSTRXYZ="<%s,%s,%s>";
+  public final static String FSTRXY="<%s,%s>";
+  
   public static final float EPSILON=1.1920928955078125E-7f;
 
   public static final int KB=1024,MB=KB*KB;
@@ -45,4 +47,7 @@ public interface UConst extends processing.core.PConstants {
   public static final int VIDWQXGAW=2560,VIDWQXGAH=1600;
   
   public static final int COLORVERTEX=8,COLORFACE=4;
+
+  public static final int SUBDIVCENTROID=0,SUBDIVMIDEDGES=1;
+  
 }

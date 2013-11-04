@@ -8,13 +8,7 @@ import java.awt.Frame;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
-import unlekker.mb2.geo.UFace;
-import unlekker.mb2.geo.UGeo;
-import unlekker.mb2.geo.UIntersections;
-import unlekker.mb2.geo.UNav3D;
-import unlekker.mb2.geo.UTriangulate;
-import unlekker.mb2.geo.UVertex;
-import unlekker.mb2.geo.UVertexList;
+import unlekker.mb2.geo.*;
 import unlekker.mb2.util.UMB;
 
 public class UTestIntersection extends UTest {
@@ -48,7 +42,7 @@ public class UTestIntersection extends UTest {
     lines=null;
     UMB.log(UMB.str(fv,' ',null));
     
-    plane=UGeo.meshPlane(2000, 2000, 20).rotX(HALF_PI);
+    plane=UGeoGenerator.meshPlane(2000, 2000, 20).rotX(HALF_PI);
   }
   
   public void draw() {
