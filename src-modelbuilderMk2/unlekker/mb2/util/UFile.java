@@ -193,10 +193,9 @@ public class UFile implements UConst {
 
     try {
       filename=getAbsolutePath(filename);   
-      
-      
+          
       UMB.logDivider(filename);
-//      new File(getPath(filename)).mkdirs();
+      new File(getPath(filename)).mkdirs();
       
       if(filename.endsWith("gz")) {
         out=new GZIPOutputStream(new FileOutputStream(filename));
@@ -247,7 +246,7 @@ public class UFile implements UConst {
     if(path==null) return null;
         
     path=path.replace(DIRCHARDOS,DIRCHAR);
-    if(!path.endsWith(DIRSTR)) path+=DIRSTR;
+//    if(!path.endsWith(DIRSTR)) path+=DIRSTR;
     
     return path;
   }
@@ -265,10 +264,12 @@ public class UFile implements UConst {
 
   public static String getPath(String path) {
     if(path==null) return null;
+    path=fixPath(path);
 
 //    if(path.indexOf(DIRCHAR)==-1 && path.indexOf(DIRCHARDOS)==-1) return ""; 
 
-    path=path.replace(DIRCHARDOS, DIRCHAR);
+    if(path.indexOf(DIRCHAR)<0) return path;
+    
     path=path.substring(0,path.lastIndexOf(DIRCHAR));
     
     return path;
@@ -299,20 +300,27 @@ public class UFile implements UConst {
    * @return Filename sans  path
    */
   public static String noPath(String name) {
-    int pos=name.lastIndexOf('\\');
-    int pos2=name.lastIndexOf('/');
-    if(pos<0 || (pos2>-1 && pos2<pos)) pos=pos2;
-
+//    int pos=name.lastIndexOf('\\');
+//    int pos2=name.lastIndexOf('/');
+//    if(pos<0 || (pos2>-1 && pos2<pos)) pos=pos2;
+    
+    
+    name=fixPath(name);
+    int pos=name.lastIndexOf(DIRCHAR);
+    if(pos<0) return name;
+    
+    UMB.log(name+" "+name.substring(pos+1));
     return name.substring(pos+1);
   }
   
   public static String getAbsolutePath(String name) {
     PApplet papplet=UMB.getPApplet();
 
-    String path=fixPath(getPath(name));
+    name=fixPath(name);
+    String path=getPath(name);
     name=noPath(name);
-    
     File f=new File(path+name);    
+    UMB.log("path = "+path+" \nname="+name+" "+f.isAbsolute());
     
     if(!f.isAbsolute()) {
       if(papplet!=null) {
@@ -326,7 +334,8 @@ public class UFile implements UConst {
 
     File ff=new File(path);
     ff.mkdirs();
-    UMB.log("ff "+ff.getAbsolutePath()+" "+name);
+    if(!path.endsWith(DIRSTR)) path+=DIRSTR;
+//    UMB.log("ff "+ff.getAbsolutePath()+" "+name);
 //    ff.
 //    if(debugLevel>2) Util.log("IO.getAbsolutePath "+s);
     return path+name;

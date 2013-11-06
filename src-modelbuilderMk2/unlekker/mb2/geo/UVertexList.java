@@ -41,11 +41,11 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     this.options=options;
   }
   
-  public UVertexList setOptions(int opt) {
-    UMB.setOptions(opt);
-    return this;
-  }
-
+//  public UVertexList setOptions(int opt) {
+//    UMB.setOptions(opt);
+//    return this;
+//  }
+//
   
   public UVertexList copy() {
     UVertexList cvl=new UVertexList();
@@ -128,7 +128,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
    * @return
    */
   public static UVertexList crossSection(int index,ArrayList<UVertexList> stack) {
-    UVertexList vl=new UVertexList().setOptions(NOCOPY);
+    UVertexList vl=(UVertexList)new UVertexList().setOptions(NOCOPY);
     
     for(UVertexList l:stack) vl.add(l.get(index));
     return vl;
@@ -149,16 +149,16 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
    * if not the original first and last vertices are added to the new list.</p>
    *   
    * @param in
-   * @param level
+   * @param smoothLevel
    * @return
    */
-  public static UVertexList smoothVL(UVertexList in, int level) {
+  public static UVertexList smooth(UVertexList in, int smoothLevel) {
     float perc=0.33f;
     UVertexList out= null;
     
     boolean isClosed=in.isClosed();
     
-    for(int j=0; j<level; j++) {
+    for(int j=0; j<smoothLevel; j++) {
       out=new UVertexList();
 
       int nn=(isClosed ? in.size() : in.size()-1);
@@ -185,6 +185,35 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return out;
    }
   
+  
+  public static ArrayList<UVertexList> smooth(ArrayList<UVertexList> in) {
+    int n=in.size();
+    if(n<3) return in;
+    
+    ArrayList<UVertexList> out=new ArrayList<UVertexList>();
+    out.add(in.get(0));
+    
+    for(int i=0; i<n-1; i++) {
+      UVertexList vl1=in.get(i);      
+      UVertexList vl2=in.get(i+1);      
+      UVertexList res1=new UVertexList();      
+      UVertexList res2=new UVertexList();      
+      
+      int cnt=0;
+      for(UVertex v1 : vl1) {
+        UVertex v2=vl2.get(cnt++);
+        res1.add(v1.lerp(0.33f, v2));
+        res2.add(v1.lerp(0.33f, v2));
+      }
+      
+      out.add(res1);
+      out.add(res2);
+    }
+    
+    out.add(in.get(in.size()-1));
+    return out;
+  }
+
   public UVertex point(float t) {
     if(t<EPSILON) return v.get(0);
     if(t>1-EPSILON) return last();

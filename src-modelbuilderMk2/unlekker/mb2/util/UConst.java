@@ -35,7 +35,7 @@ public interface UConst extends processing.core.PConstants {
   public static final char DIRCHAR='/',DIRCHARDOS='\\',NEWLN='\n';      
   public static final String DIRSTR="/",DIRSTRDOS="\\",NULLSTR="null";      
   public static final String ENCLSQ="[]",ENCLTAG="<>";
-  public static final String LOGDIVIDER="----------------";
+  public static final String LOGDIVIDER="----------------\n";
   public static final String UGEO="UGEO",UVERTEXLIST="UVL",UVERTEX="UV",UFACE="UF";
   public static final int SMOOTHSTEP=0;
   

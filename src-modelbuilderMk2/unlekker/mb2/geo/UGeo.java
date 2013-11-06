@@ -414,7 +414,7 @@ public class UGeo extends UMB  {
     return vl.get(id);
   }
 
-  public static UMB draw(ArrayList<UGeo> models) {
+  public static UMB drawModels(ArrayList<UGeo> models) {
     for(UGeo geo:models) geo.draw();
     return UMB.UMB;
 
@@ -600,9 +600,28 @@ public class UGeo extends UMB  {
   }
   
   public UGeo addFace(UVertex v1, UVertex v2, UVertex v3) {
+    if(!UFace.check(v1,v2,v3)) {
+      log("Invalid face");
+      return this;
+    }
+    if(duplicateF(v1,v2,v3)) {
+      log("Duplicate face");
+      return this;
+    }
+    
     faces.add(new UFace(this, v1,v2,v3));    
     vl.bb=null;
     return this;
+  }
+
+  public boolean duplicateF(UVertex v1, UVertex v2, UVertex v3) {
+    int cnt=0;
+    
+    UFace ff=new UFace(v1,v2,v3);
+    for(UFace theFace:faces) if(theFace.equals(ff)) return true;
+    
+    // TODO Auto-generated method stub
+    return false;
   }
 
   /**

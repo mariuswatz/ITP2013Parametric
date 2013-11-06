@@ -36,6 +36,10 @@ public class UFace extends UMB  {
     set(v);
   }
 
+  public UFace(UVertex v1, UVertex v2, UVertex v3) {
+    this(null,v1,v2,v3);
+  }
+
   public UFace(UGeo model, UVertex v1, UVertex v2, UVertex v3) {
     this();
     if(model!=null) parent=model;
@@ -309,6 +313,20 @@ public class UFace extends UMB  {
     }
     
     return true;
+  }
+
+  public static boolean check(UVertex vv[]) {
+    return check(vv[0],vv[1],vv[2]);
+  }
+  
+  public static boolean check(UVertex v1, UVertex v2, UVertex v3) {
+    if(v1.equals(v2) || v2.equals(v3) || v1.equals(v3)) return false;
+    float d1=v1.distSimple(v2);
+    float d2=v2.distSimple(v3);
+    float d3=v1.distSimple(v3);
+    
+    if(d1<EPSILON || d2<EPSILON || d3<EPSILON) return false;
+    return false;
   }
 
 }
