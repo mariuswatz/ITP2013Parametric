@@ -131,11 +131,12 @@ public class UFile implements UConst {
    * @return
    */
   public static String nextFile(String path,String prefix,String ext) {
+    
     path=getAbsolutePath(path);
     
     int last=lastIndex(path, prefix, ext)+1;
     
-    String s=fixPath(path)+prefix.trim()+" "+UMB.nf(last,4);
+    String s=path+prefix.trim()+" "+UMB.nf(last,4);
     
     if(ext!=null) {
       if(!ext.startsWith(".")) ext="."+ext;
@@ -244,8 +245,9 @@ public class UFile implements UConst {
    */
   public static String fixPath(String path) {
     if(path==null) return null;
-        
-    path=path.replace(DIRCHARDOS,DIRCHAR);
+    
+    path=path.indexOf(DIRCHARDOS)<0 ? path: path.replace(DIRCHARDOS,DIRCHAR);
+    if(isDir(path) && !path.endsWith(DIRSTR)) path+=DIRSTR;
 //    if(!path.endsWith(DIRSTR)) path+=DIRSTR;
     
     return path;
@@ -266,16 +268,47 @@ public class UFile implements UConst {
     if(path==null) return null;
     path=fixPath(path);
 
-//    if(path.indexOf(DIRCHAR)==-1 && path.indexOf(DIRCHARDOS)==-1) return ""; 
-
-    if(path.indexOf(DIRCHAR)<0) return path;
+    if(!isDir(path)) {
+      int pos=path.lastIndexOf(DIRCHAR);
+      if(pos>-1) path=path.substring(0,path.lastIndexOf(DIRCHAR)); 
+    }
     
-    path=path.substring(0,path.lastIndexOf(DIRCHAR));
+    if(!path.endsWith(DIRSTR)) path+=DIRSTR;  
     
     return path;
   }
   
   
+  public static boolean isDir(String path) {
+    boolean ok=false;
+    
+    try {
+      ok=new File(path).isDirectory();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      ok=false;
+//      e.printStackTrace();
+    }
+    
+    
+    return ok;
+  }
+
+  public static boolean isAbsolutePath(String path) {
+    boolean ok=false;
+    
+    try {
+      ok=new File(path).isAbsolute();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      ok=false;
+//      e.printStackTrace();
+    }
+    
+    
+    return ok;
+  }
+
   /**
    * Returns the file name sans extension
    * @param name
@@ -284,12 +317,10 @@ public class UFile implements UConst {
   public static String noExt(String name) {
     int pos;
     
-    pos=name.lastIndexOf(DIRCHAR);
-    if(pos==-1) pos=name.lastIndexOf(DIRCHARDOS);
-
-    if(pos!=-1) name=name.substring(pos+1);
+    name=fixPath(name);
     
-    pos=name.indexOf(".");
+    
+    pos=name.lastIndexOf(".");
     if(pos==-1) return name;
     return name.substring(0,pos);
   }
@@ -304,8 +335,9 @@ public class UFile implements UConst {
 //    int pos2=name.lastIndexOf('/');
 //    if(pos<0 || (pos2>-1 && pos2<pos)) pos=pos2;
     
-    
     name=fixPath(name);
+    if(isDir(name)) return null;
+    
     int pos=name.lastIndexOf(DIRCHAR);
     if(pos<0) return name;
     
@@ -315,12 +347,19 @@ public class UFile implements UConst {
   
   public static String getAbsolutePath(String name) {
     PApplet papplet=UMB.getPApplet();
-
-    name=fixPath(name);
-    String path=getPath(name);
-    name=noPath(name);
+    String path;
+    
+    path=fixPath(name);
+    UMB.log("name in: "+name+" > "+path);
+    
+    if(isAbsolutePath(path)) return path;
+    
+    name=noPath(path);
+    path=getPath(path);
+    
     File f=new File(path+name);    
     UMB.log("path = "+path+" \nname="+name+" "+f.isAbsolute());
+
     
     if(!f.isAbsolute()) {
       if(papplet!=null) {

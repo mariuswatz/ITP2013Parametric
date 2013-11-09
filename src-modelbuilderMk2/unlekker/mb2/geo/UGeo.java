@@ -9,6 +9,8 @@ import unlekker.mb2.util.UMB;
 
 import java.util.*;
 
+import processing.core.PImage;
+
 public class UGeo extends UMB  {
   /**
    * Master vertex list, contains all vertices for the face geometry
@@ -220,12 +222,19 @@ public class UGeo extends UMB  {
   public UGeo add(UGeo model) {
     log(model.str());
     
+    taskTimerStart("UGeo.add(UGeo)");
+    
     groupBegin(TRIANGLES);
-    for(UFace ff:model.getF()) {
+    int cnt=0;
+    ArrayList<UFace> theFaces=model.getF();
+    for(UFace ff:theFaces) {
       UVertex vv[]=ff.getV();
       addFace(vv);
+      taskTimerUpdate(map(cnt++,0,theFaces.size()-1, 0,100));
     }    
     groupEnd();
+    
+    taskTimerDone();
     
 /*    if(model.sizeGroup()>0) {
       int gn=model.sizeGroup();
@@ -420,6 +429,22 @@ public class UGeo extends UMB  {
 
   }
 
+  public UGeo drawTextured(PImage texture) {
+    if(checkGraphicsSet()) {
+      g.beginShape(TRIANGLES);
+      g.texture(texture);
+      g.textureMode(g.NORMAL);
+      
+      for(UFace f:faces) {
+        UVertex vv[]=f.getV();
+        pvertex(vv, true);
+      }
+      
+      g.endShape();
+    }
+    return this;
+  }
+    
   public UGeo draw() {
     return draw(options);
   }
@@ -437,7 +462,7 @@ public class UGeo extends UMB  {
       int opt=(isEnabled(theOptions,COLORFACE) ? COLORFACE : 0);
       for(UFace f:faces) {
         if(opt==COLORFACE) g.fill(f.col);
-        draw(f.getV());
+        pvertex(f.getV());
       }
       g.endShape();
     }
@@ -570,6 +595,10 @@ public class UGeo extends UMB  {
 
   }
 
+  public int[] addID(UVertexList v1) {
+    return vl.addID(v1);
+  }
+
   public UGeo add(UVertexList v1) {
     vl.add(v1);    
     return this;
@@ -604,7 +633,9 @@ public class UGeo extends UMB  {
       log("Invalid face");
       return this;
     }
-    if(duplicateF(v1,v2,v3)) {
+    
+    UFace ff=new UFace(this, v1, v2, v3);
+    if(duplicateF(ff)) {
       log("Duplicate face");
       return this;
     }
@@ -614,10 +645,9 @@ public class UGeo extends UMB  {
     return this;
   }
 
-  public boolean duplicateF(UVertex v1, UVertex v2, UVertex v3) {
+  public boolean duplicateF(UFace ff) {
     int cnt=0;
     
-    UFace ff=new UFace(v1,v2,v3);
     for(UFace theFace:faces) if(theFace.equals(ff)) return true;
     
     // TODO Auto-generated method stub
@@ -720,10 +750,58 @@ public class UGeo extends UMB  {
 
   public UGeo quadstrip(ArrayList<UVertexList> vl2) {
     UVertexList last=null;  
+    
+    long tD,t=System.currentTimeMillis();
+    long start=t;
+    int cnt=0;
+
+    logDivider("quadstrip(ArrayList<UVertexList>\t");
+
+    ArrayList<int[]> vID=new ArrayList<int[]>();
+    taskTimerStart("quadstrip(ArrayList<UVertexList>");
     for(UVertexList vvl:vl2) {
-      if(last!=null) quadstrip(last,vvl);
-      last=vvl;
+      vID.add(addID(vvl));
+      taskTimerUpdate(map(vID.size(),0,vl2.size()-1,0,50));
+
     }
+    
+    int n=vID.get(0).length;
+    int qID[]=new int[n*2];
+    
+    
+    String s="";
+//    for(int i=0; i<vID.size(); i++) s+=(i>0 ? "\t":"") +
+//        vID.get(i).length+"|"+vl2.get(i).size();
+//    
+    
+    cnt=0;
+    for(UVertexList vvl:vl2) {
+      if(last!=null) {
+        int id=0;
+        int id1[]=vID.get(cnt-1);
+        int id2[]=vID.get(cnt);
+        
+        for(int i=0; i<n; i++) {
+          qID[id++]=id1[i];
+          qID[id++]=id2[i];
+        }
+        
+        quadstrip(last,vvl,qID);
+      }
+      last=vvl;
+      cnt++;
+      
+      taskTimerUpdate(map(cnt,0,vl2.size()-1,50,100));
+    }
+    
+    taskTimerDone();
+    
+    s="";
+    for(int i=0; i<vID.size(); i++) s+=(i>0 ? "\t":"") +
+        vID.get(i).length+"|"+vl2.get(i).size();
+    logDivider("done - quadstrip(ArrayList<UVertexList>\t"+n+" "+qID.length+" | "+s);
+    logDivider();
+
     return this;
   }
 
@@ -823,6 +901,23 @@ public class UGeo extends UMB  {
 
   }
 
+  protected UGeo quadstrip(UVertexList vl, UVertexList vl2,int vID[]) {
+    groupBegin(QUAD_STRIP);
+    int n=vID.length/2;
+    int id=0;
+    UVertex v0=null,v1=null,v2=null,v3=null;
+
+    for(int i=1; i<n; i++) {
+      addFace(new int[] {vID[id],vID[id+2],vID[id+1]});
+      addFace(new int[] {vID[id+3],vID[id+1],vID[id+2]});
+      id+=2;
+    }
+    groupEnd();    
+    
+    return this;
+  }
+
+  
   public UGeo quadstrip(UVertexList vl, UVertexList vl2) {
     beginShape(QUAD_STRIP);
     

@@ -30,7 +30,7 @@ public class UTestSmooth extends UTest {
     
     if(UMB.rndBool()) vl.close();
     smoothLevel=UMB.rndInt(1,8);
-    vlSmooth=UVertexList.smoothVL(vl, smoothLevel);
+    vlSmooth=UVertexList.smooth(vl, smoothLevel);
     UMB.log(vl.size()+" "+vl.isClosed()+" "+vlSmooth.size());
   }
   

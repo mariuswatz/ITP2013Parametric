@@ -35,16 +35,23 @@ public class UEdgeList extends UMB implements Iterable<UEdge> {
     
   }
 
+  public void add(UFace f) {
+    UVertex vv[]=f.getV();
+    for(int i=0; i<3; i++) {
+      UEdge e=add(vv[i],vv[(i+1)%3]).add(f);
+    }
+  }
+
   public UEdge add(UVertex v1,UVertex v2) {
-    UEdge e=null;
-    if(!contains(v1, v2)) {
+    UEdge e=get(v1,v2);
+;
+    if(e==null) {
       if(parent!=null) e=new UEdge(parent,v1,v2);
       else e=new UEdge(v1,v2);
       
       edges.add(e);
     }
 
-    if(e==null) e=get(v1,v2);
     
     return e;
   }

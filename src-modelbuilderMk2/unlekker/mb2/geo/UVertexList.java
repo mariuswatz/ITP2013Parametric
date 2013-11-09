@@ -153,8 +153,8 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
    * @return
    */
   public static UVertexList smooth(UVertexList in, int smoothLevel) {
-    float perc=0.33f;
-    UVertexList out= null;
+    float perc=0.25f;
+    UVertexList inOld=in,out= null;
     
     boolean isClosed=in.isClosed();
     
@@ -178,16 +178,26 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
         out.close();
       }
       
-      log(out.str());
+      log(j+"/"+smoothLevel+" | "+out.size());
       in=out;
     }
+
+    log("smooth "+inOld.size()+" > "+ out.size());
     
     return out;
    }
   
+  public static ArrayList<UVertexList> smooth(ArrayList<UVertexList> in,int smoothLevel) {
+    while(smoothLevel-->0) {
+      in=smooth(in);
+    }
+    return in;
+  }
   
   public static ArrayList<UVertexList> smooth(ArrayList<UVertexList> in) {
     int n=in.size();
+    float perc=0.25f;
+    
     if(n<3) return in;
     
     ArrayList<UVertexList> out=new ArrayList<UVertexList>();
@@ -202,10 +212,11 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
       int cnt=0;
       for(UVertex v1 : vl1) {
         UVertex v2=vl2.get(cnt++);
-        res1.add(v1.lerp(0.33f, v2));
-        res2.add(v1.lerp(0.33f, v2));
+        res1.add(v1.lerp(perc, v2));
+        res2.add(v1.lerp(1-perc, v2));
       }
       
+//      out.add(in.get(i));
       out.add(res1);
       out.add(res2);
     }
@@ -426,6 +437,14 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   public UVertexList center() {
     translateNeg(centroid());
     return this;
+  }
+
+  public static void center(ArrayList<UVertexList> stack) {
+    UVertex c=new UVertex();
+    for(UVertexList l:stack) c.add(l.centroid());    
+    c.div(stack.size());
+    
+    for(UVertexList l:stack) l.translateNeg(c);
   }
 
   /**

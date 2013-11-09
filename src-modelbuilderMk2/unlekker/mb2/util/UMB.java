@@ -50,7 +50,8 @@ public class UMB implements UConst {
   
   protected static int gErrorCnt=0;
   
-  protected static long timerData[]=new long[300];
+  protected static long timerData[]=new long[300],timerTask[];
+  protected static String taskName;
   
 
   protected static boolean libraryPrinted=false;
@@ -63,7 +64,44 @@ public class UMB implements UConst {
       libraryPrinted=true;
     }
   }
+
   
+  public static UMB taskTimerStart(String name) {
+    taskName=name;
+    if(timerTask==null) timerTask=new long[2];
+    
+    timerTask[0]=System.currentTimeMillis();
+    timerTask[1]=timerTask[0];
+    return UMB.UMB;
+  }
+
+  public static UMB taskTimerUpdate(float perc) {
+    long tNow=System.currentTimeMillis();
+    long tD=tNow-timerTask[1];      
+    
+//    log("update "+tD+" "+(System.currentTimeMillis()-timerTask[0]));
+    if(tD>1000) {    
+      tD=tNow-timerTask[0];
+      if(perc<1) perc=perc*100f;
+      log(taskName+": "+(int)perc+"% - "+
+          nf((float)tD/1000f,1,1)+" sec");
+      timerTask[1]=tNow;
+    }      
+    
+    return UMB.UMB;    
+  }
+
+  public static UMB taskTimerDone() {
+    if(taskName!=null) {
+      long tD=System.currentTimeMillis()-timerTask[0];
+      if(tD>1000) log(taskName+": Done - "+
+          nf((float)tD/1000f,1,1)+" sec");
+      taskName=null;
+    }
+
+    return UMB.UMB;        
+  }
+
   public static long timerStart(int id) {
     long t=System.currentTimeMillis();
     id*=3;
@@ -206,7 +244,7 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to call PGraphics.line() with two UVertex
+   * Static convenience method to call PGraphics.line() with two UVertex
    * instances as input.
    */
   public static UMB pline(UVertex v, UVertex v2) {
@@ -219,7 +257,7 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to call PGraphics.line() between the origin and
+   * Static convenience method to call PGraphics.line() between the origin and
    * a single UVertex instance.  
    */
   public static UMB pline(UVertex v) {
@@ -239,7 +277,7 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to call both <code>PGraphics.pushMatrix()</code>
+   * Static convenience method to call both <code>PGraphics.pushMatrix()</code>
    * <code>PGraphics.pushStyle()</code>
    */
   public static UMB ppush() {
@@ -251,7 +289,7 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to call both <code>PGraphics.popMatrix()</code>
+   * Static convenience method to call both <code>PGraphics.popMatrix()</code>
    * <code>PGraphics.popStyle()</code>
    */
   public static UMB ppop() {
@@ -263,7 +301,7 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to call <code>PGraphics.vertex()</code> with a
+   * Static convenience method to call <code>PGraphics.vertex()</code> with a
    * UVertex instance as input
    */
   public static UMB pvertex(UVertex v) {
@@ -275,22 +313,50 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to iterate through an array of
+   * Static convenience method to iterate through an array of
    * <code>UVertex</code> and call <code>PGraphics.vertex()</code> for each
    * instance.
    */
-  public static UMB pvertex(UVertex v[]) {
-    if (checkGraphicsSet()&&v!=null) {
-      for (UVertex vv : v)
-        if (vv!=null) {
-          pvertex(vv);
+  public static UMB pvertex(UVertex varr[]) {
+    return pvertex(varr,false);
+  }
+    
+
+  /**
+   * Static convenience method to iterate through an array of
+   * <code>UVertex</code> and call <code>PGraphics.vertex()</code> for each
+   * instance. Set <code>useUV</code> to <code>true</code> to include the UV
+   * coordinates stored in UVertex.
+   * 
+   *   
+   * @param varr
+   * @param useUV
+   * @return
+   */
+  public static UMB pvertex(UVertex varr[],boolean useUV) {
+    if(checkGraphicsSet()) {
+      if(useUV) {
+        if (isGraphics3D) {
+          for(UVertex vv:varr) g3d.vertex(vv.x, vv.y, vv.z,vv.U,vv.V);
         }
+        else {
+          for(UVertex vv:varr) g.vertex(vv.x, vv.y, vv.U,vv.V);
+        }
+      }
+      else {
+        if (isGraphics3D) {
+          for(UVertex vv:varr) g3d.vertex(vv.x, vv.y, vv.z);
+        }
+        else {
+          for(UVertex vv:varr) g.vertex(vv.x, vv.y);
+        }
+      }
     }
     return UMB.UMB;
   }
 
   /**
-   * Static conveniece method to call <code>PGraphics.fill()</code>
+   * Static convenience method to call <code>PGraphics.fill()</code>
    */
   public static UMB pfill(int col) {
     if (checkGraphicsSet()) g.fill(col);
@@ -303,7 +369,7 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to call <code>PGraphics.stroke()</code>
+   * Static convenience method to call <code>PGraphics.stroke()</code>
    */
   public static UMB pstroke(int col) {
     if (checkGraphicsSet()) g.stroke(col);
@@ -319,7 +385,7 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to call <code>PGraphics.noFill()</code>
+   * Static convenience method to call <code>PGraphics.noFill()</code>
    */
   public static UMB pnoFill() {
     if (checkGraphicsSet()) g.noFill();
@@ -327,7 +393,7 @@ public class UMB implements UConst {
   }
 
   /**
-   * Static conveniece method to call <code>PGraphics.noStroke()</code>
+   * Static convenience method to call <code>PGraphics.noStroke()</code>
    */
   public static UMB pnoStroke() {
     if (checkGraphicsSet()) g.noStroke();
@@ -340,12 +406,6 @@ public class UMB implements UConst {
   }
 
 
-  public static UMB draw(UVertex varr[]) {
-    if(checkGraphicsSet()) {
-      for(UVertex vv:varr) pvertex(vv);
-    }
-    return UMB.UMB;
-  }
 
   
   ///////////////////////////////////////////////
@@ -782,7 +842,7 @@ public class UMB implements UConst {
   }
 
   public static void logDivider() {
-    log(LOGDIVIDER);
+    log(LOGDIVIDERNEWNL);
   }
 
   public static void logDivider(String s) {

@@ -136,6 +136,17 @@ public class UFace extends UMB  {
     return getV();
   }
 
+  public UVertex[] getMidV() {
+    UVertex[] mid=new UVertex[3];
+    getV();
+    
+    mid[0]=v[0].lerp(0.5f, v[1]);
+    mid[1]=v[1].lerp(0.5f, v[2]);
+    mid[2]=v[2].lerp(0.5f, v[0]);
+    
+    return mid;
+  }
+
   public UVertex[] getV() {
     if(parent==null || v!=null) return v;
     
@@ -300,6 +311,7 @@ public class UFace extends UMB  {
   
   public boolean equals(Object o) {
     UFace of=(UFace)o;
+    of.getV();
     if(parent!=null &&
         (of.parent!=null && parent==of.parent)) {
       return (vID[0]==of.vID[0] &&
@@ -326,7 +338,7 @@ public class UFace extends UMB  {
     float d3=v1.distSimple(v3);
     
     if(d1<EPSILON || d2<EPSILON || d3<EPSILON) return false;
-    return false;
+    return true;
   }
 
 }

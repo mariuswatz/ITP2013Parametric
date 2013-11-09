@@ -20,6 +20,8 @@ import unlekker.mb2.util.UFile;
 
 
 public class UGeoIO extends UMB {
+  public static int STLCOLORDEFAULT=0,STCOLORMATERIALISE=1;
+  
   private static ByteBuffer buf= null;
   private static FileOutputStream out;
   
@@ -182,14 +184,18 @@ public class UGeoIO extends UMB {
     return geo;
     
   }
-  
+
   public static boolean writeSTL(String filename,UGeo model) {
+    return writeSTL(filename, model,-1);
+  }
+
+  public static boolean writeSTL(String filename,UGeo model,int colorType) {
     boolean res=false;
     int faceNum=model.sizeF();
     
     try {
       getSTLOut(filename, faceNum);
-      writeFaces(model.getF());
+      writeSTLFaces(model.getF(),colorType);
 
       out.flush();
       out.close();
@@ -203,12 +209,16 @@ public class UGeoIO extends UMB {
   }
 
   public static boolean writeSTL(String filename,ArrayList<UGeo> models) {
+    return writeSTL(filename,models,-1);
+  }
+
+  public static boolean writeSTL(String filename,ArrayList<UGeo> models,int colorType) {
     boolean res=false;
     int faceNum=UGeo.sizeF(models);
     
     try {
       getSTLOut(filename, faceNum);
-      for(UGeo theModel:models) writeFaces(theModel.getF());
+      for(UGeo theModel:models) writeSTLFaces(theModel.getF(),colorType);
 
       out.flush();
       out.close();
@@ -234,7 +244,7 @@ public class UGeoIO extends UMB {
     return filename;
   }
 
-  private static void writeFaces(ArrayList<UFace> ff) throws IOException {
+  private static void writeSTLFaces(ArrayList<UFace> ff,int colorType) throws IOException {
     byte[] header=new byte[50];
     
     for(UFace f:ff) {
@@ -251,12 +261,37 @@ public class UGeoIO extends UMB {
         buf.putFloat(v[j].y);
         buf.putFloat(v[j].z);
       }
+      if(colorType>-1) {
+        int col=formatRGB(f.col,colorType);
+        byte a=(byte)(col&0xff);
+        byte b=(byte)(col>>8 &0xff);
+        short cshort=(short)((b<<8) | a);
+        buf.putShort(cshort);
+      }
       
       buf.rewind();
       buf.get(header);
       out.write(header);
     }
   }
+
+  private static int formatRGB(int rgb,int type) {
+    if(type==STLCOLORDEFAULT) {
+      int col15bits = (rgb >> 3 & 0x1f);
+      col15bits |= (rgb >> 11 & 0x1f) << 5;
+      col15bits |= (rgb >> 19 & 0x1f) << 10;
+      col15bits |= 0x8000;
+      return col15bits;
+    }
+    
+    int col15bits = (rgb >> 19 & 0x1f);
+    col15bits |= (rgb >> 11 & 0x1f) << 5;
+    col15bits |= (rgb >> 3 & 0x1f) << 10;
+    return col15bits;
+
+    
+}
+
 
   private static void writeSTLHeader(int faceNum) throws IOException {
     byte[] header;

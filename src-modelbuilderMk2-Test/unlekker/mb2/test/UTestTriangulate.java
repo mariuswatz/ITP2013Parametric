@@ -68,7 +68,7 @@ public class UTestTriangulate extends UTest {
     p.lights();
     main.nav.doTransforms();
 
-    int facesToDraw=(p.frameCount/50)%cyl.sizeF()+1;
+    int facesToDraw=(p.frameCount/10)%cyl.sizeF()+1;
     for(int i=0; i<facesToDraw; i++) {
       UFace f=cyl.getF().get(i);
       
