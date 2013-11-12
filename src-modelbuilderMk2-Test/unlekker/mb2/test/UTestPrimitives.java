@@ -25,11 +25,12 @@ public class UTestPrimitives extends UTest {
   public void init() {
     if(main.nav==null) main.nav=new UNav3D();
 
-    geo=UGeo.box(100);
-    UMB.log(geo.bb().str());
-    geo.add(UGeo.box(200,10,50).translate(0,100,0));
+//    geo=UGeo.box(100);
+//    UMB.log(geo.bb().str());
+//    geo.add(UGeo.box(200,10,50).translate(0,100,0));
     geo=UGeo.cyl(100, 200, 20);
     UMB.log(geo.bb().str());
+    UMB.log(geo.strGroup());
     
 //    USubdivision.subdivide(geo, UMB.SUBDIVMIDEDGES);
   }
@@ -42,26 +43,28 @@ public class UTestPrimitives extends UTest {
 
     p.noFill();
     p.stroke(255);
-    p.noStroke();
-//    geo.drawNormals(100);
+    geo.drawNormals(100);
 
     UMB.pnoStroke().pfill(p.color(255,255,0));
 //    p.noStroke();
     geo.draw();
     
-    if(p.keyPressed) {
-      if(p.millis()-last>1000) {
-        geo=USubdivision.subdivide(geo, UMB.SUBDIVMIDEDGES);
-        for(UFace f:geo.getF()) {
-          int col=p.lerpColor(0xFF330000, 0xFF00FFFF, p.random(1));
-          f.setColor(col);
-        }
-        last=p.millis();
-        geo.enable(geo.COLORFACE);
-      }
-    }
+//    if(p.keyPressed) {
+//      if(p.millis()-last>1000) {
+//        geo=USubdivision.subdivide(geo, UMB.SUBDIVMIDEDGES);
+//        for(UFace f:geo.getF()) {
+//          int col=p.lerpColor(0xFF330000, 0xFF00FFFF, p.random(1));
+//          f.setColor(col);
+//        }
+//        last=p.millis();
+//        geo.enable(geo.COLORFACE);
+//      }
+//    }
 
   }
 
+  public void keyPressed(char key) {
+    if(key=='r') geo.reverseNormals(); 
+  }
   
 }

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
@@ -53,6 +54,7 @@ public class UMB implements UConst {
   protected static long timerData[]=new long[300],timerTask[];
   protected static String taskName;
   
+  public static HashMap<Integer, String> groupTypeNames;
 
   protected static boolean libraryPrinted=false;
   static {
@@ -827,6 +829,14 @@ public class UMB implements UConst {
       buf.append(ss.toString());
     }
     log("["+strBufDispose(buf)+"]");
+  }
+
+  public static <T> void log(ArrayList<T> input) {
+//    log("log "+input.getClass().getName()+" "+input.size());
+    for(T tmp: input) {
+      
+      log(tmp.toString());
+    }
   }
 
   public static void log(int i) {

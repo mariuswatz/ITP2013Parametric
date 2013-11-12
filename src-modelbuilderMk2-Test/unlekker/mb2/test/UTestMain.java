@@ -29,7 +29,9 @@ public class UTestMain extends PApplet {
     sketchPath=UFile.getCurrentDir();
     
     tests=new ArrayList<UTest>();
-    
+
+    tests.add(new UTestPrimitives());
+
 //    tests.add(new UTestTriangulate());
     tests.add(new UTestSmooth02());
     tests.add(new UTestSTLColor()); 
@@ -37,7 +39,6 @@ public class UTestMain extends PApplet {
 //  tests.add(new UTestSTL()); 
     tests.add(new UTestSmooth());
     
-    tests.add(new UTestPrimitives());
     tests.add(new UTestIntersectionCirc());
     tests.add(new UTestEdgeList());
     tests.add(new UTestHeading03());

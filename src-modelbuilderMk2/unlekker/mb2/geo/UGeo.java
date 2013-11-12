@@ -116,6 +116,15 @@ public class UGeo extends UMB  {
   }
 
   public UGeo groupBegin(int type) {
+    if(groupTypeNames==null) {
+      groupTypeNames=new HashMap<Integer, String>();
+      groupTypeNames.put(TRIANGLE_FAN, "TRIANGLE_FAN");
+      groupTypeNames.put(TRIANGLES, "TRIANGLES");
+      groupTypeNames.put(QUAD_STRIP, "QUAD_STRIP");
+      groupTypeNames.put(QUADS, "QUADS");
+    }
+    
+    log("groupBegin "+groupTypeNames.get(type)+" "+faceGroups.size());
     faceGroups.add(new int[] {sizeF(),-1,type});
     return this;
   }
@@ -454,6 +463,17 @@ public class UGeo extends UMB  {
     return this;
   }
 
+  /**
+   * Flips all face normals by calling {@link UFace#reverse()} 
+   * @return
+   */
+  public UGeo reverseNormals() {
+    log("reverseNormals "+getF(0).normal().str());
+    for(UFace ff:faces) ff.reverse();
+    log("reverseNormals "+getF(0).normal().str());
+    return this;
+  }
+  
   public UGeo draw(int theOptions) {
     if(checkGraphicsSet()) {
       g.beginShape(TRIANGLES);
@@ -935,9 +955,14 @@ public class UGeo extends UMB  {
   public boolean writeSTL(String filename) {
     return UGeoIO.writeSTL(filename, this);
   }
+
   
+  public static boolean writeSTL(String filename,ArrayList<UGeo> models) {
+    return UGeoIO.writeSTL(filename, models);
+  }
+
   public String str() {return str(false);}
-  
+
   public String str(boolean complete) {
     StringBuffer buf=strBufGet();
     
@@ -961,6 +986,27 @@ public class UGeo extends UMB  {
     return "["+strBufDispose(buf)+"]";
   }
 
+
+  public ArrayList<String> strGroup() {
+    ArrayList<String> s=new ArrayList<String>();
+    for(int i=0; i<sizeGroup(); i++) {
+      s.add(strGroup(i));
+    }
+    return s;
+  }
+
+  public String strGroup(int id) {
+    int[] dat=faceGroups.get(id);
+    return strf("[%s n=%d|%d %d]",
+        groupTypeNames.get(dat[2]),dat[1]-dat[0],dat[0],dat[1]
+        );
+  }
+
+  
+  ////////////////////////////////
+  // GEOMETRY PRIMITIVES
+  
+  
   public static UGeo box(float w,float h,float d) {
     return UGeoGenerator.box(w,h,d);
   } 

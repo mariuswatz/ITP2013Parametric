@@ -161,9 +161,9 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     for(int j=0; j<smoothLevel; j++) {
       out=new UVertexList();
 
-      int nn=(isClosed ? in.size() : in.size()-1);
+      int nn=(isClosed ? in.size()-1 : in.size()-1);
       for(int i=0; i<nn; i++) {        
-        int i2=(i+1)%in.size();
+        int i2=(i+1);//%in.size();
         UVertex v1=UVertex.lerp(perc,in.get(i),in.get(i2));
         UVertex v2=UVertex.lerp(1-perc,in.get(i),in.get(i2));
         
@@ -178,7 +178,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
         out.close();
       }
       
-      log(j+"/"+smoothLevel+" | "+out.size());
+      log(j+"/"+smoothLevel+" | "+out.size()+" "+isClosed);
       in=out;
     }
 

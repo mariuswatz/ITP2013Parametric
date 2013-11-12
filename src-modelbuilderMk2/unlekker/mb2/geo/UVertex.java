@@ -476,8 +476,8 @@ public class UVertex extends UMB  {
   public static UVertex centroid(UVertex[] v2) {        
     if(v2==null || v2.length==0) return null;
 
-    UBB bb=new UBB().add(v2).calc();
-    log("centroid "+bb.centroid.str()+" bb "+bb.str());
+//    UBB bb=new UBB().add(v2).calc();
+//    log("centroid "+bb.centroid.str()+" bb "+bb.str());
     UVertex v=new UVertex();
     for(UVertex vv:v2) v.add(vv);
     v.div(v2.length);

@@ -58,7 +58,9 @@ public class UGeoGenerator extends UMB {
     
     vl2=vl.copy().translate(0,h,0).close();
     vl.translate(0,-h,0).close();
-    geo=new UGeo().quadstrip(vl,vl2).triangleFan(vl,true).triangleFan(vl2);
+    geo=new UGeo().quadstrip(vl,vl2).
+        triangleFan(vl,true).
+        triangleFan(vl2);
     return geo.groupJoinAll();
   }
 
