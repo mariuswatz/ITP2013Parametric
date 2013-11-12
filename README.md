@@ -5,6 +5,13 @@ See the Code & Form blog for a [detailed description](http://workshop.evolutionz
 Contact e-mail: marius at mariuswatz dot com<br />
 Class hours: Mondays 6:00pm – 8:55pm
 
+## November 12
+
+Added ITP-Workshops, which will contain code from workshops I teach at ITP. Code from this weekend's "Sound as Data" workshop can be found there.
+
+I've made several minor and incremental changes to Modelbuilder, I added a few examples showing some of the nicer ones. I now use Ant to build the library, an archive of builds can be found in the "export" folder.
+
+
 ## October 30
 
 Added source folder "src-itp-sketches". It contains miscellaneous code demos and ModelbuilderMk2 tutorials demonstrated in the Parametric Design class at ITP. I've added some examples to the 

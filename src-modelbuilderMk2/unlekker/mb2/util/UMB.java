@@ -471,13 +471,14 @@ public class UMB implements UConst {
   }
 
   public static final int color(float r, float g, float b) {
+ //   return 0xff000000 | (v1 << 16) | (v2 << 8) | v3;
     int rr=(int)r,gg=(int)g,bb=(int)b;
-    return (0xFF000000)|
-        ((rr&0xff)<<16)|((gg&0xff)<<8)|(bb&0xff);
+    return (0xff000000)|
+        ((rr)<<16)|((gg)<<8)|(bb);
   }
 
   public static final int color(int r, int g, int b, int a) {
-    return (0xFF00000)|((r&0xff)<<16)|((g&0xff)<<8)|(b&0xff);
+    return (0xff000000)|((r&0xff)<<16)|((g&0xff)<<8)|(b&0xff);
   }
 
   public static String hex(int col) {

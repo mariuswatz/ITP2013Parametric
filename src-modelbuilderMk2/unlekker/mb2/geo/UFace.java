@@ -286,6 +286,21 @@ public class UFace extends UMB  {
     centroid=null;
     return this;
   }
+  
+//  private boolean isSameClockDir(Vec3D a, Vec3D b, ReadonlyVec3D p, Vec3D norm) {
+//    float bax = b.x - a.x;
+//    float bay = b.y - a.y;
+//    float baz = b.z - a.z;
+//    float pax = p.x() - a.x;
+//    float pay = p.y() - a.y;
+//    float paz = p.z() - a.z;
+//    float nx = bay * paz - pay * baz;
+//    float ny = baz * pax - paz * bax;
+//    float nz = bax * pay - pax * bay;
+//    float dotprod = nx * norm.x + ny * norm.y + nz * norm.z;
+//    return dotprod < 0;
+//}
+
 
   public UVertex normal() {
     if(normal!=null) return normal;
@@ -293,8 +308,10 @@ public class UFace extends UMB  {
     getV();
     
     normal=UVertex.cross(
-        UVertex.delta(v[1],v[0]).norm(), 
-        UVertex.delta(v[2],v[0]).norm());
+        v[2].copy().sub(v[0]),
+        v[1].copy().sub(v[0]));
+//        UVertex.delta(v[0],v[1]).norm() 
+//        UVertex.delta(v[0],v[2]).norm());
     normal.norm();
     return normal;
   }

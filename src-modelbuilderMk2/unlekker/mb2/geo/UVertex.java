@@ -184,10 +184,11 @@ public class UVertex extends UMB  {
   }
 
   public UVertex cross(UVertex v){
-    float crossX=y*v.z-v.y*z;
-    float crossY=z*v.x-v.z*x;
-    float crossZ=x*v.y-v.x*y;
-    return(new UVertex(crossX,crossY,crossZ));
+//    float crossX=y*v.z-v.y*z;
+//    float crossY=z*v.x-v.z*x;
+//    float crossZ=x*v.y-v.x*y;
+//    return(new UVertex(crossX,crossY,crossZ));
+    return cross(this,v);
   }
 
   public static UVertex cross(UVertex v,UVertex v2){

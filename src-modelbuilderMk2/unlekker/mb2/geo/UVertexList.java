@@ -598,10 +598,14 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
 //    add(v);    
     bb=null;
     
-    v1=isEnabled(NOCOPY) ? v1 : v1.copy();
-    v.add(v1);
+    int id=indexOf(v1);
+    if(id<0) {
+      v1=isEnabled(NOCOPY) ? v1 : v1.copy();
+      v.add(v1);
+      id=size()-1;
+    }
 
-    return indexOf(v1);
+    return id;
   }
 
   public int[] addID(UVertexList vl) {
@@ -882,7 +886,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     int id=0;
     for(UVertex vvv:vv) vid[id++]=getVID(vvv);
     
-    Arrays.sort(vid);
+//    Arrays.sort(vid);
     return vid;
   }
 

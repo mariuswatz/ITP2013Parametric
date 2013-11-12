@@ -28,18 +28,25 @@ public class UGeoGenerator extends UMB {
     
     w*=0.5f;
     UVertexList vl,vl2;
-    vl=new UVertexList().add(-w,-w).add(w,-w).
-        add(w,w).add(-w,w);
+    
+    vl=UVertexList.circle(w, 4).rotZ(HALF_PI*0.5f).reverse();
+    
+//    vl=new UVertexList().add(-w,-w).add(w,-w).
+//        add(w,w).add(-w,w);
     vl2=vl.copy().translate(0,0,w);
     vl.translate(0,0,-w);
     
-    geo=new UGeo().quadstrip(vl.close(),vl2.close());
+    log(vl.str());
+    log(vl2.str());
+    geo=new UGeo();
     geo.beginShape(QUAD_STRIP).
     vertex(vl.get(3)).vertex(vl.get(0)).
     vertex(vl.get(2)).vertex(vl.get(1)).endShape();
     geo.beginShape(QUAD_STRIP).
       vertex(vl2.get(2)).vertex(vl2.get(1)).
       vertex(vl2.get(3)).vertex(vl2.get(0)).endShape();
+    geo.quadstrip(vl.close(),vl2.close());
+    geo.quadstrip(vl,vl2);
     
     return geo.groupJoinAll();
   }
@@ -50,17 +57,26 @@ public class UGeoGenerator extends UMB {
     
     UGeo geo=null;
     UVertexList vl,vl2;
-    vl=new UVertexList();
-    for(int i=0; i<steps; i++) {
-      float deg=-map(i,0,steps,0,TWO_PI);
-      vl.add(new UVertex(w,0).rotY(deg));
-    }
+//    vl=new UVertexList();
+//    for(int i=0; i<steps; i++) {
+//      float deg=map(i,0,steps,0,TWO_PI);
+//      vl.add(new UVertex(w,0).rotY(deg));
+//    }
+//    
+//    vl2=vl.copy().translate(0,h,0).close();
+//    vl.translate(0,-h,0).close();
+//    geo=new UGeo().quadstrip(vl,vl2).
+//        triangleFan(vl,true)
+//        .triangleFan(vl2);
     
-    vl2=vl.copy().translate(0,h,0).close();
-    vl.translate(0,-h,0).close();
-    geo=new UGeo().quadstrip(vl,vl2).
-        triangleFan(vl,true).
-        triangleFan(vl2);
+    vl=UVertexList.circle(w, steps).rotX(-HALF_PI);
+    vl2=vl.copy().translate(0,-w,0);
+    vl.translate(0,w,0);
+    
+    
+    geo=new UGeo().triangleFan(vl,true).triangleFan(vl2);
+    geo.quadstrip(vl,vl2);
+
     return geo.groupJoinAll();
   }
 

@@ -149,6 +149,8 @@ public class UGeo extends UMB  {
     if(id[1]-id[0]<1) {
       log("UGeo: zero cnt group "+str(id));
     }
+
+    log(strGroup());
     
     return this;
   }
@@ -237,8 +239,11 @@ public class UGeo extends UMB  {
     int cnt=0;
     ArrayList<UFace> theFaces=model.getF();
     for(UFace ff:theFaces) {
+      ff.v=null;
+      
       UVertex vv[]=ff.getV();
       addFace(vv);
+      getF(sizeF()-1).setColor(ff.col);
       taskTimerUpdate(map(cnt++,0,theFaces.size()-1, 0,100));
     }    
     groupEnd();
@@ -520,6 +525,7 @@ public class UGeo extends UMB  {
 
     
     int[] vID=vl.addID(vltmp);
+//    log(str(vID));
     
     switch (shapeType) {
       case TRIANGLE_FAN: {
@@ -527,8 +533,11 @@ public class UGeo extends UMB  {
         int n=(vltmp.size()-1)-1;
         int id=1;
         
+        
         for(int i=0; i<n; i++) {
-          addFace(cp,vltmp.get(id++),vltmp.get(id));
+          addFace(new int[] {vID[0],vID[id++],vID[id]});
+
+//          addFace(cp,vltmp.get(id++),vltmp.get(id));
         }
       }
       break;
@@ -575,16 +584,60 @@ public class UGeo extends UMB  {
       }
       break;
 
+      /* From PGraphics3D.java, 1.5.1
+       for (int i = shapeFirst; i < stop; i += 2) {
+        // first triangle
+        addTriangle(i+0, i+2, i+1);
+        // second triangle
+        addTriangle(i+2, i+3, i+1);
+      }
+
+       */
       case QUAD_STRIP: {
+        
         int n=vltmp.size()/2;
         int id=0;
         UVertex v0=null,v1=null,v2=null,v3=null;
-
+        
+/*        for(int i=0; i<n; i++) {
+          v2=vltmp.get(id);          
+          v3=vltmp.get(id+1);         
+          if(i>0) {
+//            addFace(new int[] {vID[id],vID[id+2],vID[id+1]});
+//            addFace(new int[] {vID[id+3],vID[id+1],vID[id+2]});
+            addFace(v0,v2,v1);
+            addFace(v3,v1,v2);
+          }
+          v0=v2;
+          v1=v3;
+          id+=2;
+        }
+*/
+        int vid0= 0,vid1= 0,vid2,vid3;
+        
         for(int i=1; i<n; i++) {
           addFace(new int[] {vID[id],vID[id+2],vID[id+1]});
           addFace(new int[] {vID[id+3],vID[id+1],vID[id+2]});
           id+=2;
         }
+
+        
+//        for(int i=0; i<n; i++) {
+//          vid2=vID[id];
+//          vid3=vID[id+1];
+//          if(i>0) {
+//            addFace(new int[] {vid0,vid2,vid1});
+//            addFace(new int[] {vid2,vid3,vid1});
+//          }
+//          
+//          vid0=vid2;
+//          vid1=vid3;
+////          addFace(new int[] {vID[id],vID[id+2],vID[id+1]});
+////          addFace(new int[] {vID[id+3],vID[id+1],vID[id+2]});
+////          addFace(new int[] {vID[id+2],vID[id+1],vID[id]});
+////          addFace(new int[] {vID[id+2],vID[id+3],vID[id+1]});
+//          id+=2;
+//        }
 
 //        for(int i=0; i<n; i++) {
 //          v2=vltmp.get(id);          
@@ -645,6 +698,7 @@ public class UGeo extends UMB  {
 
   public UGeo addFace(int vID[]) {
     faces.add(new UFace(this,vID));
+//    addFace(vl.get(vID[0]),vl.get(vID[1]),vl.get(vID[2]));
     return this;
   }
   
@@ -660,7 +714,8 @@ public class UGeo extends UMB  {
       return this;
     }
     
-    faces.add(new UFace(this, v1,v2,v3));    
+//    faces.add(new UFace(this, v1,v2,v3));
+    faces.add(ff);
     vl.bb=null;
     return this;
   }
@@ -888,6 +943,7 @@ public class UGeo extends UMB  {
    */
   public UGeo triangleFan(UVertexList vl,boolean reverse) {
     UVertex c=vl.centroid();
+//    c=UVertex.centroid(vl.toArray());
     return triangleFan(vl,c,reverse);
   }
 
@@ -942,12 +998,17 @@ public class UGeo extends UMB  {
     beginShape(QUAD_STRIP);
     
     int id=0;
-    for(UVertex vv:vl) {
-      vertex(vv);
-      vertex(vl2.get(id++));
+    for(int i=0; i<vl.size(); i++) {
+      vertex(vl.get(i));
+      vertex(vl2.get(i));
+//      vertex(vl2.get(id++));
     }
     endShape();
-    
+
+//    ArrayList<UVertexList> stack=new ArrayList<UVertexList>();
+//    stack.add(vl);
+//    stack.add(vl2);
+//    return quadstrip(stack);
     return this;
   }
   
@@ -998,7 +1059,7 @@ public class UGeo extends UMB  {
   public String strGroup(int id) {
     int[] dat=faceGroups.get(id);
     return strf("[%s n=%d|%d %d]",
-        groupTypeNames.get(dat[2]),dat[1]-dat[0],dat[0],dat[1]
+        groupTypeNames.get(dat[2]),dat[1]-dat[0]+1,dat[0],dat[1]
         );
   }
 

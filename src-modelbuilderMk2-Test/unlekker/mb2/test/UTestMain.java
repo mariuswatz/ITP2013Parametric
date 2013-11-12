@@ -30,23 +30,25 @@ public class UTestMain extends PApplet {
     
     tests=new ArrayList<UTest>();
 
+    
+    tests.add(new UTestNormal()); 
+//  tests.add(new UTestSTL()); 
     tests.add(new UTestPrimitives());
 
-//    tests.add(new UTestTriangulate());
-    tests.add(new UTestSmooth02());
-    tests.add(new UTestSTLColor()); 
+    tests.add(new UTestTriangulate());
+//    tests.add(new UTestSmooth02());
+//    tests.add(new UTestSTLColor()); 
 
-//  tests.add(new UTestSTL()); 
     tests.add(new UTestSmooth());
     
-    tests.add(new UTestIntersectionCirc());
-    tests.add(new UTestEdgeList());
-    tests.add(new UTestHeading03());
-    tests.add(new UTestIntersection());
-    tests.add(new UTestHeading02());
-    tests.add(new UTestHeading01());
-    tests.add(new UTestCurve());
-    tests.add(new UTestResample());
+//    tests.add(new UTestIntersectionCirc());
+//    tests.add(new UTestEdgeList());
+//    tests.add(new UTestHeading03());
+//    tests.add(new UTestIntersection());
+//    tests.add(new UTestHeading02());
+//    tests.add(new UTestHeading01());
+//    tests.add(new UTestCurve());
+//    tests.add(new UTestResample());
 //    tests.add(new UTest2D()); 
     
     theTest=tests.get(0);
@@ -55,7 +57,7 @@ public class UTestMain extends PApplet {
 
   public void draw() {
     background(0);
-     
+     color(255,255,255);
     drawCredit();
     
     pushStyle();

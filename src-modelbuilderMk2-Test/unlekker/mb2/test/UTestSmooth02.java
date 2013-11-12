@@ -32,7 +32,7 @@ public class UTestSmooth02 extends UTest {
     float m=UMB.rnd(100,300);
     for(int i=0; i<n; i++) {
       m=m*0.2f+UMB.rnd(100,300)*0.8f;
-      float t=UMB.map(i, 0, n, 0, TWO_PI);
+      float t=-UMB.map(i, 0, n, 0, TWO_PI);
       vl.add(new UVertex(m,0).rotY(t));
     }
         
@@ -107,6 +107,9 @@ public class UTestSmooth02 extends UTest {
     else if(drawType==(cnt++)) {
       UMB.pfill(p.color(255)).pnoStroke();
       geo.draw();
+      
+//      geo.pstroke(0xffff0000);
+//      geo.drawNormals(20);
 
       UMB.pstroke(colOutline).pnoFill();
       UMB.draw(stack);
