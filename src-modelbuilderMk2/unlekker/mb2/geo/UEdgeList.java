@@ -16,8 +16,8 @@ import unlekker.mb2.util.UMB;
  */
 public class UEdgeList extends UMB implements Iterable<UEdge> {
   public UGeo parent;
-  ArrayList<UEdge> edges;
-  
+  ArrayList<UEdge> edges;  
+
   public UEdgeList() {
     edges=new ArrayList<UEdge>();
   }
@@ -27,19 +27,27 @@ public class UEdgeList extends UMB implements Iterable<UEdge> {
     if(model!=null) parent=model;    
     edges=new ArrayList<UEdge>();
     for(UFace ff:model.getF()) {
-      UVertex vv[]=ff.getV();
-      add(vv[0],vv[1]).add(ff);
-      add(vv[1],vv[2]).add(ff);
-      add(vv[2],vv[0]).add(ff);
+      add(ff);
+//      UVertex vv[]=ff.getV();
+//      add(vv[0],vv[1]).add(ff);
+//      add(vv[1],vv[2]).add(ff);
+//      add(vv[2],vv[0]).add(ff);
     }
     
   }
 
   public void add(UFace f) {
     UVertex vv[]=f.getV();
+
+    UEdge ed[]=new UEdge[3];
+    
     for(int i=0; i<3; i++) {
-      UEdge e=add(vv[i],vv[(i+1)%3]).add(f);
+      UEdge e=add(vv[i],vv[(i+1)%3]);
+      e.add(f);
+      ed[i]=e;
     }
+    
+    f.setEdges(ed);
   }
 
   public UEdge add(UVertex v1,UVertex v2) {

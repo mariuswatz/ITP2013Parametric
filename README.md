@@ -5,6 +5,19 @@ See the Code & Form blog for a [detailed description](http://workshop.evolutionz
 Contact e-mail: marius at mariuswatz dot com<br />
 Class hours: Mondays 6:00pm – 8:55pm
 
+
+## November 13
+
+**Discovered and fixed:** Nightmare bug in which UFace would calculate arbitray face normals. (Embarrassing: I sorted the vertex ID array.) All recent builds are likely to contain the bug, so please download the most recent build (any build after Nov 12.)
+
+**Added:** Early (not heavily tested) versions of new classes I think will prove helpful in the future: 
+
+- UGeoGroup: Records UGeo mesh operations like quadstrip and trianglefan to facilitate subsequent manipulation.
+- UGeoSelector: Tool to select faces in a UGeo mesh, including faces connected to a given face. Provides tools to draw a preview of the selection and to "grow" the current selection to include adjacent faces.
+- UEdgeList / UEdge: Tools to represent the unique edges in a UGeo mesh. All UEdges store a record of faces connected to the edge, making it possible to find the connected faces for any given face.
+
+I have yet to create Processing examples showing this functionality, but curious souls can look in "src-modelbuilderMk2-Test" to see test code.
+
 ## November 12
 
 Added ITP-Workshops, which will contain code from workshops I teach at ITP. Code from this weekend's "Sound as Data" workshop can be found there.

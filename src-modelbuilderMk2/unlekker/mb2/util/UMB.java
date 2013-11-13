@@ -470,6 +470,10 @@ public class UMB implements UConst {
     return ((int)a<< 24) & c;
   }
 
+  public static final int color(int c) {
+    return color(c,c,c);
+  }
+
   public static final int color(float r, float g, float b) {
  //   return 0xff000000 | (v1 << 16) | (v2 << 8) | v3;
     int rr=(int)r,gg=(int)g,bb=(int)b;

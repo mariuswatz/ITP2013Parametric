@@ -77,15 +77,15 @@ public class UTestEdgeList extends UTest {
     }
     
     UMB.logDivider("groups: "+geo.sizeGroup());
-    for(int i=0; i<geo.sizeGroup(); i++) {
-      ArrayList<UFace> ff=geo.getGroup(i);
-      int col=p.color((i*30)%255);
-      for(UFace f:ff) f.setColor(col);
-      int id[]=geo.getGroupID(i);
-      UMB.logf("%d | %s",ff.size(),UMB.str(id));
-      UVertexList vl=geo.getGroupV(i);
-//      for(UVertex vv:vl) UMB.log(vv.ID);
-    }
+//    for(int i=0; i<geo.sizeGroup(); i++) {
+//      ArrayList<UFace> ff=geo.getGroup(i);
+//      int col=p.color((i*30)%255);
+//      for(UFace f:ff) f.setColor(col);
+//      int id[]=geo.getGroupID(i);
+//      UMB.logf("%d | %s",ff.size(),UMB.str(id));
+//      UVertexList vl=geo.getGroupV(i);
+////      for(UVertex vv:vl) UMB.log(vv.ID);
+//    }
     
     return cnt;
   }

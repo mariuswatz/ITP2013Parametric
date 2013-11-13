@@ -26,14 +26,16 @@ public class UGeo extends UMB  {
 
   private UVertexList vltmp;
   private int shapeType;
-  public ArrayList<int[]> faceGroups;
+  public ArrayList<UGeoGroup> faceGroups;
+  
+  public UEdgeList edges;
 
   
   public UGeo() {
     vl=new UVertexList();
     setOptions(NODUPL);
     faces=new ArrayList<UFace>();
-    faceGroups=new ArrayList<int[]>();
+    faceGroups=new ArrayList<UGeoGroup>();
   }
 
   public UGeo(UGeo v) {
@@ -56,6 +58,23 @@ public class UGeo extends UMB  {
     return this;
   }
 
+  public UGeo remove(int faceID) {
+    if(faceID<sizeF()) {
+      UFace ff=faces.get(faceID);
+      faces.remove(ff);
+      for(UGeoGroup gr:faceGroups) {
+        gr.remove(ff);
+      }
+    }
+    return this;
+  }
+
+  public UGeo remove(UFace ff) {
+    int pos=faces.indexOf(ff);
+    if(pos>-1) remove(pos);
+    return this;
+  }
+  
   public UGeo removeDupl() {
     for(UFace ff:faces) ff.getV();
     getV().removeDupl(true);
@@ -124,39 +143,18 @@ public class UGeo extends UMB  {
       groupTypeNames.put(QUADS, "QUADS");
     }
     
-    log("groupBegin "+groupTypeNames.get(type)+" "+faceGroups.size());
-    faceGroups.add(new int[] {sizeF(),-1,type});
+    faceGroups.add(new UGeoGroup(this,type).begin());
+    log("groupBegin "+groupTypeNames.get(type)+" "+faceGroups.size()+" "+sizeF());
     return this;
   }
 
-  public UGeo groupJoinAll() {
-    return groupJoin(0, sizeGroup()-1);
-  }
-
-  public UGeo groupJoin(int id1,int id2) {
-    int id[]=new int[] {getGroupID(id1)[0],getGroupID(id2)[1],getGroupID(id1)[2]};
-    
-    int cnt=(id2-id1)+1;
-    while((cnt--)>0) faceGroups.remove(id1);
-    faceGroups.add(id);
-    return this;
-  }
-
-  
   public UGeo groupEnd() {
-    int[] id=faceGroups.get(sizeGroup()-1);
-    id[1]=sizeF()-1;
-    if(id[1]-id[0]<1) {
-      log("UGeo: zero cnt group "+str(id));
-    }
-
-    log(strGroup());
-    
+    faceGroups.get(faceGroups.size()-1).end();
     return this;
   }
 
   
-  public int[] getGroupID(int id) {
+  public UGeoGroup getGroupID(int id) {
     return faceGroups.get(id);
   }
 
@@ -173,56 +171,18 @@ public class UGeo extends UMB  {
    * @return
    */
   
-  public ArrayList<UFace> getGroup(int id) {
-    int[] fid=faceGroups.get(id);
-    ArrayList<UFace> ff=new ArrayList<UFace>();
-    for(int i=fid[0]; i<=fid[1]; i++) ff.add(getF(i));
-    return ff;
+  public ArrayList<UFace> getGroupF(int id) {
+    return faceGroups.get(id).getF();
+  }
+
+  public UGeoGroup getGroup(int id) {
+    return faceGroups.get(id);
   }
 
   public UVertexList getGroupV(int id) {
-    int[] fid=faceGroups.get(id);
-    UVertexList vl=new UVertexList();
-    vl.setOptions(NOCOPY);
-    for(int i=fid[0]; i<=fid[1]; i++) {
-      int cnt=i-fid[0];
-      UFace ff=getF(i);
-      vl.add(ff.getV());
-    }
-    return vl;
+    return getGroup(id).getV();
   }
 
-  /**
-   * If the specified group is of type QUAD_STRIP, this method will return an ArrayList of UVertex[].
-   * Each array contains the four vertices of a single quad. Vertices are ordered in clockwise order, according to the logic of 
-   * beginShape(QUADS).
-   * @param id
-   * @return
-   */
-  public ArrayList<UVertex []> getGroupQuadV(int id) {
-    ArrayList<UVertex []> res=null;
-    
-    int[] fid=faceGroups.get(id);
-    if(fid[2]!=QUAD_STRIP) return null;
-    
-    
-    UVertexList vl=new UVertexList();
-    vl.setOptions(NOCOPY);
-
-    int n=(fid[1]-fid[0]+1)/2;
-//    log("getGroupQuadV "+n+" "+str(fid));
-    res=new ArrayList<UVertex[]>();
-    
-    int cnt=fid[0];
-    // vertex order for the faces = [0,2,1] [3,1,2] 
-    for(int i=0; i<n; i++) {
-      UVertex v1[]=getF(cnt++).getV();
-      UVertex v2[]=getF(cnt++).getV();
-      res.add(new UVertex[]{v1[0],v1[2],v2[0],v2[2]});
-    }
-    
-    return res;
-  }
 
   public int sizeGroup() {
     return faceGroups.size();
@@ -417,6 +377,11 @@ public class UGeo extends UMB  {
     return vl.size();
   }
 
+  public UEdgeList getEdgeList() {
+    if(edges==null) edges=new UEdgeList(this);
+    return edges;
+  }
+  
   public ArrayList<UFace> getF() {
     return faces;
   }
@@ -666,6 +631,10 @@ public class UGeo extends UMB  {
 //    UUtil.log("Faces: "+faceNum);
     return this;
 
+  }
+  
+  public boolean contains(UFace ff) {
+    return faces.indexOf(ff)>-1;
   }
 
   public int[] addID(UVertexList v1) {
@@ -1057,10 +1026,7 @@ public class UGeo extends UMB  {
   }
 
   public String strGroup(int id) {
-    int[] dat=faceGroups.get(id);
-    return strf("[%s n=%d|%d %d]",
-        groupTypeNames.get(dat[2]),dat[1]-dat[0]+1,dat[0],dat[1]
-        );
+    return getGroup(id).str();
   }
 
   

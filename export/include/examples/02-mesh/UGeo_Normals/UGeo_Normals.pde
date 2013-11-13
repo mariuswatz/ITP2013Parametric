@@ -2,8 +2,7 @@
   ModelbuilderMk2 - UGeo_Primitives.pde
  Marius Watz - http://workshop.evolutionzone.com
  
- Creates a list of pre-defined geometric primitives,
- centering and coloring them. 
+ How to draw the normals of meshes using UGeo.drawMormals().  
  
  */
 
@@ -58,8 +57,6 @@ void build() {
   // offset models to the right and left of center
   models.get(0).translate(-150,0);    
   models.get(1).translate(150,0);    
-  
-  UGeo
 }
 
 void draw() {

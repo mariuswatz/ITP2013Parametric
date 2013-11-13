@@ -47,8 +47,9 @@ public class UGeoGenerator extends UMB {
       vertex(vl2.get(3)).vertex(vl2.get(0)).endShape();
     geo.quadstrip(vl.close(),vl2.close());
     geo.quadstrip(vl,vl2);
-    
-    return geo.groupJoinAll();
+  
+    return geo;
+//    return geo.groupJoinAll();
   }
   
   public static UGeo cyl(float w,float h,int steps) {
@@ -77,7 +78,7 @@ public class UGeoGenerator extends UMB {
     geo=new UGeo().triangleFan(vl,true).triangleFan(vl2);
     geo.quadstrip(vl,vl2);
 
-    return geo.groupJoinAll();
+    return geo;//geo.groupJoinAll();
   }
 
   public static UGeo roundedBox(float w,float h,float d,float r,int steps) {

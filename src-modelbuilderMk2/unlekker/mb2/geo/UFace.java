@@ -3,6 +3,7 @@
  */
 package unlekker.mb2.geo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import unlekker.mb2.util.UMB;
@@ -21,6 +22,9 @@ public class UFace extends UMB  {
   public int ID;  
   public int vID[];
   public UVertex v[];
+  
+  public UEdge edge[];
+  protected UFace connected[];
   
   public int col;
   public UVertex normal,centroid;
@@ -48,7 +52,7 @@ public class UFace extends UMB  {
     
 //    log("F "+ID+" "+vID[0]+" "+vID[1]+" "+vID[2]);
   }
-
+  
   public UFace(UGeo model, int[] ID) {
     this();
     parent=model;
@@ -68,6 +72,47 @@ public class UFace extends UMB  {
     return this;
   }
 
+  public UFace setEdges(UEdge ed[]) {
+    edge=ed;
+    return this;
+  }
+
+  public int sizeConnected() {
+    int n=0;
+    if(connected!=null) {
+      for(UFace fc:connected) n=(fc==null ? n : n+1);
+    }
+    return n;
+  }
+
+  public UFace[] connected() {
+    if(edge==null) {
+      logErr("UFace: Edges not calculated");
+      return null;
+    }
+    
+    if(connected==null) {
+      connected=new UFace[3];
+      for(int i=0; i<edge.length; i++) {
+        if(edge[i]!=null) {
+          ArrayList<UFace> ef=edge[i].getF();
+          UFace ff=null;
+          if(ef.size()>0) {
+            ff=ef.get(0);
+            if(ff.equals(this) && ef.size()>1) {
+              ff=edge[i].faces.get(1);              
+            }
+            if(ff.equals(this)) ff=null;
+          }
+
+          connected[i]=ff;
+        }
+      }
+    }
+    
+    return connected;
+  }
+  
   public UFace set(UVertex v1, UVertex v2, UVertex v3) {
     if(parent!=null) {
       getVID(new UVertex[] {v1,v2,v3});

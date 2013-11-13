@@ -31,6 +31,9 @@ public class UTestMain extends PApplet {
     tests=new ArrayList<UTest>();
 
     
+    tests.add(new UTestSelector());
+    tests.add(new UTestEdgeList02());
+    
     tests.add(new UTestNormal()); 
 //  tests.add(new UTestSTL()); 
     tests.add(new UTestPrimitives());
@@ -42,7 +45,6 @@ public class UTestMain extends PApplet {
     tests.add(new UTestSmooth());
     
 //    tests.add(new UTestIntersectionCirc());
-//    tests.add(new UTestEdgeList());
 //    tests.add(new UTestHeading03());
 //    tests.add(new UTestIntersection());
 //    tests.add(new UTestHeading02());
@@ -52,7 +54,13 @@ public class UTestMain extends PApplet {
 //    tests.add(new UTest2D()); 
     
     theTest=tests.get(0);
-    theTest.init();
+    try {
+      theTest.init();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      exit();
+    }
   }
 
   public void draw() {

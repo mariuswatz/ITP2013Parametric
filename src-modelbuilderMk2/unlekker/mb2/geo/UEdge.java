@@ -21,7 +21,7 @@ public class UEdge extends UMB {
   public UVertex v[];
   public int ID;  
 
-  public ArrayList<UFace> faces;
+  protected ArrayList<UFace> faces;
   
   public UEdge() {
     ID=globalID++;
@@ -35,13 +35,18 @@ public class UEdge extends UMB {
     set(v1,v2);
   }
 
+  public ArrayList<UFace> getF() {
+    return faces;
+  }
+  
   public UEdge add(UFace ff) {
     if(faces.indexOf(ff)<0) faces.add(ff);
     return this;
   }
 
-  public void draw() {
+  public UEdge draw() {
     pline(v[0],v[1]);
+    return this;
   }
 
   public UEdge(UGeo model, UVertex v1, UVertex v2) {
