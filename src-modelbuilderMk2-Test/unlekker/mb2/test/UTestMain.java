@@ -30,11 +30,14 @@ public class UTestMain extends PApplet {
     
     tests=new ArrayList<UTest>();
 
+    tests.add(new UTestPrimitives02());
     
+    tests.add(new UTestSelector02());
+    tests.add(new UTestNormal()); 
+    tests.add(new UTestBPatch());
     tests.add(new UTestSelector());
     tests.add(new UTestEdgeList02());
     
-    tests.add(new UTestNormal()); 
 //  tests.add(new UTestSTL()); 
     tests.add(new UTestPrimitives());
 
@@ -53,7 +56,16 @@ public class UTestMain extends PApplet {
 //    tests.add(new UTestResample());
 //    tests.add(new UTest2D()); 
     
-    theTest=tests.get(0);
+    
+    int id=0;
+    
+    try {
+      String dat[]=loadStrings("UTestMain.dat");
+      id=Integer.parseInt(dat[0]);
+    } catch (Exception e1) {
+    }
+    theTest=tests.get(id);
+    
     try {
       theTest.init();
     } catch (Exception e) {
@@ -100,17 +112,30 @@ public class UTestMain extends PApplet {
       saveFrame(filename);
       saveFilename=filename;
     }
-    else if(key==' ') {
+    else if(key==' ' || key=='+' ) {
       int id=(tests.indexOf(theTest)+1)%tests.size();
       theTest=tests.get(id);
       theTest.init();
+    }
+    else if(key==' ' || key=='-' ) {
+      if(keyEvent.isShiftDown() || key=='-') {
+        int id=tests.indexOf(theTest);
+        id=(id<1 ? id=tests.size()-1 : id-1);
+        
+        theTest=tests.get(id);
+        theTest.init();
+        
+      }
     }
     else if(key!=CODED && key=='n') {
 //      if(keyCode==java.awt.event.KeyEvent.VK_N)     
         theTest.init();
     }
-    else theTest.keyPressed(key);
 
+    theTest.keyPressed(key);
+
+    saveStrings("UTestMain.dat",
+        new String [] {""+tests.indexOf(theTest)});
   }
 
   static public void main(String args[]) {

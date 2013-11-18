@@ -17,9 +17,12 @@ import unlekker.mb2.util.UMB;
 public class UEdgeList extends UMB implements Iterable<UEdge> {
   public UGeo parent;
   ArrayList<UEdge> edges;  
-
+  ArrayList<UFace> facesDone;
+  
+  
   public UEdgeList() {
     edges=new ArrayList<UEdge>();
+    facesDone=new ArrayList<UFace>();
   }
   
   public UEdgeList(UGeo model) {
@@ -122,5 +125,39 @@ public class UEdgeList extends UMB implements Iterable<UEdge> {
     }
     
     return -1;
+  }
+
+  public void check() {
+    if(parent==null) return;
+    
+    ArrayList<UEdge> remove= null;
+    
+    // add missing faces
+    for(UFace ff:parent.getF()) {
+      if(facesDone.indexOf(ff)<0) add(ff);
+    }
+    
+    // check faces
+    for(UEdge e:edges) {
+      if(e.sizeF()!=-1) { // sizeF==-1 means edge is just vertices 
+        if(e.sizeF()>0) {
+          ArrayList<UFace> f=e.getF();
+          for(int i=0; i<f.size(); i++) {
+            UFace ff=f.get(i);
+            if(!parent.contains(ff)) f.remove(ff) ;
+          }
+        }
+        
+        // no faces connected to edge?
+        if(e.sizeF()<1) {
+          if(remove==null) remove=new ArrayList<UEdge>();
+          remove.add(e);
+        }
+      }
+    }
+
+    if(remove!=null) {
+      for(UEdge e:remove) edges.remove(e);
+    }
   }
 }

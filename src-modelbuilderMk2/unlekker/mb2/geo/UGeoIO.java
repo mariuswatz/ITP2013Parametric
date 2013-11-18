@@ -256,11 +256,17 @@ public class UGeoIO extends UMB {
       buf.putFloat(fn.y);
       buf.putFloat(fn.z);
       
-      for(int j=0; j<3; j++) {
+//      for(int j=0; j<3; j++) {
+//        buf.putFloat(v[j].x);
+//        buf.putFloat(v[j].y);
+//        buf.putFloat(v[j].z);
+//      }
+      for(int j=2; j>-1; j--) {
         buf.putFloat(v[j].x);
         buf.putFloat(v[j].y);
         buf.putFloat(v[j].z);
       }
+      
       if(colorType>-1) {
         int col=formatRGB(f.col,colorType);
         byte a=(byte)(col&0xff);

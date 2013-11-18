@@ -19,7 +19,7 @@ public interface UConst extends processing.core.PConstants {
   public final static String FSTRXYZ="<%s,%s,%s>";
   public final static String FSTRXY="<%s,%s>";
   
-  public static final float EPSILON=1.1920928955078125E-7f;
+  public static final float EPSILON=0.0001f;
 
   public static final int KB=1024,MB=KB*KB;
   public static final int XY=0,XZ=1,YZ=2;

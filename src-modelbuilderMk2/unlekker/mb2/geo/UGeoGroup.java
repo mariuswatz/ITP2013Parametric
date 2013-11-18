@@ -4,6 +4,7 @@
 package unlekker.mb2.geo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import unlekker.mb2.util.UMB;
@@ -12,62 +13,151 @@ import java.util.*;
 
 import processing.core.PImage;
 
+/**
+ * <p>Methods to select faces in UGeo, from single faces ({@link #add(UFace)}
+ *  to single faces plus their adjacent faces ({@link #addConnected(UFace)}.
+ *  Use ({@link #addConnected()} to expand the selection to include all 
+ *  faces adjacent to currently selected faces.</p>  
+ *      
+ * To draw the selection use {@link #draw()}, it will draw selected faces
+ * in red and unselected faces 
+ * 
+ * @author Marius Watz
+ *
+ */
 public class UGeoGroup extends UMB implements Iterable<UFace> {
   public UGeo parent;
-  public int type;
-  private int atStart,atEnd;
   public ArrayList<UFace> faces;
+  public UEdgeList edges;
+  public int  type=TRIANGLES;
+
   
-  public UGeoGroup(UGeo model, int type) {
+  public UGeoGroup(UGeo model) {
     parent=model;
-    this.type=type;
     faces=new ArrayList<UFace>();
+    edges=parent.getEdgeList();
+    type=TRIANGLES;
+  }  
+  
+
+  public UGeoGroup(UGeo model,int type) {
+    this(model);
+    this.type=type;
   }
 
-  public UGeoGroup begin() {
-    atStart=parent.sizeF();
+  public UGeoGroup(UGeo model,int type,int start,int end) {
+    this(model);    
+    for(int i=start; i<end; i++) add(parent.getF(i));
+    this.type=type;
+  }
+
+  public boolean contains(UVertex v) {
+    for(UFace f:faces) if(f.contains(v)) return true;
+    return false;
+  }
+
+  public boolean contains(UFace f) {
+    return !(faces.indexOf(f)<0);
+  }
+
+  public UGeoGroup clear() {
+    faces.clear();
+    edges=null;
+    return this;
+  }
+  /**
+   * Iterates through selection and adds all adjacent faces. 
+   * @return
+   */
+  public UGeoGroup addConnected() {
+    edges=parent.getEdgeList();
+    ArrayList<UFace> fc=new ArrayList<UFace>();
+    for(UFace ff:faces) fc.add(ff);
+    
+    for(UFace cf:fc) addConnected(cf);
+    
+    return this;
+  }
+
+  /**
+   * Adds adjacent faces of the provided {@link UFace}, i.e. any face that
+   * shares an edge with that face. If the input face is not part of the 
+   * current selection, it is added.
+   * @param f
+   * @return
+   */
+  public UGeoGroup addConnected(UFace f) {
+    edges=parent.getEdgeList();
+    if(edges==null) return this;
+    
+    add(f);
+    UFace[] c=f.connected();
+    for(UFace cf:c) add(cf);
+    
+    return this;
+  }
+
+  /**
+   * Adds any faces that contain the provided {@link UVertex}.
+   * @param vv
+   * @return
+   */
+  public UGeoGroup addConnected(UVertex vv) {
+    for(UFace ff:parent.getF()) {
+      if(ff.contains(vv)) add(ff);
+    }
+    
+    return this;
+  }
+
+  
+  public UGeoGroup add(UFace f) {    
+    if(f==null || contains(f)) return this;
+
+    faces.add(f);
+    type=TRIANGLES;
+    return this;
+  }
+
+  /**
+   * Add all faces from a {@link UGeoGroup}.
+   * @param group
+   * @return
+   */
+  public UGeoGroup add(UGeoGroup group) {
+    for(UFace f:group) add(f);
     return this;
   }
   
-  public UGeoGroup end() {
-    atEnd=parent.sizeF();
-    
-    for(int i=atStart; i<atEnd; i++) {
-      faces.add(parent.getF(i));
+  public UGeoGroup remove(UFace ff) {
+    if(contains(ff)) {
+      faces.remove(ff);
+      type=TRIANGLES;
     }
-    log(str());
-
-    return this;    
+    return this;
   }
-  
+
   public int size() {
     return faces.size();
   }
   
-  public String typeName() {
-    if(!groupTypeNames.containsKey(type)) return NULLSTR; 
-    return groupTypeNames.get(type);
-  }
-
   public Iterator<UFace> iterator() {
     return faces.iterator();
   }
 
-  public UGeoGroup remove(UFace ff) {
-    if(faces.indexOf(ff)>-1) faces.remove(ff);
-    return this;    
+  /**
+   * Get a random face from the parent UGeo.
+   * @return
+   */
+  public UFace getRndF() {
+    int n=parent.sizeF();
+    return parent.getF(rndInt(n));
   }
-
+  
   public ArrayList<UFace> getF() {
     return faces;
   }
   
-  public String str() {
-    return strf("[%s n=%d]",
-        typeName(),size()
-        );
-  }
-
   public UVertexList getV() {
     UVertexList vl=new UVertexList();
     vl.setOptions(NOCOPY|NODUPL);
@@ -79,54 +169,89 @@ public class UGeoGroup extends UMB implements Iterable<UFace> {
   }
 
   
-  /**
-   * If the specified group is of type QUAD_STRIP, this method will return an ArrayList of UVertex[].
-   * Each array contains the four vertices of a single quad. Vertices are ordered in clockwise order, according to the logic of 
-   * beginShape(QUADS).
-   * @param id
-   * @return
-   */
-  /*
-  public ArrayList<UVertex []> getGroupQuadV(int id) {
-    ArrayList<UVertex []> res=null;
-    
-    int[] fid=faceGroups.get(id);
-    if(fid[2]!=QUAD_STRIP) return null;
-    
-    
-    UVertexList vl=new UVertexList();
-    vl.setOptions(NOCOPY);
-
-    int n=(fid[1]-fid[0]+1)/2;
-//    log("getGroupQuadV "+n+" "+str(fid));
-    res=new ArrayList<UVertex[]>();
-    
-    int cnt=fid[0];
-    // vertex order for the faces = [0,2,1] [3,1,2] 
-    for(int i=0; i<n; i++) {
-      UVertex v1[]=getF(cnt++).getV();
-      UVertex v2[]=getF(cnt++).getV();
-      res.add(new UVertex[]{v1[0],v1[2],v2[0],v2[2]});
+  public UGeoGroup subdivide(int subdivType,boolean remove) {
+    ArrayList<UFace> newf=USubdivision.subdivide(getF(), subdivType);
+    if(remove) {
+      parent.remove(getF());
+      faces.clear();
     }
     
-    return res;
+    parent.addFace(newf);
+    type=TRIANGLES;
+    faces=newf;
+    
+    return this;
   }
-   */
-  
-//  public ArrayList<String> strGroup() {
-//    ArrayList<String> s=new ArrayList<String>();
-//    for(int i=0; i<sizeGroup(); i++) {
-//      s.add(strGroup(i));
-//    }
-//    return s;
-//  }
-//
-//  public String strGroup(int id) {
-//    int[] dat=faceGroups.get(id);
-//    return strf("[%s n=%d|%d %d]",
-//        groupTypeNames.get(dat[2]),dat[1]-dat[0]+1,dat[0],dat[1]
-//        );
-//  }
 
+  /**
+   * Draws the faces contained in this UGeoGroup. 
+   * @return
+   */
+  public UGeoGroup draw() {
+    return draw(false);
+  }
+
+  public UGeoGroup drawNormals(float w) {
+    if(parent.tainted) check();
+    for(UFace ff:faces) ff.drawNormal(w);
+    return this;
+  }
+
+  /**
+   * If <code>asSelection==true</code> the faces in this group is drawn 
+   * in red, while the remaining faces from {@link #parent} are drawn in 
+   * the current style. 
+   * 
+   * @return
+   */
+  public UGeoGroup draw(boolean asSelection) {
+    if(parent.tainted) check();
+    
+    if(asSelection) {
+      ppush().pfill(color(255,0,0));
+      draw(faces,0);
+      ppop();
+      
+      for(UFace ff:parent.getF()) {
+        if(!contains(ff)) ff.draw();
+      }
+    }
+    else {
+      draw(faces,parent.options);
+    }
+    
+    return this;
+  }
+
+  
+  public UGeoGroup setColor(int col) {
+    for(UFace ff:parent.getF()) ff.setColor(col);
+    return this;
+  }
+  
+  /**
+   * Checks validity of current selection. Any faces in the selection
+   * that can't be found in the parent UGeo will be removed.
+   * @return
+   */
+  public UGeoGroup check() {
+    for(int i=0; i<size(); i++) {
+      UFace fc=faces.get(i);
+      if(!parent.contains(fc)) remove(fc);
+    }
+    return this;
+  }
+  
+  
+  public String str() {
+    return strf("[%s n=%d]",
+        typeName(),size()
+        );
+  }
+
+  public String typeName() {
+    if(!groupTypeNames.containsKey(type)) return NULLSTR; 
+    return groupTypeNames.get(type);
+  }
   
 }

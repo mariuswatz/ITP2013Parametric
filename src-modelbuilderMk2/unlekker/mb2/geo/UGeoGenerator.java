@@ -19,6 +19,63 @@ public class UGeoGenerator extends UMB {
     return geo.quadstrip(meshl);
   }
 
+  public static UGeo meshBox(float w,float h,float d,int steps) {
+    w*=0.5f;
+    h*=0.5f;
+    d*=0.5f;
+
+    UGeo geo=new UGeo();
+    UVertexList ll=UVertexList.line(100,steps);
+    ArrayList<UVertexList> meshl=new ArrayList<UVertexList>();
+
+    for(int i=0; i<steps; i++) {
+      float t=map(i,0,steps-1,-1,1);
+      meshl.add(ll.copy().translate(0,t*50,-50));
+    }
+
+    
+    for(int i=1; i<steps; i++) {
+      UVertexList vl=meshl.get(i).copy().rotX(HALF_PI);
+      meshl.add(vl);
+    }
+
+    for(int i=1; i<steps; i++) {
+      UVertexList vl=meshl.get(i).copy().rotX(PI);
+      meshl.add(vl);
+    }
+
+    for(int i=1; i<steps; i++) {
+      UVertexList vl=meshl.get(i).copy().rotX(HALF_PI*3);
+      meshl.add(vl);
+    }
+
+    UVertexList.scale(meshl, w/50f,h/50f,d/50f);
+    
+    geo.quadstrip(meshl);
+//    log(geo.bb().str());
+    
+    meshl.clear();
+    ll=UVertexList.line(d*2,steps).rotY(HALF_PI);
+    for(int i=0; i<steps; i++) {
+      float t=map(i,0,steps-1,-1,1);
+      meshl.add(ll.copy().translate(w,t*h,0));
+    }
+    geo.quadstrip(meshl);
+    
+    meshl.clear();
+    ll.scale(-1,1,1);
+    for(int i=0; i<steps; i++) {
+      float t=map(i,0,steps-1,1,-1);
+      meshl.add(ll.copy().translate(-w,t*h,0));
+    }
+    geo.quadstrip(meshl);
+//    log(geo.bb().str());
+    
+    return geo;
+  }
+
+  
+
   public static UGeo box(float w,float h,float d) {
     return box(1).scale(w,h,d);
   } 
@@ -46,7 +103,6 @@ public class UGeoGenerator extends UMB {
       vertex(vl2.get(2)).vertex(vl2.get(1)).
       vertex(vl2.get(3)).vertex(vl2.get(0)).endShape();
     geo.quadstrip(vl.close(),vl2.close());
-    geo.quadstrip(vl,vl2);
   
     return geo;
 //    return geo.groupJoinAll();
@@ -71,8 +127,8 @@ public class UGeoGenerator extends UMB {
 //        .triangleFan(vl2);
     
     vl=UVertexList.circle(w, steps).rotX(-HALF_PI);
-    vl2=vl.copy().translate(0,-w,0);
-    vl.translate(0,w,0);
+    vl2=vl.copy().translate(0,-h,0);
+    vl.translate(0,h,0);
     
     
     geo=new UGeo().triangleFan(vl,true).triangleFan(vl2);

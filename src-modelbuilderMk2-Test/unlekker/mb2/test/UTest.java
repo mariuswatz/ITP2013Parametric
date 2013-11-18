@@ -11,6 +11,12 @@ public class UTest extends UMB {
   public static PApplet p;
   public static UTestMain main;
   
+  public String name;
+  
+  public UTest() {
+    name=this.getClass().getSimpleName();
+  }
+  
   public void init() {
     
   }

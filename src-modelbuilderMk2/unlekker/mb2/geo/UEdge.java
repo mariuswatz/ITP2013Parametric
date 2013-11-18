@@ -35,6 +35,10 @@ public class UEdge extends UMB {
     set(v1,v2);
   }
 
+  public int sizeF() {    
+    return faces==null ? -1 : faces.size();
+  }
+  
   public ArrayList<UFace> getF() {
     return faces;
   }

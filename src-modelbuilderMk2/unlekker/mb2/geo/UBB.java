@@ -51,6 +51,8 @@ public class UBB extends UMB {
 
   public UBB calc() {
     dim.set(max).sub(min);
+    dim.set(dim.abs());
+    
     centroid.set(max).add(min).mult(0.5f);
 //    log("calc\t"+centroid.str()+" "+str());
     

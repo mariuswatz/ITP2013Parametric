@@ -48,7 +48,6 @@ public class UVertex extends UMB  {
   public UVertex copy() {
     return new UVertex(this);
   }
-
   
   public UVertex draw() {
     return (UVertex)pvertex(this);
@@ -101,12 +100,19 @@ public class UVertex extends UMB  {
 
 //  if(>EPSILON);+abs(v1.y-y)+abs(v1.z-z);
 
-    float res=v.x-x;
-    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
-    res=v.y-y;
-    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
-    res=v.z-z;
-    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
+//    float res=abs(v.x-x);
+//    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
+//    res=abs(v.y-y);
+//    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
+//    res=abs(v.z-z);
+//    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
+    float res=distSimple(v);
+    
+    if(res>EPSILON) return false;
+//    res=abs(v.y-y);
+//    if(res>EPSILON) return false;
+//    res=abs(v.z-z);
+//    if(res>EPSILON) return false;
     
 //    if(distSimple(v)<EPSILON) return true;
     return true;
@@ -315,6 +321,13 @@ public class UVertex extends UMB  {
         nf(z*RAD_TO_DEG,prec));
   }
 
+  public boolean closeSq(UVertex vv,float limitSq) {
+    return (distSq(vv)<limitSq);
+  }
+
+  public boolean close(UVertex vv,float limit) {
+    return (dist(vv)<limit);
+  }
   
   /**
    * Distance between XYZ of this vertex and XYZ of v1 
@@ -332,8 +345,8 @@ public class UVertex extends UMB  {
    * @return Returns <code>sq(v1.x-x)+sq(v1.y-y)+sq(v1.z-z)</code>
    */
   public float distSq(UVertex v1) {
-    float a=(v1.x-x),b=(v1.x-x),c=(v1.z-z);
-    return a*a+b*b+z*z;
+    float a=(v1.x-x),b=(v1.y-y),c=(v1.z-z);
+    return a*a+b*b+c*c;
   }
 
   /**

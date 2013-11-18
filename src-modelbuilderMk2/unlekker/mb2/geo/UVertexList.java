@@ -285,6 +285,19 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return cl;
   }
 
+  public static ArrayList<UVertexList> grid2D(int nx,int ny,float w,float h) {
+    ArrayList<UVertexList> res=new ArrayList<UVertexList>();
+
+    UVertexList tmp=line(w,nx);
+    for(int i=0; i<ny; i++) {
+      res.add(tmp.copy().translate(0,map(i,0,ny-1,0,h)));
+    }
+
+    return center(res);
+  }
+
+  
+
   public static UVertexList circle(float w,int nn) {
     UVertexList cl=new UVertexList();
     for(int i=0; i<nn; i++) {
@@ -439,12 +452,35 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return this;
   }
 
-  public static void center(ArrayList<UVertexList> stack) {
+  public static ArrayList<UVertexList> scale(ArrayList<UVertexList> stack,float m) {
+    return scale(stack,m,m,m);
+  }
+
+  public static ArrayList<UVertexList> scale(ArrayList<UVertexList> stack,float x,float y,float z) {
+    for(UVertexList l:stack) l.scale(x,y,z);
+    
+    return stack;
+  }
+
+  public static ArrayList<UVertexList> translate(ArrayList<UVertexList> stack, UVertex vv) {
+    return translate(stack,vv.x,vv.y,vv.z);
+  }
+  
+  public static ArrayList<UVertexList> translate(ArrayList<UVertexList> stack,float x,float y,float z) {
+    for(UVertexList l:stack) l.translate(x,y,z);
+    
+    return stack;
+  }
+
+
+  public static ArrayList<UVertexList> center(ArrayList<UVertexList> stack) {
     UVertex c=new UVertex();
     for(UVertexList l:stack) c.add(l.centroid());    
     c.div(stack.size());
     
     for(UVertexList l:stack) l.translateNeg(c);
+    
+    return stack;
   }
 
   /**
@@ -462,6 +498,18 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     v.clear();
     return this;
   }
+  
+  public ArrayList<UVertex> getClose(UVertex vv,float limit) {
+    ArrayList<UVertex> l=new ArrayList<UVertex>();
+    
+    limit=limit*limit;
+    for(UVertex vert:v) if(!vv.equals(vert)){
+      if(vert.closeSq(vv,limit)) l.add(vert); 
+    }
+    
+    return l;
+  }
+      
   
   public UVertex[] get(int vID[]) {
     return get(vID,null);
@@ -559,7 +607,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     }
     
     if(isEnabled(NODUPL) && v.contains(v1)) {
-      log("Duplicate: "+v1+" "+ v.contains(v1));
+//      log("Duplicate: "+v1+" "+ v.contains(v1));
       return this;
     }
 
@@ -610,7 +658,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
 
   public int[] addID(UVertexList vl) {
     int[] id=new int[vl.size()];
-    for(int i=0; i<id.length; i++) id[i]=addID(vl.get(i));
+    for(int i=0; i<id.length; i++) id[i]=getVID(vl.get(i));
     return id;
   }
 

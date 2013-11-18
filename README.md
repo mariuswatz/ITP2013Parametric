@@ -8,7 +8,7 @@ Class hours: Mondays 6:00pm – 8:55pm
 
 ## November 13
 
-**Discovered and fixed:** Nightmare bug in which UFace would calculate arbitray face normals. (Embarrassing: I sorted the vertex ID array.) All recent builds are likely to contain the bug, so please download the most recent build (any build after Nov 12.)
+**Discovered and fixed:** Nightmare bug in which UFace would calculate arbitray face normals. E(mbarrassing: I sorted the vertex ID array.) All recent builds are likely to contain the bug, so please download the most recent build (any build after Nov 12.)
 
 **Added:** Early (not heavily tested) versions of new classes I think will prove helpful in the future: 
 

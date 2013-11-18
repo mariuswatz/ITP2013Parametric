@@ -14,6 +14,7 @@ import java.util.Locale;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.opengl.PGraphics3D;
+import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
 import unlekker.mb2.geo.UVertex;
 import unlekker.mb2.geo.UVertexList;
@@ -70,10 +71,12 @@ public class UMB implements UConst {
   
   public static UMB taskTimerStart(String name) {
     taskName=name;
-    if(timerTask==null) timerTask=new long[2];
+    if(timerTask==null) timerTask=new long[3];
     
     timerTask[0]=System.currentTimeMillis();
     timerTask[1]=timerTask[0];
+    timerTask[2]=-1;
+    
     return UMB.UMB;
   }
 
@@ -83,6 +86,10 @@ public class UMB implements UConst {
     
 //    log("update "+tD+" "+(System.currentTimeMillis()-timerTask[0]));
     if(tD>1000) {    
+      if(timerTask[2]<0) {
+        logDivider(taskName+"\t");
+        timerTask[2]=1;
+      }
       tD=tNow-timerTask[0];
       if(perc<1) perc=perc*100f;
       log(taskName+": "+(int)perc+"% - "+
@@ -96,8 +103,11 @@ public class UMB implements UConst {
   public static UMB taskTimerDone() {
     if(taskName!=null) {
       long tD=System.currentTimeMillis()-timerTask[0];
-      if(tD>1000) log(taskName+": Done - "+
-          nf((float)tD/1000f,1,1)+" sec");
+      if(tD>1000) {
+        log(taskName+": Done - "+
+        nf((float)tD/1000f,1,1)+" sec");
+        logDivider();
+      }
       taskName=null;
     }
 
@@ -402,8 +412,43 @@ public class UMB implements UConst {
     return UMB.UMB;
   }
 
+  public UMB draw(ArrayList<UFace> faces,int theOptions) {
+    if(checkGraphicsSet()) {
+      g.beginShape(TRIANGLES);      
+      
+      int opt=(isEnabled(theOptions,COLORFACE) ? COLORFACE : 0);
+      if(opt==COLORFACE) {
+        for(UFace f:faces) {
+          if(opt==COLORFACE) g.fill(f.col);
+          pvertex(f.getV());
+        }
+      }
+      else {
+        for(UFace f:faces) pvertex(f.getV());
+      }
+
+      g.endShape();
+    }
+    return UMB.UMB;
+  }
   public static UMB draw(ArrayList<UVertexList> vl) {
+    return draw(vl,false);
+  }
+
+  public static UMB draw(ArrayList<UVertexList> vl,boolean drawGrid) {
     for(UVertexList l:vl) l.draw();
+    if(drawGrid) {
+      int nx=vl.get(0).size();
+      int ny=vl.size();
+      
+      for(int j=0; j<nx; j++) {
+        g.beginShape();
+          for(int i=0; i<ny; i++) {
+          pvertex(vl.get(i).get(j));
+        }
+        g.endShape();
+      }
+    }
     return UMB.UMB;
   }
 
@@ -934,7 +979,7 @@ public class UMB implements UConst {
   static public String nf(float num, int lead, int decimal) {
     if (formatFloat==null) nfInitFormats();
     
-    if((num-Math.floor(num))<0.00001) return nf((int)num,lead);
+    if((num-Math.floor(num))<EPSILON) return nf((int)num,lead);
     
     formatFloat.setMinimumIntegerDigits(lead);
     formatFloat.setMaximumFractionDigits(decimal);

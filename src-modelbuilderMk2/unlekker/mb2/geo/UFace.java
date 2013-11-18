@@ -1,5 +1,5 @@
-/*
- * modelbuilderMk2
+/*[[ 
+ * modelbuildeVrMk2
  */
 package unlekker.mb2.geo;
 
@@ -23,11 +23,11 @@ public class UFace extends UMB  {
   public int vID[];
   public UVertex v[];
   
-  public UEdge edge[];
+  protected UEdge edge[];
   protected UFace connected[];
   
   public int col;
-  public UVertex normal,centroid;
+  private UVertex normal,centroid;
   
   public UFace() {
     ID=globalID++;
@@ -51,6 +51,17 @@ public class UFace extends UMB  {
     set(v1,v2,v3);
     
 //    log("F "+ID+" "+vID[0]+" "+vID[1]+" "+vID[2]);
+  }
+  
+  public boolean contains(UVertex vv) {
+    getV();
+    if(v[0]==vv) return true;
+    if(v[1]==vv) return true;
+    if(v[2]==vv) return true;
+//    if(v[0].equals(vv)) return true;
+//    if(v[1].equals(vv)) return true;
+//    if(v[2].equals(vv)) return true;
+    return false;
   }
   
   public UFace(UGeo model, int[] ID) {
@@ -85,9 +96,18 @@ public class UFace extends UMB  {
     return n;
   }
 
+  public UEdge[] edges() {
+    if(edge==null) {
+      logErr("UFace.edges: Edges not calculated");
+      return null;
+    }
+    
+    return edge;
+  }
+
   public UFace[] connected() {
     if(edge==null) {
-      logErr("UFace: Edges not calculated");
+      logErr("UFace.connected: Edges not calculated");
       return null;
     }
     
@@ -250,7 +270,12 @@ public class UFace extends UMB  {
     }
     return reset();
   }
-  
+
+  public UFace copy(UGeo newParent) {
+    getV();
+    return new UFace(newParent, v[0],v[1],v[2]);
+  }
+
   public UFace copy() {
     return new UFace(this);
   }
@@ -346,6 +371,16 @@ public class UFace extends UMB  {
 //    return dotprod < 0;
 //}
 
+
+  public float area() {
+    getV();
+    float a=v[0].dist(v[1]);
+    float b=v[1].dist(v[2]);
+    float c=v[2].dist(v[0]);
+    float s=(a+b+c)/2;
+    float area=(float)Math.sqrt(s*(s-a)*(s-b)*(s-c));
+    return area;
+}
 
   public UVertex normal() {
     if(normal!=null) return normal;

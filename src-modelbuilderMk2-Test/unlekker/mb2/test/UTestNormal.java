@@ -11,6 +11,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
+import unlekker.mb2.geo.UGeoGenerator;
 import unlekker.mb2.geo.UIntersections;
 import unlekker.mb2.geo.UNav3D;
 import unlekker.mb2.geo.USubdivision;
@@ -24,7 +25,7 @@ public class UTestNormal extends UTest {
   long last=0;
   
   UFace fn;
-  int cnt=0;
+  int cnt=2;
   
   public void init() {
     if(main.nav==null) main.nav=new UNav3D();
@@ -57,7 +58,8 @@ public class UTestNormal extends UTest {
     
     
     
-    geo=UGeo.cyl(50, 100, 6);
+    geo=UGeo.cyl(150, 300, 9);
+    geo=UGeoGenerator.meshBox(150, 300,150, 9);
     geo.add(geoFan);
     
     geo.writeSTL(p.sketchPath("Prim.stl"));
@@ -72,14 +74,20 @@ public class UTestNormal extends UTest {
     p.noFill();
     p.stroke(255,150,0);
     
-    if(cnt==0) geo.drawNormals(40);
-    if(cnt==1) geoFan.drawNormals(40);
-//    geo2.drawNormals(40);
-//    geoFan.drawNormals(40);
+    if(cnt==0) geo.drawNormals(10);
+    if(cnt==1) geoFan.drawNormals(10);
+    if(cnt==2) {
+//      geo.drawNormals(10);
+      
+      p.stroke(255,0,0);
+      geo.drawVertexNormals(10);
+    }
+//    geo2.drawNormals(10);
+//    geoFan.drawNormals(10);
 
     p.stroke(100);
     p.fill(200);
-    if(cnt==0) geo.draw();
+    if(cnt==0 || cnt==2) geo.draw();
     if(cnt==1) geoFan.draw();
 //    geo2.draw();
 //    p.noStroke();
@@ -90,6 +98,25 @@ public class UTestNormal extends UTest {
 
   public void keyPressed(char key) {
     if(key=='r') geo.reverseNormals(); 
+    if(key=='o') {
+      for(int i=0; i<10; i++) {
+        int vid=(int)p.random(geo.sizeV());
+        UVertex rnd=geo.getV(vid);
+        UVertex n=geo.getVNormal(vid).copy();
+        n.rotX(rndSigned(0.2f,1)*DEG_TO_RAD*10);
+        n.rotY(rndSigned(0.2f,1)*DEG_TO_RAD*10);
+        
+        n.mult(10);
+        rnd.add(n);
+//        rnd.add(p.random(-10,10),p.random(-10,10),p.random(-10,10));
+//        log(vid+" "+rnd.str());
+      }
+      
+      long t=System.currentTimeMillis();
+      geo.regenerateFaceData();
+      logDivider("ttt"+(System.currentTimeMillis()-t));
+    }
+
     if(key==TAB) cnt=(cnt+1)%3;
   }
   
