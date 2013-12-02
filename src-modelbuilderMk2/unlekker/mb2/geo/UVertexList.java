@@ -8,6 +8,7 @@ import java.util.Iterator;
 import processing.core.PVector;
 import processing.opengl.*;
 import unlekker.mb2.util.UMB;
+import unlekker.mb2.util.UTask;
 
 /**
  * 
@@ -313,7 +314,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
       float t=map(i,0,nn-1,a,b);
       cl.add(new UVertex(w,0,0).rotZ(t));
     }
-    return cl.close();
+    return cl;
   }
 
   
@@ -372,7 +373,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     
     for(UVertex vv:v) bb.add(vv);
     
-    return bb.calc();
+    return bb.check();
   }
   
   /**
@@ -440,7 +441,21 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
 
   public UVertex centroid() {
     bb();
-    return bb.centroid;
+    UVertex cv=bb.centroid();
+    
+    if(v.get(0).U>UNAN) {
+      float U=0;
+      float V=0;
+      for(UVertex vv:v) {
+        U+=(vv.U>UNAN ? vv.U : 0);
+        V+=(vv.V>UNAN ? vv.V : 0);
+      }
+      
+      float nf=1f/(float)size();
+      cv.setUV(U*nf, V*nf);
+    }
+
+    return cv;
   }
   
   /** 
@@ -499,8 +514,18 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return this;
   }
   
-  public ArrayList<UVertex> getClose(UVertex vv,float limit) {
-    ArrayList<UVertex> l=new ArrayList<UVertex>();
+
+  /**
+  /**
+   * Returns new UVertexList that contains all vertices that are closer
+   * to the input <code>vv</code> than <code>limit</code> units.
+   * See {@link UVertex#dist(UVertex)}.
+   * @param vv
+   * @param limit
+   * @return
+   */
+  public UVertexList closeTo(UVertex vv,float limit) {
+    UVertexList l=(UVertexList)new UVertexList().enable(NOCOPY);
     
     limit=limit*limit;
     for(UVertex vert:v) if(!vv.equals(vert)){
@@ -509,7 +534,21 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     
     return l;
   }
-      
+
+  /**
+   * Returns new UVertexList containing all vertices that lie within
+   * the provided {@link UBB} bounding box.
+   * @param bb
+   * @return
+   */
+  public UVertexList inBB(UBB bb) {
+    UVertexList l=(UVertexList)new UVertexList().enable(NOCOPY);
+    
+    for(UVertex vv:v) if(bb.inBB(vv)) l.add(vv);
+    
+    return l;
+  }
+
   
   public UVertex[] get(int vID[]) {
     return get(vID,null);
@@ -526,12 +565,62 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     return tmp;
   }
 
-  
+
   public int getVID(UVertex vv) {
-    int index=indexOf(vv);
-    if(index<0) index=addID(vv);
-    
-    return index;}
+    int pos=indexOf(vv);
+    return pos;
+  }
+
+  public int[] getVID(UVertex[] vv) {
+    int[] id=new int[vv.length];
+    for(int i=0; i<vv.length; i++) {
+      id[i]=indexOf(vv[i]);
+    }
+    return id;
+  }
+
+  public int[] getVID(UVertexList l) {
+    int[] id=new int[l.size()];
+    for(int i=0; i<id.length; i++) {
+      UVertex vv=l.get(i);
+      
+      id[i]=indexOf(vv);
+      float dd=0;
+      if(id[i]<0) {
+        int found=-1;
+        for(int j=0; j<v.size() && found<0; j++) {
+          dd=v.get(j).dist(vv);
+          if(dd<EPSILON) found=j; 
+        }
+        
+//        add(vv);
+        log(found+" "+dd+" | "+size()+" "+vv.str()+" | "+
+            id[i]+" "+
+            l.indexOf(vv));
+      }
+    }
+    return id;
+  }
+
+//public int[] getVID(UVertex[] vv) {
+//return getVID(vv,null);
+//}
+//
+//public int[] getVID(UVertex[] vv, int[] vid) {
+//if(vid==null) vid=new int[vv.length];
+//
+//int id=0;
+//for(UVertex vvv:vv) vid[id++]=getVID(vvv);
+//
+////Arrays.sort(vid);
+//return vid;
+//}
+
+//  public int getVID(UVertex vv) {
+//    int index=indexOf(vv);
+//    if(index<0) index=addID(vv);
+//    
+//    return index;}
 
   public UVertex get(int id) {
     return (id>size() ? null : v.get(id));
@@ -601,13 +690,14 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   }
 
   public UVertexList add(UVertex v1) {
+    
     if(v1==null) {
-      v.add(null);
+//      v.add(null);
       return this;
     }
     
     if(isEnabled(NODUPL) && v.contains(v1)) {
-//      log("Duplicate: "+v1+" "+ v.contains(v1));
+      log("Duplicate: "+v1+" "+ v.contains(v1)+" "+str());
       return this;
     }
 
@@ -634,6 +724,8 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   }
 
   public UVertexList add(UVertexList v1) {
+//    log(optionStr()+" "+size());
+
     for(UVertex vv:v1) add(vv);
     return this;
   }
@@ -643,22 +735,30 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   }
 
   public int addID(UVertex v1) {
-//    add(v);    
     bb=null;
+    int id=-1;
     
-    int id=indexOf(v1);
-    if(id<0) {
-      v1=isEnabled(NOCOPY) ? v1 : v1.copy();
-      v.add(v1);
+    if(isEnabled(NODUPL)) {
+      id=indexOf(v1);
+      if(id<0) {
+        v1=isEnabled(NOCOPY) ? v1 : v1.copy();
+        v.add(v1);
+        id=size()-1;
+      }      
+    }
+    else {
+      v.add(isEnabled(NOCOPY) ? v1 : v1.copy());
       id=size()-1;
     }
+//    add(v);    
+    
 
     return id;
   }
 
   public int[] addID(UVertexList vl) {
     int[] id=new int[vl.size()];
-    for(int i=0; i<id.length; i++) id[i]=getVID(vl.get(i));
+    for(int i=0; i<id.length; i++) id[i]=addID(vl.get(i));
     return id;
   }
 
@@ -803,21 +903,25 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
    */
   public UVertexList removeDupl(boolean doDelete) {
     int id=0;
-    enable(NODUPL);
+    
+    UTask task=new UTask("removeDupl");
+//    enable(NODUPL);
     while(id<v.size()) {
       int index=indexOf(v.get(id));
       if(index<id) {
         
         if(doDelete) { // REMOVE FROM LIST
           v.remove(id);
-          id--;
+//          id--;
         }
         else { // REPLACE WITH REFERENCE TO FIRST INSTANCE
           v.set(id, v.get(index));
         }
       }
-      id++;
+      else id++;
     }    
+    
+    task.done();
     
     return this;
   }
@@ -874,6 +978,30 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     for(UVertexList vv:vl) vv.setV(map(id++,0,n,0,1));
   }
 
+  /**
+   * Maps U coordinates for the vertices in this list to the range U=[min..max]  
+   * @param min
+   * @param max
+   * @return
+   */
+  public UVertexList setU(float min,float max) {
+    int cnt=0,n=size();
+    for(UVertex vv:v) vv.U=map(cnt++, 0,n-1, min,max);
+    return this;
+  }
+
+  /**
+   * Maps V coordinates for the vertices in this list to the range V=[min..max]  
+   * @param min
+   * @param max
+   * @return
+   */
+  public UVertexList setV(float min,float max) {
+    int cnt=0,n=size();
+    for(UVertex vv:v) vv.V=map(cnt++, 0,n-1, min,max);
+    return this;
+  }
+
   public UVertexList setU(float U) {
     for(UVertex vv:v) vv.U=U;
     return this;
@@ -887,18 +1015,30 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   //////////////////////////////////////////
   // COLOR
 
+  /**
+   * Maps the color for each vertex to a gradient [col1..col2]  
+   * @param col1
+   * @param col2
+   * @return
+   */
+  public UVertexList setColorGradient(int col1,int col2) {
+    int cnt=0,n=size();
+    for(UVertex vv:v) vv.setColor(lerpColor(col1, col1, map(cnt++,0,n-1,0,1)));
+    return this;
+  }
+
   public UVertexList setColor(int c) {
     for(UVertex vv:v) vv.setColor(c);
     return this;
   }
 
   public UVertexList setColor(int c, int a) {
-    setColor(color(c, a));
+    setColor(pcolor(c, a));
     return this;
   }
 
   public UVertexList setColor(float a,float b,float c) {
-    return setColor(color(a,b,c));
+    return setColor(pcolor(a,b,c));
   }
 
   public String str() {
@@ -924,18 +1064,5 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     
   }
 
-  public int[] getVID(UVertex[] vv) {
-    return getVID(vv,null);
-  }
-
-  public int[] getVID(UVertex[] vv, int[] vid) {
-    if(vid==null) vid=new int[vv.length];
-    
-    int id=0;
-    for(UVertex vvv:vv) vid[id++]=getVID(vvv);
-    
-//    Arrays.sort(vid);
-    return vid;
-  }
 
 }

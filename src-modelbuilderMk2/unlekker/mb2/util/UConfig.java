@@ -35,7 +35,43 @@ public class UConfig extends Properties {
     }
   }
 
-  public boolean getBoolean(String id, boolean defState) {
+  public UConfig put(String key,int val) {
+    setProperty(key, ""+val);
+    return this;
+  }
+
+  public UConfig put(String key,float val) {
+    setProperty(key, ""+UMB.nf(val));
+    return this;
+  }
+
+  public UConfig put(String key,boolean bool) {
+    setProperty(key, ""+bool);
+    return this;
+  }
+
+  public UConfig put(String key,String val) {
+    setProperty(key, val);
+    return this;
+  }
+
+  public String get(String id) {
+    return getProperty(id);
+  }
+
+  public boolean getBool(String id) {
+    return getBool(id,false);
+  }
+
+  public int getInt(String id) {
+    return getInt(id,-1);
+  }
+
+  public float getFloat(String id) {
+    return getFloat(id,-1);
+  }
+
+  public boolean getBool(String id, boolean defState) {
     String tmp=getProperty(id,""+defState).toLowerCase().trim();
     if(tmp.compareTo("true")==0) return true;
     return false;
@@ -56,7 +92,7 @@ public class UConfig extends Properties {
     return Float.parseFloat(getProperty(id,""+defVal));
   }
 
-  public void listProperties() {
+  public void list() {
     for (java.util.Enumeration e=propertyNames(); e.hasMoreElements(); ) {
       String id=""+e.nextElement();
       System.out.println(id+" = "+getProperty(id));

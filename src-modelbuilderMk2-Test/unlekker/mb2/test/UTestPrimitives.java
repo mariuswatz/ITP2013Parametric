@@ -39,11 +39,11 @@ public class UTestPrimitives extends UTest {
     UMB.log(geo.strGroup());
     
     for(int i=0; i<geo.sizeF(); i++) {
-      if(i%2==0) geo.getF(i).setColor(color(255,0,0));
-      else geo.getF(i).setColor(color(255,255,255));
+      if(i%2==0) geo.getF(i).setColor(pcolor(255,0,0));
+      else geo.getF(i).setColor(pcolor(255,255,255));
     }
     
-    geo.add(UGeo.cyl(100, 200, 20).setColor(color(0,255,255)));
+    geo.add(UGeo.cyl(100, 200, 20).setColor(pcolor(0,255,255)));
 
 //    geo.center();
 //    geo.enable(geo.COLORFACE);
@@ -52,7 +52,7 @@ public class UTestPrimitives extends UTest {
     if(rndBool()) 
       geo2=UGeo.box(100).translate(-200,0,0);
 
-    else geo2=UGeo.cyl(100, 200, 20).setColor(color(0,255,255));
+    else geo2=UGeo.cyl(100, 200, 20).setColor(pcolor(0,255,255));
     geo2.translate(0,450,0);
 
     for(UFace ff:geo.getF()) {

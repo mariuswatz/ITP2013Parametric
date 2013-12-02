@@ -24,7 +24,7 @@ public class UTestSelector02 extends UTest {
     log("1 "+geo.str());
     
     for(UVertex vv:geo.getV()) {
-      ArrayList<UVertex> close=geo.getV().getClose(vv, 1);
+      UVertexList close=geo.getV().closeTo(vv, 1);
       if(close.size()>0) {
         logDivider(vv.ID+" "+vv.str()+" "+close.size());
         for(UVertex cv:close) {
@@ -44,7 +44,7 @@ public class UTestSelector02 extends UTest {
     
     int cnt=0;
     for(UVertex vv:geo.getV()) {
-      ArrayList<UVertex> close=geo.getV().getClose(vv, 1);
+      UVertexList close=geo.getV().closeTo(vv, 1);
       if(close.size()>0) {
         cnt+=close.size();
         logDivider((cnt)+" "+vv.ID+" "+vv.str()+" "+close.size());
@@ -76,9 +76,9 @@ public class UTestSelector02 extends UTest {
     p.stroke(255,0,0);
     if(sel.size()<1) geo.draw().drawNormals(10);
     else {
-      pstroke(color(0));
+      pstroke(pcolor(0));
       sel.draw(true);
-      pstroke(color(255));
+      pstroke(pcolor(255));
       sel.drawNormals(10);
     }
     if(lastSel!=null) UMB.pellipse(lastSel, 10);

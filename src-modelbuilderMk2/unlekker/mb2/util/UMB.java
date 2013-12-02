@@ -58,6 +58,7 @@ public class UMB implements UConst {
   public static HashMap<Integer, String> groupTypeNames;
 
   protected static boolean libraryPrinted=false;
+  
   static {
     if(!libraryPrinted) {
       UMB.logDivider(VERSION);
@@ -68,6 +69,204 @@ public class UMB implements UConst {
     }
   }
 
+  //////////////////////////////////////////////////
+  
+  public static HashMap<Integer,String> keyNames;
+  
+
+  static {
+    keyNames=new HashMap<Integer,String>();
+    keyNames.put(KEY_ENTER,"KEY_ENTER");
+    keyNames.put(KEY_BACK_SPACE,"KEY_BACK_SPACE");
+    keyNames.put(KEY_TAB,"KEY_TAB");
+    keyNames.put(KEY_CANCEL,"KEY_CANCEL");
+    keyNames.put(KEY_CLEAR,"KEY_CLEAR");
+    keyNames.put(KEY_SHIFT,"KEY_SHIFT");
+    keyNames.put(KEY_CONTROL,"KEY_CONTROL");
+    keyNames.put(KEY_ALT,"KEY_ALT");
+    keyNames.put(KEY_PAUSE,"KEY_PAUSE");
+    keyNames.put(KEY_CAPS_LOCK,"KEY_CAPS_LOCK");
+    keyNames.put(KEY_ESCAPE,"KEY_ESCAPE");
+    keyNames.put(KEY_SPACE,"KEY_SPACE");
+    keyNames.put(KEY_PAGE_UP,"KEY_PAGE_UP");
+    keyNames.put(KEY_PAGE_DOWN,"KEY_PAGE_DOWN");
+    keyNames.put(KEY_END,"KEY_END");
+    keyNames.put(KEY_HOME,"KEY_HOME");
+    keyNames.put(KEY_LEFT,"KEY_LEFT");
+    keyNames.put(KEY_UP,"KEY_UP");
+    keyNames.put(KEY_RIGHT,"KEY_RIGHT");
+    keyNames.put(KEY_DOWN,"KEY_DOWN");
+    keyNames.put(KEY_COMMA,"KEY_COMMA");
+    keyNames.put(KEY_MINUS,"KEY_MINUS");
+    keyNames.put(KEY_PERIOD,"KEY_PERIOD");
+    keyNames.put(KEY_SLASH,"KEY_SLASH");
+    keyNames.put(KEY_0,"KEY_0");
+    keyNames.put(KEY_1,"KEY_1");
+    keyNames.put(KEY_2,"KEY_2");
+    keyNames.put(KEY_3,"KEY_3");
+    keyNames.put(KEY_4,"KEY_4");
+    keyNames.put(KEY_5,"KEY_5");
+    keyNames.put(KEY_6,"KEY_6");
+    keyNames.put(KEY_7,"KEY_7");
+    keyNames.put(KEY_8,"KEY_8");
+    keyNames.put(KEY_9,"KEY_9");
+    keyNames.put(KEY_SEMICOLON,"KEY_SEMICOLON");
+    keyNames.put(KEY_EQUALS,"KEY_EQUALS");
+    keyNames.put(KEY_A,"KEY_A");
+    keyNames.put(KEY_B,"KEY_B");
+    keyNames.put(KEY_C,"KEY_C");
+    keyNames.put(KEY_D,"KEY_D");
+    keyNames.put(KEY_E,"KEY_E");
+    keyNames.put(KEY_F,"KEY_F");
+    keyNames.put(KEY_G,"KEY_G");
+    keyNames.put(KEY_H,"KEY_H");
+    keyNames.put(KEY_I,"KEY_I");
+    keyNames.put(KEY_J,"KEY_J");
+    keyNames.put(KEY_K,"KEY_K");
+    keyNames.put(KEY_L,"KEY_L");
+    keyNames.put(KEY_M,"KEY_M");
+    keyNames.put(KEY_N,"KEY_N");
+    keyNames.put(KEY_O,"KEY_O");
+    keyNames.put(KEY_P,"KEY_P");
+    keyNames.put(KEY_Q,"KEY_Q");
+    keyNames.put(KEY_R,"KEY_R");
+    keyNames.put(KEY_S,"KEY_S");
+    keyNames.put(KEY_T,"KEY_T");
+    keyNames.put(KEY_U,"KEY_U");
+    keyNames.put(KEY_V,"KEY_V");
+    keyNames.put(KEY_W,"KEY_W");
+    keyNames.put(KEY_X,"KEY_X");
+    keyNames.put(KEY_Y,"KEY_Y");
+    keyNames.put(KEY_Z,"KEY_Z");
+    keyNames.put(KEY_OPEN_BRACKET,"KEY_OPEN_BRACKET");
+    keyNames.put(KEY_BACK_SLASH,"KEY_BACK_SLASH");
+    keyNames.put(KEY_CLOSE_BRACKET,"KEY_CLOSE_BRACKET");
+    keyNames.put(KEY_NUMPAD0,"KEY_NUMPAD0");
+    keyNames.put(KEY_NUMPAD1,"KEY_NUMPAD1");
+    keyNames.put(KEY_NUMPAD2,"KEY_NUMPAD2");
+    keyNames.put(KEY_NUMPAD3,"KEY_NUMPAD3");
+    keyNames.put(KEY_NUMPAD4,"KEY_NUMPAD4");
+    keyNames.put(KEY_NUMPAD5,"KEY_NUMPAD5");
+    keyNames.put(KEY_NUMPAD6,"KEY_NUMPAD6");
+    keyNames.put(KEY_NUMPAD7,"KEY_NUMPAD7");
+    keyNames.put(KEY_NUMPAD8,"KEY_NUMPAD8");
+    keyNames.put(KEY_NUMPAD9,"KEY_NUMPAD9");
+    keyNames.put(KEY_MULTIPLY,"KEY_MULTIPLY");
+    keyNames.put(KEY_ADD,"KEY_ADD");
+    keyNames.put(KEY_SEPARATER,"KEY_SEPARATER");
+    keyNames.put(KEY_SEPARATOR,"KEY_SEPARATOR");
+    keyNames.put(KEY_SUBTRACT,"KEY_SUBTRACT");
+    keyNames.put(KEY_DECIMAL,"KEY_DECIMAL");
+    keyNames.put(KEY_DIVIDE,"KEY_DIVIDE");
+    keyNames.put(KEY_DELETE,"KEY_DELETE");
+    keyNames.put(KEY_NUM_LOCK,"KEY_NUM_LOCK");
+    keyNames.put(KEY_SCROLL_LOCK,"KEY_SCROLL_LOCK");
+    keyNames.put(KEY_F1,"KEY_F1");
+    keyNames.put(KEY_F2,"KEY_F2");
+    keyNames.put(KEY_F3,"KEY_F3");
+    keyNames.put(KEY_F4,"KEY_F4");
+    keyNames.put(KEY_F5,"KEY_F5");
+    keyNames.put(KEY_F6,"KEY_F6");
+    keyNames.put(KEY_F7,"KEY_F7");
+    keyNames.put(KEY_F8,"KEY_F8");
+    keyNames.put(KEY_F9,"KEY_F9");
+    keyNames.put(KEY_F10,"KEY_F10");
+    keyNames.put(KEY_F11,"KEY_F11");
+    keyNames.put(KEY_F12,"KEY_F12");
+    keyNames.put(KEY_F13,"KEY_F13");
+    keyNames.put(KEY_F14,"KEY_F14");
+    keyNames.put(KEY_F15,"KEY_F15");
+    keyNames.put(KEY_F16,"KEY_F16");
+    keyNames.put(KEY_F17,"KEY_F17");
+    keyNames.put(KEY_F18,"KEY_F18");
+    keyNames.put(KEY_F19,"KEY_F19");
+    keyNames.put(KEY_F20,"KEY_F20");
+    keyNames.put(KEY_F21,"KEY_F21");
+    keyNames.put(KEY_F22,"KEY_F22");
+    keyNames.put(KEY_F23,"KEY_F23");
+    keyNames.put(KEY_F24,"KEY_F24");
+    keyNames.put(KEY_PRINTSCREEN,"KEY_PRINTSCREEN");
+    keyNames.put(KEY_INSERT,"KEY_INSERT");
+    keyNames.put(KEY_HELP,"KEY_HELP");
+    keyNames.put(KEY_META,"KEY_META");
+    keyNames.put(KEY_BACK_QUOTE,"KEY_BACK_QUOTE");
+    keyNames.put(KEY_QUOTE,"KEY_QUOTE");
+    keyNames.put(KEY_KP_UP,"KEY_KP_UP");
+    keyNames.put(KEY_KP_DOWN,"KEY_KP_DOWN");
+    keyNames.put(KEY_KP_LEFT,"KEY_KP_LEFT");
+    keyNames.put(KEY_KP_RIGHT,"KEY_KP_RIGHT");
+    keyNames.put(KEY_DEAD_GRAVE,"KEY_DEAD_GRAVE");
+    keyNames.put(KEY_DEAD_ACUTE,"KEY_DEAD_ACUTE");
+    keyNames.put(KEY_DEAD_CIRCUMFLEX,"KEY_DEAD_CIRCUMFLEX");
+    keyNames.put(KEY_DEAD_TILDE,"KEY_DEAD_TILDE");
+    keyNames.put(KEY_DEAD_MACRON,"KEY_DEAD_MACRON");
+    keyNames.put(KEY_DEAD_BREVE,"KEY_DEAD_BREVE");
+    keyNames.put(KEY_DEAD_ABOVEDOT,"KEY_DEAD_ABOVEDOT");
+    keyNames.put(KEY_DEAD_DIAERESIS,"KEY_DEAD_DIAERESIS");
+    keyNames.put(KEY_DEAD_ABOVERING,"KEY_DEAD_ABOVERING");
+    keyNames.put(KEY_DEAD_DOUBLEACUTE,"KEY_DEAD_DOUBLEACUTE");
+    keyNames.put(KEY_DEAD_CARON,"KEY_DEAD_CARON");
+    keyNames.put(KEY_DEAD_CEDILLA,"KEY_DEAD_CEDILLA");
+    keyNames.put(KEY_DEAD_OGONEK,"KEY_DEAD_OGONEK");
+    keyNames.put(KEY_DEAD_IOTA,"KEY_DEAD_IOTA");
+    keyNames.put(KEY_DEAD_VOICED_SOUND,"KEY_DEAD_VOICED_SOUND");
+    keyNames.put(KEY_DEAD_SEMIVOICED_SOUND,"KEY_DEAD_SEMIVOICED_SOUND");
+    keyNames.put(KEY_AMPERSAND,"KEY_AMPERSAND");
+    keyNames.put(KEY_ASTERISK,"KEY_ASTERISK");
+    keyNames.put(KEY_QUOTEDBL,"KEY_QUOTEDBL");
+    keyNames.put(KEY_LESS,"KEY_LESS");
+    keyNames.put(KEY_GREATER,"KEY_GREATER");
+    keyNames.put(KEY_BRACELEFT,"KEY_BRACELEFT");
+    keyNames.put(KEY_BRACERIGHT,"KEY_BRACERIGHT");
+    keyNames.put(KEY_AT,"KEY_AT");
+    keyNames.put(KEY_COLON,"KEY_COLON");
+    keyNames.put(KEY_CIRCUMFLEX,"KEY_CIRCUMFLEX");
+    keyNames.put(KEY_DOLLAR,"KEY_DOLLAR");
+    keyNames.put(KEY_EURO_SIGN,"KEY_EURO_SIGN");
+    keyNames.put(KEY_EXCLAMATION_MARK,"KEY_EXCLAMATION_MARK");
+    keyNames.put(KEY_INVERTED_EXCLAMATION_MARK,"KEY_INVERTED_EXCLAMATION_MARK");
+    keyNames.put(KEY_LEFT_PARENTHESIS,"KEY_LEFT_PARENTHESIS");
+    keyNames.put(KEY_NUMBER_SIGN,"KEY_NUMBER_SIGN");
+    keyNames.put(KEY_PLUS,"KEY_PLUS");
+    keyNames.put(KEY_RIGHT_PARENTHESIS,"KEY_RIGHT_PARENTHESIS");
+    keyNames.put(KEY_UNDERSCORE,"KEY_UNDERSCORE");
+    keyNames.put(KEY_WINDOWS,"KEY_WINDOWS");
+    keyNames.put(KEY_CONTEXT_MENU,"KEY_CONTEXT_MENU");
+    keyNames.put(KEY_FINAL,"KEY_FINAL");
+    keyNames.put(KEY_CONVERT,"KEY_CONVERT");
+    keyNames.put(KEY_NONCONVERT,"KEY_NONCONVERT");
+    keyNames.put(KEY_ACCEPT,"KEY_ACCEPT");
+    keyNames.put(KEY_MODECHANGE,"KEY_MODECHANGE");
+    keyNames.put(KEY_KANA,"KEY_KANA");
+    keyNames.put(KEY_KANJI,"KEY_KANJI");
+    keyNames.put(KEY_ALPHANUMERIC,"KEY_ALPHANUMERIC");
+    keyNames.put(KEY_KATAKANA,"KEY_KATAKANA");
+    keyNames.put(KEY_HIRAGANA,"KEY_HIRAGANA");
+    keyNames.put(KEY_FULL_WIDTH,"KEY_FULL_WIDTH");
+    keyNames.put(KEY_HALF_WIDTH,"KEY_HALF_WIDTH");
+    keyNames.put(KEY_ROMAN_CHARACTERS,"KEY_ROMAN_CHARACTERS");
+    keyNames.put(KEY_ALL_CANDIDATES,"KEY_ALL_CANDIDATES");
+    keyNames.put(KEY_PREVIOUS_CANDIDATE,"KEY_PREVIOUS_CANDIDATE");
+    keyNames.put(KEY_CODE_INPUT,"KEY_CODE_INPUT");
+    keyNames.put(KEY_JAPANESE_KATAKANA,"KEY_JAPANESE_KATAKANA");
+    keyNames.put(KEY_JAPANESE_HIRAGANA,"KEY_JAPANESE_HIRAGANA");
+    keyNames.put(KEY_JAPANESE_ROMAN,"KEY_JAPANESE_ROMAN");
+    keyNames.put(KEY_KANA_LOCK,"KEY_KANA_LOCK");
+    keyNames.put(KEY_INPUT_METHOD_ON_OFF,"KEY_INPUT_METHOD_ON_OFF");
+    keyNames.put(KEY_CUT,"KEY_CUT");
+    keyNames.put(KEY_COPY,"KEY_COPY");
+    keyNames.put(KEY_PASTE,"KEY_PASTE");
+    keyNames.put(KEY_UNDO,"KEY_UNDO");
+    keyNames.put(KEY_AGAIN,"KEY_AGAIN");
+    keyNames.put(KEY_FIND,"KEY_FIND");
+    keyNames.put(KEY_PROPS,"KEY_PROPS");
+    keyNames.put(KEY_STOP,"KEY_STOP");
+    keyNames.put(KEY_COMPOSE,"KEY_COMPOSE");
+    keyNames.put(KEY_ALT_GRAPH,"KEY_ALT_GRAPH");
+    keyNames.put(KEY_BEGIN,"KEY_BEGIN");
+    keyNames.put(KEY_UNDEFINED,"KEY_UNDEFINED");
+    
+  }
   
   public static UMB taskTimerStart(String name) {
     taskName=name;
@@ -332,7 +531,32 @@ public class UMB implements UConst {
   public static UMB pvertex(UVertex varr[]) {
     return pvertex(varr,false);
   }
+
+  public static UMB pvertex(UVertexList vl) {
+    return pvertex(vl,false);
+  }
+
+  public static UMB pvertex(UVertexList vl,boolean reverse) {
+    if (checkGraphicsSet()) {
+      int n=vl.size();
+      
+      if (isGraphics3D) {
+        for(int i=0; i<n; i++) {
+          UVertex tmp=vl.get(reverse ? n-1-i : i).draw();
+          g3d.vertex(tmp.x, tmp.y, tmp.z);
+        }
+      }
+      else {
+        for(int i=0; i<n; i++) {
+          UVertex tmp=vl.get(reverse ? n-1-i : i).draw();
+          g.vertex(tmp.x, tmp.y);
+        }
+      }
+    }
     
+    return UMB.UMB;
+  }
+
 
   /**
    * Static convenience method to iterate through an array of
@@ -376,7 +600,7 @@ public class UMB implements UConst {
   }
 
   public static UMB pfill(float rr,float gg,float bb) {
-    if (checkGraphicsSet()) g.fill(color(rr,gg,bb));
+    if (checkGraphicsSet()) g.fill(pcolor(rr,gg,bb));
     return UMB.UMB;
   }
 
@@ -431,6 +655,66 @@ public class UMB implements UConst {
     }
     return UMB.UMB;
   }
+
+  //////////////////////////////// DRAW QUADSTRIP / FAN
+
+  public static UMB drawTriangleFan(UVertexList vl) {
+    return drawTriangleFan(vl, null, false);
+  }
+
+  public static UMB drawTriangleFan(UVertexList vl,boolean reverse) {
+    return drawTriangleFan(vl, null, reverse);
+  }
+
+  public static UMB drawTriangleFan(UVertexList vl,UVertex c,boolean reverse) {
+    if (checkGraphicsSet()) {
+      int n=vl.size();
+      if(c==null) c=vl.centroid();
+      
+      g.beginShape(TRIANGLE_FAN);
+      pvertex(c).pvertex(vl,reverse);
+      g.endShape();
+    }
+    return UMB.UMB;    
+  }
+
+  /**
+   * Draws a quad strip mesh directly without creating a UGeo. 
+   * @param vl List of vertex lists.
+   * @return
+   */
+  public static UMB drawQuadstrip(ArrayList<UVertexList> vl) {
+    if (checkGraphicsSet()) {
+      int n=vl.size();
+      
+      UVertexList last=null;
+      for(UVertexList tmp:vl) {
+        if(last!=null) drawQuadstrip(last, tmp);
+        last=tmp;
+      }
+    }    
+    
+    return UMB.UMB;
+  }
+
+  /**
+   * Draws a quad strip mesh directly without creating a UGeo. 
+   * @param vl 
+   * @param vl2 
+   * @return
+   */
+  public static UMB drawQuadstrip(UVertexList vl,UVertexList vl2) {
+    if(checkGraphicsSet()) {
+      g.beginShape(QUAD_STRIP);
+      int n=vl.size();
+      for(int i=0; i<n; i++) {
+        pvertex(vl.get(i)).pvertex(vl2.get(i));
+      }
+      g.endShape();
+    }
+    return UMB.UMB;
+  }
+
   public static UMB draw(ArrayList<UVertexList> vl) {
     return draw(vl,false);
   }
@@ -505,28 +789,32 @@ public class UMB implements UConst {
       return "Options: "+buf.toString();
     }
     
-    return "Options: None";
+    return "Options: None "+options;
   }
   
   ///////////////////////////////////////////////
   // COLOR 
   
-  public static final int color(int c,float a) {
+  public static final int pcolor(int c,float a) {
     return ((int)a<< 24) & c;
   }
 
-  public static final int color(int c) {
-    return color(c,c,c);
+  public static final int pcolor(int c) {
+    return pcolor(c,c,c);
   }
 
-  public static final int color(float r, float g, float b) {
+  public static final int pcolor(float c) {
+    return pcolor(c,c,c);
+  }
+
+  public static final int pcolor(float r, float g, float b) {
  //   return 0xff000000 | (v1 << 16) | (v2 << 8) | v3;
     int rr=(int)r,gg=(int)g,bb=(int)b;
     return (0xff000000)|
         ((rr)<<16)|((gg)<<8)|(bb);
   }
 
-  public static final int color(int r, int g, int b, int a) {
+  public static final int pcolor(int r, int g, int b, int a) {
     return (0xff000000)|((r&0xff)<<16)|((g&0xff)<<8)|(b&0xff);
   }
 
@@ -549,7 +837,7 @@ public class UMB implements UConst {
     return s;
   }
 
-  public static final int color(String hex) {
+  public static final int pcolor(String hex) {
     int c=0xFFFF0000,alpha=255;
     
     boolean ok=true;
@@ -576,7 +864,7 @@ public class UMB implements UConst {
       c=(alpha<<24) | Integer.parseInt(hex, 16);
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      c=color(255,0,0);
+      c=pcolor(255,0,0);
       e.printStackTrace();
     }
     
@@ -587,7 +875,23 @@ public class UMB implements UConst {
   // MATH
   // map,lerp,max,constrain code taken from processing.core.PApplet
   
-  
+
+  static public final float circleXforY(float y) {
+    float val=0;
+    
+    val=(float)Math.asin(y);
+    
+    return (float)Math.cos(val);
+  }
+
+  static public final float circleYforX(float x) {
+    float val=0;
+    
+    val=(float)Math.acos(x);
+    
+    return (float)Math.sin(val);
+  }
+
   static public final float abs(float n) {
     return (n < 0) ? -n : n;
   }
@@ -619,7 +923,18 @@ public class UMB implements UConst {
   static public final float min(float a, float b) {
     return (a < b) ? a : b;
   }
+  
 
+  static public final float[] norm(float val[],float max) {
+    for(int i=0; i<val.length; i++) val[i]=val[i]/max;
+    return val;
+  }
+
+  
+  static public final float dampen(
+      float val,float valOld,float factor) {
+        return val*factor+valOld*(1-factor);
+  }
   
   static public final float map(float value,
       float ostart, float ostop) {
@@ -644,6 +959,21 @@ public class UMB implements UConst {
     return start + (stop-start) * amt;
   }
 
+  static public final int lerpColor(int c1,int c2,float t) {
+    float a1 = ((c1 >> 24) & 0xff);
+    float r1 = (c1 >> 16) & 0xff;
+    float g1 = (c1 >> 8) & 0xff;
+    float b1 = c1 & 0xff;
+    float a2 = (c2 >> 24) & 0xff;
+    float r2 = (c2 >> 16) & 0xff;
+    float g2 = (c2 >> 8) & 0xff;
+    float b2 = c2 & 0xff;
+
+    return (((int) (a1 + (a2-a1)*t) << 24) |
+        ((int) (r1 + (r2-r1)*t) << 16) |
+        ((int) (g1 + (g2-g1)*t) << 8) |
+        ((int) (b1 + (b2-b1)*t)));
+  }
   
   // extended versions
   
@@ -651,6 +981,27 @@ public class UMB implements UConst {
     return (a%b+b)%b; 
   }
 
+  static public final float[] toFloat(int[] val,float fval[]) {
+    if(fval==null || fval.length!=val.length) fval=new float[val.length];
+    
+    int cnt=0;
+    for(int theVal:val) fval[cnt++]=theVal;
+    
+    return fval;
+  }  
+  
+  static public final float[] maxima(float val[]) {
+    return maxima(val,null);
+  }
+
+  static public final float[] maxima(float val[],float dat[]) {
+    if(dat==null) dat=new float[3];
+    dat[0]=max(val);
+    dat[1]=max(val);
+    dat[2]=max(abs(dat[0]),abs(dat[1]));
+    return dat;
+  }
+  
   static public final float max(ArrayList<Float> val) {
     float theMax=Float.MIN_VALUE;
     
@@ -661,7 +1012,7 @@ public class UMB implements UConst {
   static public final float min(ArrayList<Float> val) {
     float theMin=Float.MAX_VALUE;
     
-    for(float v:val) theMin=(v>theMin ? v : theMin);
+    for(float v:val) theMin=(v<theMin ? v : theMin);
     return theMin;
   }
 
@@ -780,6 +1131,10 @@ public class UMB implements UConst {
       return rndBool() ? val : -val;
     }
 
+  public static <T> int rndIndex(ArrayList<T> l) {
+    return rndInt(l.size());
+  }
+
   public static int rndInt(int max) {
     return rnd.integer(max);
   }
@@ -821,6 +1176,17 @@ public class UMB implements UConst {
     return UMB.papplet;    
   }
 
+  public static String className(Object o) {
+    return o.getClass().getSimpleName();
+  }
+  
+  public static String keyName(int key) {
+    if(keyNames.containsKey(key)) {
+      return keyNames.get(key);
+    }
+    return NULLSTR;
+  }
+  
   public static boolean checkGraphicsSet() {
     if(g==null) {
       if(gErrorCnt%100==0) logErr("ModelbuilderMk2: No PGraphics set. Use UMB.setGraphics(PApplet).");
@@ -849,6 +1215,8 @@ public class UMB implements UConst {
 
   public static void setGraphics(PGraphics gg) {
     UMB.g=gg;
+    if((g==null)) return;
+    
     if(gg.is3D()) {
       UMB.g3d=(PGraphics3D)gg;
       isGraphics3D=true;
@@ -860,11 +1228,37 @@ public class UMB implements UConst {
         " (is3D="+isGraphics3D+")");
   }
 
+  public static UMB depth() {
+    if(checkGraphicsSet()) {
+      papplet.hint(DISABLE_DEPTH_TEST);
+    }
+    return UMB.UMB;
+  }
+
+  public static UMB noDepth() {
+    if(checkGraphicsSet()) {
+      papplet.hint(DISABLE_DEPTH_TEST);
+    }
+    return UMB.UMB;
+  }
+
   //////////////////////////////////////////
   // LOGGING
   
-  public static void log(String s) {
-    System.out.println(timeStr()+" "+s);
+  public static UMB log(String s) {
+    if(s.indexOf(NEWLN)>-1) {
+      int pos=s.indexOf(NEWLN);
+//      log("pos "+pos+" "+s.substring(0,pos)+"|");
+      while(pos>-1) {
+        log(s.substring(0,pos));
+        s=s.substring(pos+1);
+        pos=s.indexOf(NEWLN,pos+1);
+      }
+      if(s.length()>0) log(s);
+    }
+    else System.out.println(timeStr()+" "+s);
+    
+    return UMB.UMB;
   }
 
   public static void logf(String s,Object... arg) {
@@ -881,6 +1275,14 @@ public class UMB implements UConst {
     log("["+strBufDispose(buf)+"]");
   }
 
+  public static <T> T first(ArrayList<T> input) {
+    return input.get(0);
+  }
+
+  public static <T> T last(ArrayList<T> input) {
+    return input.get(input.size()-1);
+  }
+
   public static <T> void log(ArrayList<T> input) {
 //    log("log "+input.getClass().getName()+" "+input.size());
     for(T tmp: input) {
@@ -889,24 +1291,34 @@ public class UMB implements UConst {
     }
   }
 
-  public static void log(int i) {
-    log(""+i);
+  public static UMB log(char c) {
+    return log(""+c);
   }
 
-  public static void log(float f) {
-    log(""+f);
+  public static UMB log(int i) {
+    return log(""+i);
   }
 
-  public static void logErr(String s) {
+  public static UMB log(float f) {
+    return log(""+f);
+  }
+
+  public static UMB logErr(String s) {
     System.err.println(s);
+    return UMB.UMB;
   }
 
-  public static void logDivider() {
-    log(LOGDIVIDERNEWNL);
+  public static UMB logDivider() {
+    return log(LOGDIVIDERNEWNL);
   }
 
-  public static void logDivider(String s) {
-    log(LOGDIVIDER+' '+s);
+  public static UMB logDivider(String s) {
+    if(s!=null && s.length()>0 && s.charAt(0)=='\n') {
+      log(LOGDIVIDERNEWNL);
+      s=s.substring(1);
+      return log(s);
+    }
+    else return log(LOGDIVIDER+' '+s);
   }
 
   public static String timeStr(long t) {
@@ -943,10 +1355,10 @@ public class UMB implements UConst {
   // FILE TOOLS
   
   public static String nextFile(String path,String pre) {
-    return nextFilename(path, pre,null);
+    return nextFile(path, pre,null);
   }
 
-  public static String nextFilename(String path,String pre,String ext) {
+  public static String nextFile(String path,String pre,String ext) {
     return UFile.nextFile(path, pre, ext);
   }
   
@@ -1052,6 +1464,10 @@ public class UMB implements UConst {
 
   public static <T> String str(ArrayList<T> o) {
     return str(o,NEWLN,null);
+  }
+
+  public static <T> String str(ArrayList<T> o,boolean asArray) {
+    return str(o,TAB,ENCLSQ);
   }
 
   public static <T> String str(ArrayList<T> o, char delim,String enclosure) {

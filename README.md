@@ -5,6 +5,25 @@ See the Code & Form blog for a [detailed description](http://workshop.evolutionz
 Contact e-mail: marius at mariuswatz dot com<br />
 Class hours: Mondays 6:00pm – 8:55pm
 
+## December 02
+
+Good news: I found a way to optimize a big bottleneck in UGeo. By default, UGeo tries to eliminate duplicate vertices, which is a GOOD THING. But all that checking for duplicates becomes a BAD THING for complex meshes, resulting in calls to UVertex.equals() numbering in the hundreds of thousands.
+
+Mesh-building operations like quadstrip(UVertexList vl,UVertexList vl2) and quadstrip(ArrayList<UVertexList> stack) can slow to a crawl for meshes with 1000+ vertices. Build times over a minute for a quadstrip operation is just embarrassing.
+
+The fix:
+
+- Pre-add all new vertices and only initializing UFaces with pre-calculated vertex IDs
+- Add UGeo.removeDupl() to give the option to remove duplicates on demand
+- Temporarily disable NODUPL for quadstrip(ArrayList<UVertexList> stack), followed by a call to UGeo.removeDupl() to remove duplicate vertices and remap face vertex IDs
+
+In testing this does seem to speed things up quite a bit. Complex mesh building will still take time, but should be much faster. 
+
+**Other news:**
+
+- UGeo.vertexNormals(): Calculate vertex normals (as opposed to face normals) for a mesh. Useful for displacing vertices along their normals, which will be more "natural" than simple random XYZ displacement
+- UColor: New class for generating color palettes, using gradients. This is a preliminary version, not extensively tested.
+- Added new examples.
 
 ## November 13
 

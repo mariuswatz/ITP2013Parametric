@@ -30,6 +30,11 @@ public class UTestMain extends PApplet {
     
     tests=new ArrayList<UTest>();
 
+    
+    tests.add(new UTestMath());
+    tests.add(new UTestGeo());
+    tests.add(new UTestTask());
+  tests.add(new UTestSmooth02());
     tests.add(new UTestPrimitives02());
     
     tests.add(new UTestSelector02());
@@ -42,7 +47,6 @@ public class UTestMain extends PApplet {
     tests.add(new UTestPrimitives());
 
     tests.add(new UTestTriangulate());
-//    tests.add(new UTestSmooth02());
 //    tests.add(new UTestSTLColor()); 
 
     tests.add(new UTestSmooth());
@@ -67,7 +71,7 @@ public class UTestMain extends PApplet {
     theTest=tests.get(id);
     
     try {
-      theTest.init();
+      initTest();
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -81,7 +85,13 @@ public class UTestMain extends PApplet {
     drawCredit();
     
     pushStyle();
-    theTest.draw();
+    try {
+      theTest.draw();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      exit();
+    }
     popStyle();
     
   }
@@ -115,7 +125,7 @@ public class UTestMain extends PApplet {
     else if(key==' ' || key=='+' ) {
       int id=(tests.indexOf(theTest)+1)%tests.size();
       theTest=tests.get(id);
-      theTest.init();
+      initTest();
     }
     else if(key==' ' || key=='-' ) {
       if(keyEvent.isShiftDown() || key=='-') {
@@ -123,19 +133,26 @@ public class UTestMain extends PApplet {
         id=(id<1 ? id=tests.size()-1 : id-1);
         
         theTest=tests.get(id);
-        theTest.init();
+        initTest();
         
       }
     }
     else if(key!=CODED && key=='n') {
 //      if(keyCode==java.awt.event.KeyEvent.VK_N)     
-        theTest.init();
+      
+        initTest();
     }
 
     theTest.keyPressed(key);
 
     saveStrings("UTestMain.dat",
         new String [] {""+tests.indexOf(theTest)});
+  }
+
+  private void initTest() {
+    UMB.logDivider(theTest.name);
+    theTest.init();
+    
   }
 
   static public void main(String args[]) {

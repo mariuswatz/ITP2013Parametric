@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
-import unlekker.mb2.util.UMB;
+import unlekker.mb2.util.*;
 
 public class UVertex extends UMB  {
   public static int globalID;
@@ -13,7 +13,7 @@ public class UVertex extends UMB  {
   public float x,y,z;
   
   public int col;
-  public float U=-1,V=-1;
+  public float U=UNAN,V=UNAN;
   public UVertex normal;
   
   public UVertex() {
@@ -94,30 +94,59 @@ public class UVertex extends UMB  {
     return set(Math.cos(angle),Math.sin(angle),0);
   }
 
+  public static UTask eqTask;
+  
   public boolean equals(Object o) {
-    UVertex v=(UVertex)o;
-    if(this==v || v.ID==ID) return true;
-
-//  if(>EPSILON);+abs(v1.y-y)+abs(v1.z-z);
-
-//    float res=abs(v.x-x);
-//    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
-//    res=abs(v.y-y);
-//    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
-//    res=abs(v.z-z);
-//    if(res>0 ? res>EPSILON : -res>EPSILON) return false;
-    float res=distSimple(v);
+    long t=0;
     
-    if(res>EPSILON) return false;
+    if(eqTask!=null) {
+      t=System.currentTimeMillis();
+//      if(eqTask==null) {
+//        eqTask=new UTask("UVertex.equals");
+//        eqTask.addData("equals", 0);
+//        eqTask.addData("equalsTime", 0);
+//      }
+          
+      eqTask.increment("equals");
+
+//      eqTask.getStackInfo(true);      
+//      String s="";
+//      for(String tmp:eqTask.stack) s+=tmp+TAB;
+//      eqTask.addLogUnique(s);
+      
+    }
+    boolean equals=true;
+    
+    UVertex v=(UVertex)o;
+    if(this==v || v.ID==ID) equals=true;
+    else {
+      float res=v.x-x;
+      if((res<0 ? -res:res)>EPSILON) equals=false;
+      else {
+        res=v.y-y;
+        if((res<0 ? -res:res)>EPSILON) equals=false;
+        else {
+          res=v.z-z;
+          if((res<0 ? -res:res)>EPSILON) equals=false;
+        }
+      }
+    }
+
+
+    if(eqTask!=null) 
+      eqTask.increment("equalsTime",(int)(System.currentTimeMillis()-t));
+
+//    if(dist(v)<EPSILON) return true;
 //    res=abs(v.y-y);
 //    if(res>EPSILON) return false;
 //    res=abs(v.z-z);
 //    if(res>EPSILON) return false;
     
 //    if(distSimple(v)<EPSILON) return true;
-    return true;
+    return equals;
   }
-  
+
+
   //////////////////////////////////////////
   // VECTOR MATH
 
@@ -236,7 +265,7 @@ public class UVertex extends UMB  {
   }
 
  public float angleXY() {
-   return -PApplet.atan2(-y, x);
+   return PApplet.atan2(-y, x);
  }
 
   public UVertex abs() {
@@ -479,12 +508,12 @@ public class UVertex extends UMB  {
   }
 
   public UVertex setColor(int c, int a) {
-    setColor(color(c, a));
+    setColor(pcolor(c, a));
     return this;
   }
 
   public UVertex setColor(float a,float b,float c) {
-    return setColor(color(a,b,c));
+    return setColor(pcolor(a,b,c));
   }
 
   public static UVertex centroid(UVertex[] v2) {        
@@ -495,6 +524,18 @@ public class UVertex extends UMB  {
     UVertex v=new UVertex();
     for(UVertex vv:v2) v.add(vv);
     v.div(v2.length);
+    
+    if(v2[0].U>UNAN) {
+      float U=0;
+      float V=0;
+      for(UVertex vv:v2) {
+        U+=(vv.U>UNAN ? vv.U : 0);
+        V+=(vv.V>UNAN ? vv.V : 0);
+      }
+      
+      float nf=1f/(float)v2.length;
+      v.setUV(U*nf, V*nf);
+    }
     
     return v;//bb.centroid;
   }

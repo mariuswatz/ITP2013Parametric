@@ -86,7 +86,12 @@ public class UNav3D extends UMB {
   rot.set(0,0,0);
   return this;
 }
-  
+
+  public void doTransforms(boolean doCenter) {
+    if(doCenter) ptranslate(papplet.width/2, papplet.height/2);
+    doTransforms();
+  }
+
   /**
    * Executes the needed transformations (provided a
    * PApplet reference exists.) 

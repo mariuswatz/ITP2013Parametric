@@ -53,6 +53,20 @@ public class UFace extends UMB  {
 //    log("F "+ID+" "+vID[0]+" "+vID[1]+" "+vID[2]);
   }
   
+  public boolean inBB(UBB bb,boolean allVertices) {
+    getV();
+    if(!allVertices) {
+      return (bb.inBB(v[0]) || bb.inBB(v[1]) || bb.inBB(v[2]));
+    }
+    
+    int cnt=0;
+    cnt=(bb.inBB(v[0]) ? cnt+1 : cnt);
+    cnt=(bb.inBB(v[1]) ? cnt+1 : cnt);
+    cnt=(bb.inBB(v[2]) ? cnt+1 : cnt);
+    return (cnt==3);    
+  }
+
+  
   public boolean contains(UVertex vv) {
     getV();
     if(v[0]==vv) return true;
@@ -63,11 +77,17 @@ public class UFace extends UMB  {
 //    if(v[2].equals(vv)) return true;
     return false;
   }
-  
+
+  public UFace(UGeo model, int id1,int id2,int id3) {
+    this();
+    parent=model;
+    vID=new int[] {id1,id2,id3};
+  }
+
   public UFace(UGeo model, int[] ID) {
     this();
     parent=model;
-    vID=new int[] {ID[0],ID[1],ID[2]};
+    System.arraycopy(ID, 0, vID, 0, 3);
   }
 
   public UFace set(UVertex vv[]) {
@@ -149,11 +169,18 @@ public class UFace extends UMB  {
   }
 
   public int[] getVID() {
+    if(v==null) getV();
     return getVID(v);    
   }
 
   private int[] getVID(UVertex vv[]) {
-    vID=parent.getVID(vv);
+    vID=new int[] {
+        parent.addVertex(vv[0]),  
+        parent.addVertex(vv[1]),  
+        parent.addVertex(vv[2])
+    };
+    v=null;
+    
     return vID;
   }
 
@@ -210,6 +237,13 @@ public class UFace extends UMB  {
     mid[2]=v[2].lerp(0.5f, v[0]);
     
     return mid;
+  }
+
+  public UFace remapVID() {
+    getVID(v);
+    getV(true);
+
+    return this;
   }
 
   public UVertex[] getV() {
@@ -306,7 +340,7 @@ public class UFace extends UMB  {
   }
 
   public UFace setColor(float a,float b,float c) {
-    return setColor(color(a,b,c));
+    return setColor(pcolor(a,b,c));
   }
 
   public UVertex centroid() {

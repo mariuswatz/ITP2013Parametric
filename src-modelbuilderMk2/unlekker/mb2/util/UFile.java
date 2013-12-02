@@ -104,6 +104,9 @@ public class UFile implements UConst {
   }
 
 
+  public static String nextFilename(String path,String prefix) {
+    return nextFile(path, prefix);
+  }
   /**
    * Generates auto-incrementing filename based on the provided
    * path and file prefix (file extension is disregarded.) 
@@ -111,7 +114,7 @@ public class UFile implements UConst {
    * @param prefix
    * @return
    */
-  public static String nextFilename(String path,String prefix) {
+  public static String nextFile(String path,String prefix) {
     return nextFile(path, prefix,null);
   }
 
@@ -341,7 +344,7 @@ public class UFile implements UConst {
     int pos=name.lastIndexOf(DIRCHAR);
     if(pos<0) return name;
     
-    UMB.log(name+" "+name.substring(pos+1));
+//    UMB.log(name+" "+name.substring(pos+1));
     return name.substring(pos+1);
   }
   

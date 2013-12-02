@@ -66,10 +66,10 @@ public class UTestEdgeList02 extends UTest {
       p.stroke(255,0,0);
 //    e.draw();
 //    e.pnoStroke().pfill(color(255));
-      pfill(color(255));
+      pfill(pcolor(255));
       f.draw();
       UFace conn[]=f.connected();
-      pfill(color(0,255,255));
+      pfill(pcolor(0,255,255));
       if(conn[0]!=null) conn[0].draw();
       if(conn[1]!=null) conn[1].draw();
       if(conn[2]!=null) conn[2].draw();

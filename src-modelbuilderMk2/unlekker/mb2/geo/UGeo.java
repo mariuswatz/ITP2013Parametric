@@ -6,11 +6,9 @@ package unlekker.mb2.geo;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import unlekker.mb2.util.UMB;
-
-import java.util.*;
-
 import processing.core.PImage;
+import unlekker.mb2.util.UMB;
+import unlekker.mb2.util.UTask;
 
 public class UGeo extends UMB  {
   /**
@@ -80,6 +78,21 @@ public class UGeo extends UMB  {
     return this;
   }
 
+  /**
+   * Regenerate face data (normals, centroid, vertices) for a 
+   * specific face.
+   * @param id
+   * @return
+   */
+  public UGeo regenerateFaceData(int id) {
+    getF().get(id).reset();
+    return this;
+  }
+
+  /**
+   * Regenerate face data (normals, centroid, vertices) for all faces.
+   * @return
+   */
   public UGeo regenerateFaceData() {
     taint();
     for(UFace ff:getF()) {
@@ -93,8 +106,17 @@ public class UGeo extends UMB  {
   }
 
   /**
-   * Checks the validity of connected {@link UGeoGroup} and {@link UEdgeList} 
-   * instances, removing any edges or faces that are no longer found in this UGeo.
+   * <p>Checks the validity of connected {@link UGeoGroup} and {@link UEdgeList} 
+   * instances, removing any edges or faces that are no longer found in this UGeo.</p>
+   * 
+   * <p><code>UGeo</code> uses an internal flag ({@link #tainted}) to track operations that might
+   * cause its internal state to need updating. If this flag is set, some methods 
+   * (such as {@link #writeSTL(String)} and all {@link #draw()} / <code>drawXXX()</code>)
+   * will call <code>check()</code> automatically.</p>
+   * 
+   * <p>If <code>check()</code> is called by the user when <code>tainted==false</code>, 
+   * no operations will take place. To force an update, use {@link #taint()} or 
+   * {@link #regenerateFaceData()}.</p> 
    * @return
    */
   public UGeo check() {
@@ -102,9 +124,6 @@ public class UGeo extends UMB  {
     
     if(edges!=null) edges.check();    
     for(UGeoGroup gr:groups) gr.check();
-    for(UFace ff:faces) {
-      
-    }
 
     tainted=false;
     return this;
@@ -131,12 +150,31 @@ public class UGeo extends UMB  {
   }
   
   public UGeo removeDupl() {
+    UTask task=new UTask("removeDupl | "+str());
+    task.addLog("Before: "+str());
+    
+    task.update(0,"getV "+sizeV());
     for(UFace ff:faces) ff.getV();
+    task.update(25,"getV "+sizeV());
+    
     getV().removeDupl(true);
+    task.update(50,"getV.removeDupl "+sizeV());
+    
+    int cnt=0,nf=faces.size();
+    int modulus=nf/20;
+    
     for(UFace ff:faces) {
-      ff.getVID();
-      ff.getV(true);
+      if((cnt++)%modulus==0) {
+        task.update(
+            map(cnt,0,nf-1,75,100),"getV.remapVID");
+
+      }
+      ff.remapVID();
     }
+    
+    task.addLog("After: "+str());
+    task.done();
+//    log(task.log);
     
     return this;
   }
@@ -149,13 +187,14 @@ public class UGeo extends UMB  {
   }
 
   public UGeo enable(int opt) {
-    super.setOptions(opt);
-    vl.setOptions(opt);
+    super.enable(opt);
+    vl.enable(opt);
     return this;
   }
 
   public UGeo disable(int opt) {
     super.disable(opt);
+    vl.disable(opt);
     return this;
   }
 
@@ -378,7 +417,7 @@ public class UGeo extends UMB  {
   public static void center(ArrayList<UGeo> models) {
     UBB btmp=new UBB();
     for(UGeo geo:models) btmp.add(geo.bb());
-    btmp.calc();
+    btmp.check();
     UVertex c=btmp.centroid;
     for(UGeo geo:models) geo.translateNeg(c);
     
@@ -490,8 +529,8 @@ public class UGeo extends UMB  {
   }
 
   public UEdgeList getEdgeList() {
-    if(edges==null) edges=new UEdgeList(this);
     if(tainted) check();
+    if(edges==null) edges=new UEdgeList(this);
     
     return edges;
   }
@@ -501,6 +540,7 @@ public class UGeo extends UMB  {
   }
 
   public ArrayList<UFace> getFNoGroup() {
+    if(tainted) check();
     ArrayList<UFace> fl=new ArrayList<UFace>();
     
     for(UFace ff:getF()) {
@@ -523,7 +563,37 @@ public class UGeo extends UMB  {
   }
 
   public UFace getF(int id) {
+    if(tainted) check();
     return faces.get(id);
+  }
+
+  /**
+   * Returns list of faces whose vertices are completely contained
+   * inside the provided {@link UBB} bounding box.
+   * @param bb
+   * @return
+   */
+  public ArrayList<UFace> getFacesInBB(UBB bb) {
+    if(tainted) check();
+    return getFacesInBB(bb,true);
+  }
+
+  /**
+   * <p>Returns list of faces whose vertices are contained
+   * inside the provided {@link UBB} bounding box.</p>
+   *  
+   * <p>If <code>allVertices==false</code>, a face will be included
+   * if any of its vertices lie within the bounding box, 
+   * otherwise all vertices must be contained in order to
+   * be included.</p> 
+   * @param bb
+   * @return
+   */
+  public ArrayList<UFace> getFacesInBB(UBB bb,boolean allVertices) {
+    ArrayList<UFace> ff=new ArrayList<UFace>();
+    
+    for(UFace f:faces) if(f.inBB(bb, allVertices)) ff.add(f);
+    return ff;
   }
 
   /**
@@ -538,6 +608,13 @@ public class UGeo extends UMB  {
     return vl.get(id);
   }
 
+  /**
+   * Returns the vertex normal for a specific vertex. Calls 
+   * {@link #vertexNormals()} to calculate the vertex normals if 
+   * needed.
+   * @param id
+   * @return
+   */
   public UVertex getVNormal(int id) {    
     return vertexNormals().get(id);
   }
@@ -603,8 +680,6 @@ public class UGeo extends UMB  {
   
   public UGeo draw(int theOptions) {
     if(checkGraphicsSet()) {
-      g.beginShape(TRIANGLES);
-      
       g.beginShape(TRIANGLES);      
       
       int opt=(isEnabled(theOptions,COLORFACE) ? COLORFACE : 0);
@@ -676,7 +751,11 @@ public class UGeo extends UMB  {
         int id=0;
         
         for(int i=0; i<n; i++) {
-          addFace(vltmp.get(id++),vltmp.get(id++),vltmp.get(id++));
+          addFace(new int[] {
+              vID[id++],
+              vID[id++],
+              vID[id++]
+          });
         }
       }
       break;
@@ -703,11 +782,23 @@ public class UGeo extends UMB  {
         int id=0;
         UVertex v0,v2;
         
+        int vvID[];
+        
         for(int i=0; i<n; i++) {
-          v0=vltmp.get(id);
-          v2=vltmp.get(id+2);          
-          addFace(v0,vltmp.get(id+1),v2);
-          addFace(v0,v2,vltmp.get(id+3));
+          vvID =new int[] {
+              vID[id],vID[id+1],vID[id+2]
+          };
+          addFace(vvID);
+
+          vvID =new int[] {
+              vID[id],vID[id+2],vID[id+3]
+          };
+          addFace(vvID);
+
+//          v0=vltmp.get(id);
+//          v2=vltmp.get(id+2);          
+//          addFace(v0,vltmp.get(id+1),v2);
+//          addFace(v0,v2,vltmp.get(id+3));
           id+=4;
         }
       }
@@ -817,7 +908,13 @@ public class UGeo extends UMB  {
   }
   
   public UGeo addFace(UVertex vv[]) {
-    return addFace(vv[0], vv[1], vv[2]);
+    int vID[]=new int[] {
+        addVertex(vv[0]),
+        addVertex(vv[10]),
+        addVertex(vv[2])
+    };
+    
+    return addFace(vID);
   }
 
   public UGeo addFace(ArrayList<UFace> f) {
@@ -833,9 +930,15 @@ public class UGeo extends UMB  {
   public UGeo addFace(UFace f) {
     tainted=true;
     
+    
+    
     f.setParent(this);
     faces.add(f);
     return this;
+  }
+
+  public UGeo addFace(int id1,int id2,int id3) {
+    return addFace(new int[] {id1,id2,id3});
   }
 
   public UGeo addFace(int vID[]) {
@@ -846,27 +949,35 @@ public class UGeo extends UMB  {
 //    addFace(vl.get(vID[0]),vl.get(vID[1]),vl.get(vID[2]));
     return this;
   }
-  
-  public UGeo addFace(UVertex v1, UVertex v2, UVertex v3) {
-    edges=null;
-    if(!UFace.check(v1,v2,v3)) {
-      log("Invalid face");
-      return this;
-    }
-    
-    UFace ff=new UFace(this, v1, v2, v3);
-    if(duplicateF(ff)) {
-      log("Duplicate face");
-      return this;
-    }
-    
-//    faces.add(new UFace(this, v1,v2,v3));
-    faces.add(ff);
-    tainted=true;
 
-    vl.bb=null;
-    return this;
+  public UGeo addFace(UVertex v1, UVertex v2, UVertex v3) {
+    return addFace(
+        addVertex(v1),
+        addVertex(v2),
+        addVertex(v3)
+        );
   }
+
+//  public UGeo addFace(UVertex v1, UVertex v2, UVertex v3) {
+//    edges=null;
+//    if(!UFace.check(v1,v2,v3)) {
+//      log("Invalid face");
+//      return this;
+//    }
+//    
+//    UFace ff=new UFace(this, v1, v2, v3);
+//    if(duplicateF(ff)) {
+//      log("Duplicate face");
+//      return this;
+//    }
+//    
+////    faces.add(new UFace(this, v1,v2,v3));
+//    faces.add(ff);
+//    tainted=true;
+//
+//    vl.bb=null;
+//    return this;
+//  }
 
   public boolean duplicateF(UFace ff) {
     int cnt=0;
@@ -932,7 +1043,7 @@ public class UGeo extends UMB  {
   }
 
   public int[] getVID(UVertex vv[],int vid[]) {    
-    return vl.getVID(vv,vid);
+    return vl.getVID(vv);
   }
 
   /**
@@ -971,7 +1082,7 @@ public class UGeo extends UMB  {
     return id;
   }
 
-  public UGeo quadstrip(ArrayList<UVertexList> vl2) {
+  public UGeo quadstrip(ArrayList<UVertexList> stack) {
     UVertexList last=null;  
     
     long tD,t=System.currentTimeMillis();
@@ -979,25 +1090,37 @@ public class UGeo extends UMB  {
     int cnt=0;
 
 
+    if(UVertex.eqTask!=null) 
+      UVertex.eqTask.clear();
+    
+    UTask task=new UTask("quadstrip(ArrayList n="+
+        stack.size()+
+        ")");
+    
+    int optionsOld=options;
+    
+    boolean nodupl=isEnabled(NODUPL);
+    if(nodupl) {
+      disable(NODUPL);
+    }
+    
     ArrayList<int[]> vID=new ArrayList<int[]>();
-    taskTimerStart("quadstrip(ArrayList<UVertexList>");
-    for(UVertexList vvl:vl2) {
-      vID.add(addID(vvl));
-      taskTimerUpdate(map(vID.size(),0,vl2.size()-1,0,50));
+    
+    for(UVertexList vvl:stack) {
+      vID.add(vl.addID(vvl));
+//      log("vID "+vID.size()+" "+sizeV()+" "+UVertex.eqTask.strData());
+      task.update(map(vID.size(),0,stack.size()-1,0,25),"v="+sizeV());
 
     }
+    
+//    log("got vID "+papplet.millis());
     
     int n=vID.get(0).length;
     int qID[]=new int[n*2];
     
     
-    String s="";
-//    for(int i=0; i<vID.size(); i++) s+=(i>0 ? "\t":"") +
-//        vID.get(i).length+"|"+vl2.get(i).size();
-//    
-    
     cnt=0;
-    for(UVertexList vvl:vl2) {
+    for(UVertexList vvl:stack) {
       if(last!=null) {
         int id=0;
         int id1[]=vID.get(cnt-1);
@@ -1011,17 +1134,20 @@ public class UGeo extends UMB  {
         quadstrip(last,vvl,qID);
       }
       last=vvl;
+      task.update(map(cnt,0,stack.size()-1,25,100),
+          "v="+sizeV()+" f="+sizeF());
+     
       cnt++;
       
-      taskTimerUpdate(map(cnt,0,vl2.size()-1,50,100));
     }
     
-    taskTimerDone();
-    
-    s="";
-    for(int i=0; i<vID.size(); i++) s+=(i>0 ? "\t":"") +
-        vID.get(i).length+"|"+vl2.get(i).size();
+    setOptions(optionsOld);
+    if(isEnabled(NODUPL)) removeDupl();
 
+    
+    task.done();
+    if(UVertex.eqTask!=null) log(UVertex.eqTask.log);
+    
     return this;
   }
 
@@ -1128,9 +1254,15 @@ public class UGeo extends UMB  {
     int id=0;
     UVertex v0=null,v1=null,v2=null,v3=null;
 
+    
+    taint();
+    
     for(int i=1; i<n; i++) {
-      addFace(new int[] {vID[id],vID[id+2],vID[id+1]});
-      addFace(new int[] {vID[id+3],vID[id+1],vID[id+2]});
+      
+      faces.add(new UFace(this,vID[id],vID[id+2],vID[id+1]));
+      faces.add(new UFace(this,vID[id+3],vID[id+1],vID[id+2]));
+//      addFace(new int[] {vID[id],vID[id+2],vID[id+1]});
+//      addFace(new int[] {vID[id+3],vID[id+1],vID[id+2]});
       id+=2;
     }
     groupEnd();    
@@ -1159,6 +1291,7 @@ public class UGeo extends UMB  {
   
   
   public boolean writeSTL(String filename) {
+    if(tainted) check();
     return UGeoIO.writeSTL(filename, this);
   }
 
@@ -1172,8 +1305,8 @@ public class UGeo extends UMB  {
   public String str(boolean complete) {
     StringBuffer buf=strBufGet();
     
-    buf.append(UGEO).append(TAB).append("f="+sizeF());
-    buf.append(TAB).append("v="+sizeV());      
+    buf.append(UGEO).append(TAB).append(" f="+sizeF());
+    buf.append(TAB).append(" v="+sizeV());      
 
     if(complete) {
       buf.append(NEWLN).append(vl.str());

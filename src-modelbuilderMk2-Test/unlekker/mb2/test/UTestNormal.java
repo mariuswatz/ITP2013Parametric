@@ -42,7 +42,7 @@ public class UTestNormal extends UTest {
     geoFan=new UGeo().triangleFan(vl,true).triangleFan(vl2);
     geoFan.quadstrip(vl,vl2);
     geoFan.center().translate(0,0,-300);
-    geoFan.setColor(color(255,0,0)).enable(COLORFACE);
+    geoFan.setColor(pcolor(255,0,0)).enable(COLORFACE);
     
     geo.quadstrip(vl, vl2);
     
@@ -54,7 +54,7 @@ public class UTestNormal extends UTest {
 //    stack.add(vl.copy().translate(0,0,-150));
     
     geo2=new UGeo().quadstrip(stack);
-    geo2.translate(0,0,-100).setColor(color(255,0,0)).enable(COLORFACE);
+    geo2.translate(0,0,-100).setColor(pcolor(255,0,0)).enable(COLORFACE);
     
     
     

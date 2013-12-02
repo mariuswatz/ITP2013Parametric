@@ -35,7 +35,7 @@ public class UGeoGroup extends UMB implements Iterable<UFace> {
   public UGeoGroup(UGeo model) {
     parent=model;
     faces=new ArrayList<UFace>();
-    edges=parent.getEdgeList();
+    if(parent.edges!=null) edges=parent.getEdgeList();
     type=TRIANGLES;
   }  
   
@@ -208,7 +208,7 @@ public class UGeoGroup extends UMB implements Iterable<UFace> {
     if(parent.tainted) check();
     
     if(asSelection) {
-      ppush().pfill(color(255,0,0));
+      ppush().pfill(pcolor(255,0,0));
       draw(faces,0);
       ppop();
       
