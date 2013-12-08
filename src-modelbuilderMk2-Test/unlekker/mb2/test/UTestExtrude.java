@@ -23,7 +23,6 @@ import unlekker.mb2.util.UMB;
 public class UTestExtrude extends UTest {
   UGeo geo,geo2;
   UEdgeList border;
-  UVertexList borderV;
   
   public void init() {
     if(main.nav==null) main.nav=new UNav3D();
@@ -52,14 +51,7 @@ public class UTestExtrude extends UTest {
     border=geo.getEdgeList();
     border=border.getBoundary();
     
-    borderV=border.getV().sortAsPolygon();
-    
-    
     geo2=UGeoGenerator.extrude(geo, 10,true);
-    geo.translate(0,100,0);
-    
-    geo=UGeoGenerator.sphere(100, 20);
-    log(geo2.str());
     
   }
   
@@ -77,15 +69,20 @@ public class UTestExtrude extends UTest {
       float r=5;
       
       UVertex last=null;
-      for(UVertex vv:borderV) {
-        pellipse(vv, r);
-        if(last!=null) pline(last,vv);
-        last=vv;
-        r+=0.25f;
-      }
+//      for(UVertex vv:borderV) {
+////        pellipse(vv, r);
+//        if(last!=null) pline(last,vv);
+//        last=vv;
+//        r+=0.25f;
+//      }
       
-      p.strokeWeight(5);
+      p.stroke(0,50,100);
+      geo.draw();
+      
       p.stroke(0,255,255);
+      geo.drawVertexNormals(10);
+
+      p.strokeWeight(2);
       for(UEdge e:border) e.draw();
 
     }
@@ -108,8 +105,8 @@ public class UTestExtrude extends UTest {
     p.strokeWeight(1);
     p.stroke(50);
     p.fill(255);
-    geo.draw();
-    geo.drawNormals(10);
+//    geo.draw();
+//    geo.drawNormals(10);
 
     
     p.fill(255,255,0);
