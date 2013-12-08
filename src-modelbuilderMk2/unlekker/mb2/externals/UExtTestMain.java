@@ -80,7 +80,7 @@ public class UExtTestMain extends PApplet {
 
       // We decided the separation between the polygon points dependent of the mouseX
     float pointSeparation = map(constrain(mouseX, 100, width-100), 
-        100, width-100, 4, 200);
+        100, width-100, 4, 20);
 
 //     We create the polygonized version
     RG.setPolygonizer(RG.UNIFORMLENGTH);

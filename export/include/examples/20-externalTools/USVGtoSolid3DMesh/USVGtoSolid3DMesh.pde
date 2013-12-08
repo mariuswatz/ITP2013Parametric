@@ -62,7 +62,7 @@ public void keyPressed( ) {
 void build() {
   // We decided the separation between the polygon points dependent of the mouseX
   float pointSeparation = map(constrain(mouseX, 100, width-100), 
-  100, width-100, 10, 200);
+    100, width-100, 4, 20);
 
   //     We create the polygonized version
   RG.setPolygonizer(RG.UNIFORMLENGTH);
@@ -74,6 +74,7 @@ void build() {
   // triangulate polygon to UGeo
   ArrayList<UVertexList> cont=UGeomerative.fromRContour(poly.contours);
   println("contours "+cont.size());
+  for(UVertexList vl:cont) if(vl.hasDuplicates()) println("dupl");
   geo2=UPoly2Tri.triangulate(cont);
 
   // make a copy of triangulated mesh and extrude it to make solid 3D form

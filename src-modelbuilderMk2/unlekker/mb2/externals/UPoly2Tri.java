@@ -66,7 +66,10 @@ public class UPoly2Tri extends UMB {
     int cnt=0;
     for(UVertexList vl:stack) {
       if(vl.hasDuplicates()) {
-        tmp.add(vl.copy().removeDupl(true));
+        UVertexList tl=new UVertexList().enable(NOCOPY);
+        tl.add(vl).removeDupl(true);
+        log("dupl "+tl.size()+" "+vl.size());
+        tmp.add(tl);
       }
       else tmp.add(vl);
       
@@ -99,27 +102,33 @@ public class UPoly2Tri extends UMB {
     
     task.update(60, "Triangulation done.");
 
-    UGeo geo=new UGeo().setV(master);
-    cnt=0;
-    int n=tri.size()/10;
-    for(ArrayList<Integer> l:tri) {
-      geo.addFace(l.get(0), l.get(1), l.get(2));
-      if((cnt++)%n==0) task.update(
-          map(cnt,0,tri.size()-1,60,95), "Adding faces.");
+    UGeo geo=new UGeo();
+    
+    if(tri!=null && tri.size()>0) {
+      geo.setV(master);
+      cnt=0;
+      int n=tri.size()/10;
+      for(ArrayList<Integer> l:tri) {
+        geo.addFace(l.get(0), l.get(1), l.get(2));
+        if((cnt++)%n==0) task.update(
+            map(cnt,0,tri.size()-1,60,95), "Adding faces.");
 
-//    log(str(l,true));
-  }
-    cnt=0;
-    n=geo.sizeF()-1;
-    for(UFace ff:geo.getF()) {
-      boolean cw=ff.isClockwise();
-      if(cw) {
-        ff.reverse();
-        cnt++;
-        if(cnt%10==0) task.update(map(cnt,0,n,95,100), "Fixing triangle order.");
+//      log(str(l,true));
+    }
+      cnt=0;
+      n=geo.sizeF()-1;
+      for(UFace ff:geo.getF()) {
+        boolean cw=ff.isClockwise();
+        if(cw) {
+          ff.reverse();
+          cnt++;
+          if(cnt%10==0) task.update(map(cnt,0,n,95,100), "Fixing triangle order.");
+        }
       }
     }
-    
+    else {
+      log("Error in UPoly2Tri.triangulate");
+    }
     
     task.done();
     
