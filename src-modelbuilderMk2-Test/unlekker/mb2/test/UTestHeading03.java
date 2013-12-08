@@ -39,7 +39,7 @@ public class UTestHeading03 extends UTest {
       profiles=UHeading.sweep(row, prof);
       if(p2==null) p2=profiles;
       
-      geo.add(new UGeo().quadstrip(profiles).translate(00,0,0));
+//      geo.add(new UGeo().quadstrip(profiles).translate(00,0,0));
       
       if(last!=null) {
         for(int i=0; i<row.size(); i++) {
@@ -101,12 +101,12 @@ public class UTestHeading03 extends UTest {
     main.nav.doTransforms();
 
     p.noFill();
-    p.stroke(255);
+    p.stroke(255,0,0);
     UMB.draw(p1);
     UMB.draw(p2);
     
-//    p.fill(255);
-//    geo.draw();
+    p.fill(255);
+    geo.draw();
     
   }
 

@@ -5,6 +5,33 @@ See the Code & Form blog for a [detailed description](http://workshop.evolutionz
 Contact e-mail: marius at mariuswatz dot com<br />
 Class hours: Mondays 6:00pm – 8:55pm
 
+## December 08
+
+New:
+
+- Added package: unlekker.mb2.externals. This will contain utility classes for interfacing ModelbuilderMk2 with other libraries, converting data structures as needed and giving access to useful tools not provided by ModelbuilderMk2 itself.
+- unlekker.mb2.externals.UGeomerative: Converts data structures from the [Geomerative library by Ricard Marxer](https://github.com/rikrd/geomerative/). Geomerative is useful for reading SVG files and creating vertex outlines of the geometry they contain.
+- unlekker.mb2.externals.UPoly2Tri: Interface to [Poly2Tri-java by Wu Liang](http://sites-final.uclouvain.be/mema/Poly2Tri/), making it possible to triangulate both simple (single-contour) and compound (contour with holes) polygons into a valid UGeo mesh. Especially useful for converting RPolygon geometry from Geometry to UGeo.
+- UVertexList/UFace.isClockwise: Checks to see if face or vertex list is ordered in clockwise order.
+
+
+## December 06
+
+New:
+
+- UEdgeList.getBoundary: Returns edges that are only used by a single face, which means that they lie on the boundary of the mesh.
+- UGeoGenerator.extrude: Creates an extruded version of a mesh by copying all faces and translating them along their vertex normals by a given offset. UEdgeList.getBoundary is used to find boundary edges and quads are created to fill in the gaps.
+- UGeoGenerator.sphere: Generates sphere mesh.
+- UVertexList: reorderToAngle(), reorderToPoint(), shiftOrder() - methods to reorder vertices 
+- UVertexList: unclose() - if the last vertex instance is identical to the first, remove it.
+
+Fixes:
+
+- Bug in UVertexList: Transformation methods (scale(), rotX() etc.) did not take into account if a list was closed. Since close() adds another reference to the first UVertex to the end of the list, transformations would be applied twice to that instance. 
+- In all honesty, close() is a bit of a kludgy hack. It can cause unexpected behavior in a number of likely scenarios if not taken into account. I recommend using close() as late as possible in the geometry generation process. If subsequent manipulation is necessary, check isClosed() and apply unclose() if needed.
+- UVertexList.unclose() has been added to make it easier to deal with this kind of issue. The new reorder/shiftOrder methods use unclose().
+- Bug in UFile: nextFile() was broken. Now it isn't.
+
 ## December 02
 
 Good news: I found a way to optimize a big bottleneck in UGeo. By default, UGeo tries to eliminate duplicate vertices, which is a GOOD THING. But all that checking for duplicates becomes a BAD THING for complex meshes, resulting in calls to UVertex.equals() numbering in the hundreds of thousands.

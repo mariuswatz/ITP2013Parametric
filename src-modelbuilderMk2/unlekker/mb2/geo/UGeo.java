@@ -54,6 +54,8 @@ public class UGeo extends UMB  {
 
   public UGeo(UGeo v) {
     this();
+    log("UGeo(UGeo v)UGeo(UGeo v) "+str());
+
     set(v);
   }
 
@@ -62,6 +64,7 @@ public class UGeo extends UMB  {
    * @return
    */
   public UGeo copy() {
+    log("copy "+str());
     return new UGeo(this);
   }
 
@@ -122,9 +125,24 @@ public class UGeo extends UMB  {
   public UGeo check() {
     if(!tainted) return this;
     
-    if(edges!=null) edges.check();    
-    for(UGeoGroup gr:groups) gr.check();
+    UTask task=new UTask("UGeo.check "+str());
+    
+    task.update(25,"Check edges");
+    
+    if(edges!=null) edges.check();
+    int cnt=0,n=groups.size();
+    for(UGeoGroup gr:groups) {
+      gr.check();
+      if(cnt%n==0) {
+        float perc=map(cnt,0,groups.size()-1, 25,100);
+        task.update(perc,"Check group");
+      }
+    }
 
+    
+    regenerateFaceData();
+
+    
     tainted=false;
     return this;
   }
@@ -149,6 +167,22 @@ public class UGeo extends UMB  {
     return this;
   }
   
+  public UGeo removeDuplV() {
+    int old=vl.size();
+    int id[]=vl.removeDuplID();
+//    log("removeDuplV:"+id.length+" "+old+" "+vl.size()+" max "+max(id));
+    for(UFace ff:faces) {
+      ff.vID[0]=id[ff.vID[0]];
+      ff.vID[1]=id[ff.vID[1]];
+      ff.vID[2]=id[ff.vID[2]];
+      ff.getV(true);
+    }
+
+    vlNormal=null;
+    taint();
+    return this;
+  }
+  
   public UGeo removeDupl() {
     UTask task=new UTask("removeDupl | "+str());
     task.addLog("Before: "+str());
@@ -157,7 +191,7 @@ public class UGeo extends UMB  {
     for(UFace ff:faces) ff.getV();
     task.update(25,"getV "+sizeV());
     
-    getV().removeDupl(true);
+    removeDuplV();
     task.update(50,"getV.removeDupl "+sizeV());
     
     int cnt=0,nf=faces.size();
@@ -170,6 +204,20 @@ public class UGeo extends UMB  {
 
       }
       ff.remapVID();
+    }
+    
+    ArrayList<UFace> remove=new ArrayList<UFace>();
+    for(UFace ff:faces) {
+      boolean dupl=false;
+      for(UFace f2:faces) if(!dupl && f2!=ff) {
+        dupl=f2.equalsVID(ff);
+      }
+      if(dupl) remove.add(ff);
+    }
+    
+    if(remove.size()>0) {
+      task.addLog("Duplicate faces: "+remove.size());
+      for(UFace ff:remove) faces.remove(ff);
     }
     
     task.addLog("After: "+str());
@@ -198,6 +246,16 @@ public class UGeo extends UMB  {
     return this;
   }
 
+  
+  public UGeo setV(UVertexList vl) {
+    this.vl=vl;
+    if(faces.size()>0) {
+      for(UFace ff:faces) ff.remapVID();
+      regenerateFaceData();
+    }
+    return this;
+  }
+
   /**
    * Copies the mesh data contained <code>model</code> to this UGeo instance,
    * replacing any existing data. The <code>model.vl</code> vertex list
@@ -208,13 +266,23 @@ public class UGeo extends UMB  {
    * @return
    */
   public UGeo set(UGeo model) {
+    UTask task=new UTask("UGeo.set()");
+    
    vl=model.getV().copy();
+   task.update(10,"set(UGeo model) "+model.str()+" "+model.getV().str()+" "+ vl.str());
+   
    faces=new ArrayList<UFace>();
+   int cnt=0,n=model.sizeF()/20;
    for(UFace ff:model.getF()) {
-     UFace newFace=new UFace(this,ff.vID);
-     newFace.setColor(ff.col);
-     addFace(newFace);
+     addFace(ff.vID);     
+     last(faces).setColor(ff.col);
+     if((cnt++)%n==0) 
+       task.update(
+           map(cnt,0,model.sizeF(),10,100),
+           "Adding faces");
    }
+   task.done();
+   
    return this;
   }
   
@@ -287,22 +355,39 @@ public class UGeo extends UMB  {
 
 
   public UGeo add(UGeo model) {
-    log(model.str());
+    UTask task=new UTask("UGeo.add(UGeo)");
+    task.update(0,"UGeo.add(UGeo) "+str()+" < "+model.str());
     
-    taskTimerStart("UGeo.add(UGeo)");
+    int ID[]=addID(model.getV());
     
     int n=model.sizeGroup();
     for(int i=0; i<n; i++) {
       UGeoGroup gr=model.getGroup(i);
       groupBegin(gr.type);
-      addFace(gr.getF());
+      
+      for(UFace ff:gr.getF()) {
+        addFace(ID[ff.vID[0]], ID[ff.vID[1]], ID[ff.vID[2]]);
+      }
+      
+//      addFace(gr.getF());
       groupEnd();
+      if(i%2==0) {
+        float perc=map(i,0,n-1,0,50);
+        task.update(perc,"add groups");
+      }
     }
     
+    
     ArrayList<UFace> noGroup=model.getFNoGroup();
+    int cnt=0;
     if(noGroup.size()>0) {
       groupBegin(TRIANGLES);
       addFace(noGroup);
+      groupEnd();
+      if((cnt++)%10==0) {
+        float perc=map(cnt,0,noGroup.size(),50,100);
+        task.update(perc,"add faces");
+      }
       groupEnd();
     }
 
@@ -319,7 +404,7 @@ public class UGeo extends UMB  {
 //    }    
 //    groupEnd();
     
-    taskTimerDone();
+    task.done();
     
 /*    if(model.sizeGroup()>0) {
       int gn=model.sizeGroup();
@@ -367,15 +452,17 @@ public class UGeo extends UMB  {
   }
 
   public UVertexList vertexNormals() {
-    if(!tainted && vlNormal!=null) return vlNormal;
+    if(vlNormal!=null) return vlNormal;
         
+    UTask task=new UTask("UGeo.vertexNormals()");
+
     UVertexList vertNormal=new UVertexList();
     UVertexList tmp=new UVertexList();
     tmp.enable(NODUPL);
 
     boolean debug=false;
     
-    int n=0;
+    int n=0,nmod=sizeV()/30;
     UVertex vn=new UVertex();
     for(UVertex vv:getV()) {
       n=0; 
@@ -399,8 +486,14 @@ public class UGeo extends UMB  {
       
 //      vn.norm();
       if(debug) log(vv.ID+" "+n+" "+str+" >>>> "+vn.str());
-      vertNormal.add(vn.copy());
+      if(n%nmod==0) task.update(
+          map(n,0,sizeV()-1,0,100),
+          "vertexNormals");
+      
+      vertNormal.add(vn);
     }
+    
+    task.done();
     
     vlNormal=vertNormal;
     return vlNormal;
@@ -538,6 +631,10 @@ public class UGeo extends UMB  {
   public ArrayList<UFace> getF() {
     return faces;
   }
+
+//  public ArrayList<UFace> getF() {
+//    return faces;
+//  }
 
   public ArrayList<UFace> getFNoGroup() {
     if(tainted) check();
@@ -682,15 +779,72 @@ public class UGeo extends UMB  {
     if(checkGraphicsSet()) {
       g.beginShape(TRIANGLES);      
       
-      int opt=(isEnabled(theOptions,COLORFACE) ? COLORFACE : 0);
-      if(opt==COLORFACE) {
-        for(UFace f:faces) {
-          if(opt==COLORFACE) g.fill(f.col);
-          pvertex(f.getV());
+      boolean colorFace=isEnabled(theOptions,COLORFACE);
+      boolean colorVertex=isEnabled(theOptions,COLORVERTEX);
+      boolean isSmooth=isEnabled(theOptions,SMOOTHMESH);
+      
+      UVertex[] vv,vn;
+
+      // SMOOTH WITH NORMALS
+      if(isSmooth) {
+        if(colorFace) {
+          for(UFace f:faces) {
+            vv=f.getV();
+            vn=f.getVNormals();
+            
+            g.fill(f.col);
+            g3d.normal(vn[0].x, vn[0].y, vn[0].z);
+            pvertex(vv[0]);
+            g3d.normal(vn[1].x, vn[1].y, vn[1].z);
+            pvertex(vv[1]);
+            g3d.normal(vn[2].x, vn[2].y, vn[2].z);
+            pvertex(vv[2]);
+          }
+        }
+        else if(colorVertex) {
+          for(UFace f:faces) {
+            vv=f.getV();
+            vn=f.getVNormals();
+            
+            g.fill(vv[0].col);
+            g3d.normal(vn[0].x, vn[0].y, vn[0].z);
+            pvertex(vv[0]);
+            
+            g.fill(vv[1].col);
+            g3d.normal(vn[1].x, vn[1].y, vn[1].z);
+            pvertex(vv[1]);
+            
+            g.fill(vv[2].col);
+            g3d.normal(vn[2].x, vn[2].y, vn[2].z);
+            pvertex(vv[2]);
+          }
+        }
+        else {
+          for(UFace f:faces) pvertex(f.getV());
         }
       }
+      // NO NORMALS
       else {
-        for(UFace f:faces) pvertex(f.getV());
+        if(colorFace) {
+          for(UFace f:faces) {
+            g.fill(f.col);
+            pvertex(f.getV());
+          }
+        }
+        else if(colorVertex) {
+          for(UFace f:faces) {
+            vv=f.getV();
+            g.fill(vv[0].col);
+            pvertex(vv[0]);
+            g.fill(vv[1].col);
+            pvertex(vv[1]);
+            g.fill(vv[2].col);
+            pvertex(vv[2]);
+          }
+        }
+        else {
+          for(UFace f:faces) pvertex(f.getV());
+        }
       }
       
       g.endShape();
@@ -761,7 +915,29 @@ public class UGeo extends UMB  {
       break;
 
       case TRIANGLE_STRIP: {
-        log("UGeo: TRIANGLE_STRIP currently unsupported.");
+        int n=(vltmp.size())-2;
+        int id=0;
+        
+        for(int i=0; i<n; i++) {
+          if(i%2==0) {
+            addFace(vID[id],vID[id+2],vID[id+1]);
+          }
+          else {
+            addFace(vID[id],vID[id+1],vID[id+2]);
+          }
+          id++;
+        }
+        // PROCESSING
+//        int stop = shapeLast - 2;
+//        for (int i = shapeFirst; i < stop; i++) {
+//          // have to switch between clockwise/counter-clockwise
+//          // otherwise the feller is backwards and renderer won't draw
+//          if ((i % 2) == 0) {
+//            addTriangle(i, i+2, i+1);
+//          } else {
+//            addTriangle(i, i+1, i+2);
+//          }
+//        }
 
 //        int stop = bvCnt - 2;
 //        for (int i = 0; i < stop; i++) {
@@ -1083,6 +1259,10 @@ public class UGeo extends UMB  {
   }
 
   public UGeo quadstrip(ArrayList<UVertexList> stack) {
+    return quadstrip(stack,false);
+  }
+
+  public UGeo quadstrip(ArrayList<UVertexList> stack,boolean addCaps) {
     UVertexList last=null;  
     
     long tD,t=System.currentTimeMillis();
@@ -1139,6 +1319,11 @@ public class UGeo extends UMB  {
      
       cnt++;
       
+    }
+    
+    if(addCaps) {
+      triangleFan(stack.get(0),true);
+      triangleFan(last(stack));
     }
     
     setOptions(optionsOld);
@@ -1291,7 +1476,6 @@ public class UGeo extends UMB  {
   
   
   public boolean writeSTL(String filename) {
-    if(tainted) check();
     return UGeoIO.writeSTL(filename, this);
   }
 
@@ -1354,4 +1538,33 @@ public class UGeo extends UMB  {
   public static UGeo cyl(float w,float h,int steps) {
     return UGeoGenerator.cyl(w, h, steps);
   }
+  
+  /**
+   * Returns a new UGeo where the faces in this mesh are
+   * extruded along vertex normals. If <code>makeSolid==true</code>
+   * the original faces are added and quads are added to fill in
+   * the side edges of the mesh boundary. 
+   * @param offs
+   * @param makeSolid
+   * @return
+   */
+  public UGeo extrude(float offs,boolean makeSolid) {
+    return UGeoGenerator.extrude(this, offs, makeSolid);
+  }
+  
+  /**
+   * Extrudes mesh faces and adds the new faces to this instance 
+   * instead of creating a new one. 
+   * @param offs
+   * @param makeSolid
+   * @return
+   */
+  public UGeo extrudeSelf(float offs,boolean makeSolid) {
+    UGeo tmp=UGeoGenerator.extrude(this, offs, makeSolid,false);
+    add(tmp);
+    removeDupl();
+    taint();
+    return this;
+  }
+  
 }

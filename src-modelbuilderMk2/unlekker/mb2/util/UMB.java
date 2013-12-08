@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 
@@ -750,7 +751,6 @@ public class UMB implements UConst {
 
   public UMB enable(int opt) {
     options=options|opt;
-//    log(optionStr());
     return this;
   }
 
@@ -1131,6 +1131,10 @@ public class UMB implements UConst {
       return rndBool() ? val : -val;
     }
 
+  public static <T> T rnd(ArrayList<T> l) {
+    return l.get(rndInt(l.size()));
+  }
+
   public static <T> int rndIndex(ArrayList<T> l) {
     return rndInt(l.size());
   }
@@ -1281,6 +1285,14 @@ public class UMB implements UConst {
 
   public static <T> T last(ArrayList<T> input) {
     return input.get(input.size()-1);
+  }
+  
+  public static <T> ArrayList<T> removeDupl(ArrayList<T> l) {
+    HashSet<T> set = new HashSet<T>(l);
+    l.clear();
+    for(T tmp:set) l.add(tmp);
+
+    return l;
   }
 
   public static <T> void log(ArrayList<T> input) {

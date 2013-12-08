@@ -2,6 +2,15 @@ package unlekker.mb2.geo;
 
 import unlekker.mb2.util.UMB;
 
+
+/*
+ * - Line / line
+ * - Line / plane
+ * - Line / tri
+ * - Line / sphere
+ * - Tri / plane (+clip)
+ * - Tri / tri (+clip)
+ */
 public class UIntersections extends UMB {
   private static UFace planeY;
   

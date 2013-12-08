@@ -25,6 +25,10 @@ public class UTest extends UMB {
     
   }
 
+  public void save(String filename) {
+    
+  }
+
   public void keyPressed(char key) {
     // TODO Auto-generated method stub
     

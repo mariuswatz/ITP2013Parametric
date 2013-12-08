@@ -117,6 +117,16 @@ public class UBB extends UMB {
     return dim;
   }
 
+  public UVertex maxV() {
+    if(tainted) check();
+    return max;
+  }
+
+  public UVertex minV() {
+    if(tainted) check();
+    return min;
+  }
+
   public float dimX() {
     if(tainted) check();
     return dim.x;
@@ -132,6 +142,36 @@ public class UBB extends UMB {
     return dim.z;
   }
 
+  public float minX() {
+    if(tainted) check();
+    return min.x;
+  }
+  
+  public float minY() {
+    if(tainted) check();
+    return min.z;
+  }
+
+  public float minZ() {
+    if(tainted) check();
+    return min.z;
+  }
+
+  public float maxX() {
+    if(tainted) check();
+    return max.x;
+  }
+  
+  public float maxY() {
+    if(tainted) check();
+    return max.z;
+  }
+
+  public float maxZ() {
+    if(tainted) check();
+    return max.z;
+  }
+  
   public float dimMax() {
     if(tainted) check();
     return max(dim.x,max(dim.y,dim.z));

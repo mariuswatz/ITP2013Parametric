@@ -193,6 +193,8 @@ public class UGeoIO extends UMB {
     boolean res=false;
     int faceNum=model.sizeF();
     
+    if(model.tainted) model.check();
+
     try {
       getSTLOut(filename, faceNum);
       writeSTLFaces(model.getF(),colorType);
@@ -218,7 +220,11 @@ public class UGeoIO extends UMB {
     
     try {
       getSTLOut(filename, faceNum);
-      for(UGeo theModel:models) writeSTLFaces(theModel.getF(),colorType);
+      for(UGeo theModel:models) {
+        if(theModel.tainted) theModel.check();
+
+        writeSTLFaces(theModel.getF(),colorType);
+      }
 
       out.flush();
       out.close();

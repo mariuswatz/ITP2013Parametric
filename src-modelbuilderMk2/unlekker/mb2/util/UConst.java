@@ -52,6 +52,7 @@ public interface UConst extends processing.core.PConstants {
   public static final int VIDWQXGAW=2560,VIDWQXGAH=1600;
   
   public static final int COLORVERTEX=8,COLORFACE=4;
+  public static final int SMOOTHMESH=16;
 
   public static final int SUBDIVCENTROID=0,SUBDIVMIDEDGES=1;
   

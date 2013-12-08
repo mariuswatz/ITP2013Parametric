@@ -42,7 +42,7 @@ public class UTestSmooth02 extends UTest {
     
     vl=new UVertexList();
     int n=rndInt(9,37)*2;
-    n=36;
+    n=15;
     
     float m=UMB.rnd(100,300);
     for(int i=0; i<n; i++) {
@@ -61,7 +61,7 @@ public class UTestSmooth02 extends UTest {
     stack=new ArrayList<UVertexList>();
     stackNoSmooth=new ArrayList<UVertexList>();
     
-    n=20;
+    n=16;
     m=p.random(0.25f,0.5f);
     for(int i=0; i<n; i++) {
       m=m*0.2f+p.random(0.5f,2f)*0.8f;

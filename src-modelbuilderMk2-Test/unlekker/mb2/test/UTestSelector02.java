@@ -93,13 +93,24 @@ public class UTestSelector02 extends UTest {
   }
 
   public void keyPressed(char key) {
+    if(key=='i') {
+      sel.getVID();
+    }
+
     if(key=='o') {
-      for(int i=0; i<10; i++) {
-        int vid=(int)p.random(geo.sizeV());
-        UVertex rnd=geo.getV(vid);
-        rnd.mult(rnd(1.1f,1.2f));
-//        rnd.add(p.random(-10,10),p.random(-10,10),p.random(-10,10));
-        log(vid+" "+rnd.str());
+      ArrayList<Integer> id=sel.getVID();
+      if(id!=null && id.size()>0) {
+        for(int i:id) {
+          UVertex vv=geo.getV(i);
+          UVertex vn=geo.getVNormal(i).copy();
+          
+          float m=rnd(2,5);
+            float rx=rndSigned(0.2f,1)*DEG_TO_RAD*30;
+            float ry=rndSigned(0.2f,1)*DEG_TO_RAD*30;
+
+          vn.mult(m).rotZ(rx).rotY(ry);
+          vv.add(vn);
+        }
       }
     }
     if(key=='p') {

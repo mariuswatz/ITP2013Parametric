@@ -158,12 +158,41 @@ public class UGeoGroup extends UMB implements Iterable<UFace> {
     return faces;
   }
   
+  public ArrayList<Integer> getVID() {
+    long t=System.currentTimeMillis();
+    ArrayList<Integer> l=new ArrayList<Integer>();
+    for(UFace ff:faces) {
+      l.add(ff.vID[0]);
+      l.add(ff.vID[1]);
+      l.add(ff.vID[2]);
+    }
+    
+    log(l.size());
+    l=removeDupl(l);
+    log(l.size());
+    log("getVID "+(System.currentTimeMillis()-t));
+    
+    return l;
+  }
+
+
+  
   public UVertexList getV() {
     UVertexList vl=new UVertexList();
     vl.setOptions(NOCOPY|NODUPL);
-    for(UFace ff:faces) {
-      vl.add(ff.getV());
-    }
+    
+    ArrayList<Integer> id=getVID();
+    for(int tmp:id) vl.add(parent.getV(tmp));
+    
+    return vl;
+  }
+
+  public UVertexList getVNormal() {
+    UVertexList vl=new UVertexList();
+    vl.setOptions(NOCOPY|NODUPL);
+    
+    ArrayList<Integer> id=getVID();
+    for(int tmp:id) vl.add(parent.getVNormal(tmp));
     
     return vl;
   }

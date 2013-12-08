@@ -40,22 +40,42 @@ public class UEdgeList extends UMB implements Iterable<UEdge> {
   }
 
   public void add(UFace f) {
-    UVertex vv[]=f.getV();
-
-    UEdge ed[]=new UEdge[3];
+//    UVertex vv[]=f.getV();
+//
+//    UEdge ed[]=new UEdge[3];
+//    
+//    for(int i=0; i<3; i++) {
+//      UEdge e=add(vv[i],vv[(i+1)%3]);
+//      e.add(f);
+//      ed[i]=e;
+//    }
     
+    int vID[]=f.vID;
+  UEdge ed[]=new UEdge[3];
     for(int i=0; i<3; i++) {
-      UEdge e=add(vv[i],vv[(i+1)%3]);
+      UEdge e=add(vID[i],vID[(i+1)%3]);
       e.add(f);
       ed[i]=e;
     }
-    
     f.setEdges(ed);
   }
 
+  public UEdge add(int id1,int id2) {
+    UEdge e=get(id1,id2);
+    
+    if(e==null) {
+      e=new UEdge(parent,parent.getV(id1),parent.getV(id2));      
+      
+      edges.add(e);
+    }
+    
+    return e;
+  }
+
   public UEdge add(UVertex v1,UVertex v2) {
+    if(v1==null || v2==null) log(v1+" "+v2);
     UEdge e=get(v1,v2);
-;
+
     if(e==null) {
       if(parent!=null) e=new UEdge(parent,v1,v2);
       else e=new UEdge(v1,v2);
@@ -94,9 +114,44 @@ public class UEdgeList extends UMB implements Iterable<UEdge> {
     return false;
   }
 
+  public UVertexList getV() {
+    UVertexList vl=new UVertexList();
+    vl.enable(NOCOPY);
+    
+    for(UEdge ed:edges) vl.add(ed.v);
+    vl.removeDupl(true);
+    
+    return vl;
+    
+  }
+
+  public UEdgeList getBoundary() {
+    UEdgeList ed=new UEdgeList();
+    ed.parent=parent;
+    parent.check();
+    
+    int cnt=0;
+    for(UEdge e:edges) {
+      if(e.isBoundary()) {
+        ed.add(e.v[0], e.v[1]);
+      }
+//      log((cnt++)+" "+e.sizeF()+" "+e.isBoundary()+" "+ed.size());
+    }
+    
+    log("getBoundary: "+ed.size());
+    return ed;
+  }
+  
   public UEdge get(UVertex v1,UVertex v2) {
     UEdge e=null;
     int id=indexOf(v1, v2);
+    if(id>-1) e=edges.get(id);
+    return e;
+  }
+
+  public UEdge get(int id1,int id2) {
+    UEdge e=null;
+    int id=indexOf(id1, id2);
     if(id>-1) e=edges.get(id);
     return e;
   }
@@ -122,6 +177,17 @@ public class UEdgeList extends UMB implements Iterable<UEdge> {
         if(e.equals(id1,id2)) return cnt;
         cnt++;
       }
+    }
+    
+    return -1;
+  }
+
+  public int indexOf(int id1,int id2) {
+
+    int cnt=0;
+    for(UEdge e:edges) {
+      if(e.equals(id1, id2)) return cnt;
+      cnt++;
     }
     
     return -1;

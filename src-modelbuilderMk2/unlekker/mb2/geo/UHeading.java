@@ -188,9 +188,9 @@ public class UHeading extends UMB {
       else if(vn==null) vv=vp;
       else vv=vn;
       
-      log(i+"/"+input.size()+" "+
-          isClosed+" vp="+(vp!=null)+
-          " vn="+(vn!=null)+" "+vv.str());
+//      log(i+"/"+input.size()+" "+
+//          isClosed+" vp="+(vp!=null)+
+//          " vn="+(vn!=null)+" "+vv.str());
       
       dl.add(vv);
       

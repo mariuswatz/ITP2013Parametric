@@ -28,6 +28,7 @@ public class UFace extends UMB  {
   
   public int col;
   private UVertex normal,centroid;
+  private int[] vIDSorted;
   
   public UFace() {
     ID=globalID++;
@@ -245,6 +246,31 @@ public class UFace extends UMB  {
 
     return this;
   }
+  
+  /**
+   * <p>Determines the winding order of this vertex list by calculating the area of the polygon
+   * it represents.Only works in the XY plane. The area calculation is <code>Area = Area + (X2 - X1) * (Y2 + Y1) / 2)</code>.</p>
+   * 
+   *  <p>Code by Jonathan Cooper, found at <a href="http://forums.esri.com/Thread.asp?c=2&f=1718&t=174277#513372">
+   *  http://forums.esri.com/Thread.asp?c=2&f=1718&t=174277#513372</a>.</p>
+   * @return
+   */
+   public boolean isClockwise(){
+     getV();
+     UVertex pt1 = v[0];
+     UVertex firstPt = pt1;
+     UVertex lastPt = null;
+     double area = 0.0;
+     for(int i=1; i<3; i++) {
+       
+       UVertex pt2 = v[i];
+       area += (((pt2.x - pt1.x) * (pt2.y + pt1.y)) / 2);
+       pt1 = pt2;
+       lastPt = pt1;
+     }
+     area += (((firstPt.x - lastPt.x) * (firstPt.y + lastPt.y)) / 2);
+     return area < 0;
+   }
 
   public UVertex[] getV() {
     if(parent==null || v!=null) return v;
@@ -256,7 +282,18 @@ public class UFace extends UMB  {
     
     return v;
   }
-  
+
+  public UVertex[] getVNormals() {
+    if(parent==null) return null;
+    
+    parent.vertexNormals();
+    return new UVertex[] {
+        parent.getVNormal(vID[0]),
+        parent.getVNormal(vID[1]),
+        parent.getVNormal(vID[2])
+    };
+  }
+
   public UFace translate(UVertex v1) {    
     return translate(v1.x,v1.y,v1.z);    
   }
@@ -387,6 +424,7 @@ public class UFace extends UMB  {
   public UFace reset() {
     normal=null;
     if(parent!=null) v=null;
+    vIDSorted=null;
     centroid=null;
     return this;
   }
@@ -439,7 +477,29 @@ public class UFace extends UMB  {
     
     return mid;
   }
-  
+
+  public boolean equalsVID(UFace f) {
+    
+    if(f.vIDSorted==null) {
+      int id[]=new int[3];
+      System.arraycopy(f.vID, 0, id, 0, 3);
+      Arrays.sort(id);
+      f.vIDSorted=id;
+    }
+    if(vIDSorted==null) {
+      int id[]=new int[3];
+      System.arraycopy(vID, 0, id, 0, 3);
+      Arrays.sort(id);
+      vIDSorted=id;
+    }
+
+    if(vIDSorted[0]==f.vIDSorted[0] &&
+       vIDSorted[1]==f.vIDSorted[1] && 
+       vIDSorted[2]==f.vIDSorted[2]) return true;
+    
+    return false;
+  }
+
   public boolean equals(Object o) {
     UFace of=(UFace)o;
     of.getV();
@@ -456,6 +516,22 @@ public class UFace extends UMB  {
     }
     
     return true;
+  }
+  
+  public float dist(UFace ff) {
+    return 0;
+  }
+
+  public boolean facingSameWay(UFace ff) {
+    UVertex n=normal();
+    UVertex n2=ff.normal();
+    
+    int cnt=0;
+    cnt+=sign(n.x) == sign(n2.x) ? 1 : 0;
+    cnt+=sign(n.y) == sign(n2.y) ? 1 : 0;
+    cnt+=sign(n.z) == sign(n2.z) ? 1 : 0;
+    
+    return cnt==3;
   }
 
   public static boolean check(UVertex vv[]) {

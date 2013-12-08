@@ -27,14 +27,32 @@ public class UTestMain extends PApplet {
     
     UMB.setPApplet(this);
     sketchPath=UFile.getCurrentDir();
+    sketchPath="C:/Users/marius/Dropbox/03 Code/ITP2013Parametric/nosync/data";
+    
+//    sketchPath="c:/Users/marius/Dropbox/40 Teaching/2013 ITP/ITP-Parametric - Resources/Code/ITP-Parametric-sketches/exportSketchDocu";
+//    
+//    String filename=UFile.nextFile(sketchPath, "exportSketchDocu");
+//    String str[]=new String[] {"a","b"};
+//    saveStrings(filename+".txt",str);
+//    println(filename);
+//    
+//    filename=UFile.nextFile(sketchPath, "exportSketchDocu");
+//    saveStrings(filename+".txt",str);
+//    println(filename);
+//
+//    exit();
+//    stop();
     
     tests=new ArrayList<UTest>();
 
+    tests.add(new UTestVertexList());
     
+    tests.add(new UTestExtrude());
+    tests.add(new UTestHeading03());
     tests.add(new UTestMath());
     tests.add(new UTestGeo());
     tests.add(new UTestTask());
-  tests.add(new UTestSmooth02());
+    tests.add(new UTestSmooth02());
     tests.add(new UTestPrimitives02());
     
     tests.add(new UTestSelector02());
@@ -52,7 +70,6 @@ public class UTestMain extends PApplet {
     tests.add(new UTestSmooth());
     
 //    tests.add(new UTestIntersectionCirc());
-//    tests.add(new UTestHeading03());
 //    tests.add(new UTestIntersection());
 //    tests.add(new UTestHeading02());
 //    tests.add(new UTestHeading01());
@@ -84,7 +101,7 @@ public class UTestMain extends PApplet {
      color(255,255,255);
     drawCredit();
     
-    pushStyle();
+//    pushStyle();
     try {
       theTest.draw();
     } catch (Exception e) {
@@ -92,7 +109,7 @@ public class UTestMain extends PApplet {
       e.printStackTrace();
       exit();
     }
-    popStyle();
+//    popStyle();
     
   }
 
@@ -121,6 +138,7 @@ public class UTestMain extends PApplet {
       println(filename);      
       saveFrame(filename);
       saveFilename=filename;
+      theTest.save(filename);
     }
     else if(key==' ' || key=='+' ) {
       int id=(tests.indexOf(theTest)+1)%tests.size();

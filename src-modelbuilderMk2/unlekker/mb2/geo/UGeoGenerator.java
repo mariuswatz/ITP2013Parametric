@@ -1,11 +1,48 @@
 package unlekker.mb2.geo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import unlekker.mb2.util.UMB;
+import unlekker.mb2.util.UTask;
 
 public class UGeoGenerator extends UMB {
-
+  static HashMap<String, UGeo> proto;
+  
+  static {
+    proto=new HashMap<String, UGeo>();
+  }
+  
+  public static UGeo sphere(float rad,int res) {
+    String key="sph"+res;
+    
+    if(proto.containsKey(key)) {
+      return proto.get(key);
+    }
+    
+    UGeo geo=new UGeo();
+    UVertex top,bottom;
+    
+    UVertexList l=UVertexList.arc(1, -HALF_PI, HALF_PI, res);
+    top=l.first();
+    bottom=l.last();
+    
+    l.remove(0).remove(l.size()-1);
+    
+    ArrayList<UVertexList> stack=new ArrayList<UVertexList>();
+    for(int i=0; i<res; i++) {
+      float t=map(i,0,res, 0,TWO_PI);
+      stack.add(l.copy().rotY(-t));
+    }
+    stack.add(l.copy());
+    
+    geo.quadstrip(stack);
+    geo.triangleFan(UVertexList.crossSection(0, stack),top);
+    geo.triangleFan(UVertexList.crossSection(stack.get(0).size()-1, stack),bottom,true);
+    
+    proto.put(key, geo);
+    return geo.copy().scale(rad);
+  }
   
   public static UGeo meshPlane(float w,float h,int steps) {
     UGeo geo=new UGeo();
@@ -74,7 +111,109 @@ public class UGeoGenerator extends UMB {
     return geo;
   }
 
-  
+  public static UGeo extrude(UGeo geo,float offs,boolean makeSolid) {
+    return extrude(geo,offs,makeSolid,true);
+  }
+
+  public static UGeo extrude(UGeo geo,float offs,boolean makeSolid,boolean addOriginal) {
+    boolean force=false;
+    geo.check();
+    
+    UTask task=new UTask("extrude - "+geo.str(),force);
+
+    UGeo extr=geo.copy();
+    int n=extr.sizeF()/10,cnt=0;
+    n=max(3,extr.sizeF()/10);
+    for(UFace tmp:extr.getF()) {
+      tmp.reverse();
+      if((cnt++)%n==0) 
+        task.update(map(cnt,0,extr.sizeF()-1,0,25),"reverse",force);
+    }
+    
+//    extr.vertexNormals();
+//    task.update(40,"vertexNormals",force);
+
+    cnt=0;
+    n=max(3,extr.sizeV()/10);
+    
+    UVertex vn=new UVertex();
+    for(UVertex tmp:extr.getV()) {
+      vn.set(extr.getVNormal(cnt++)).mult(offs);
+      tmp.add(vn);
+      if(cnt%n==0) 
+        task.update(map(cnt,0,extr.sizeV()-1,25,40),"offset vertex",force);
+    }
+
+    
+    if(makeSolid) {
+      task.update(40,"boundary - before | "+geo.str(),force);
+      UEdgeList border=geo.getEdgeList();
+      task.update(40,"boundary - edgelist",force);
+      
+      border=border.getBoundary();
+      task.update(40,"boundary",force);
+      
+      int last=-1;
+      
+      UVertex v1=new UVertex(),v2=new UVertex(),
+          v3=new UVertex(),v4=new UVertex();
+      UVertex tmp=new UVertex();
+      
+ 
+      extr.beginShape(QUADS);
+      
+      cnt=0;
+      n=max(3,border.size()/10);
+      
+      
+      for(UEdge ed:border) {
+        v1.set(ed.v[1]);
+        v2.set(ed.v[0]);
+        
+//        if(v2.x>v1.x) {
+//          UVertex tmpv=v1;
+//          v1=v2;
+//          v2=tmpv;
+//        }
+        
+        int id1=geo.getVID(v1);
+        int id2=geo.getVID(v2);
+        
+        if(id1>-1 && id2>-1) {
+          tmp.set(geo.getVNormal(id2)).mult(-offs);
+          v3.set(v2).add(tmp);
+
+          tmp.set(geo.getVNormal(id1)).mult(-offs);
+          v4.set(v1).add(tmp);
+
+          extr.vertex(v1);
+          extr.vertex(v2);
+          extr.vertex(v3);
+          extr.vertex(v4);          
+        }
+        else {
+          logf("Extrude: No ID found for %s and %s",
+              ed.v[0].str(),ed.v[1].str());
+        }
+        if((cnt++)%n==0) task.update(map(cnt,0,border.size()-1,50,90),"extruding edges.",force);
+
+      }
+      extr.endShape();
+      
+      if(addOriginal) {
+        task.update(91,"Final: add to geo",force);
+        extr.add(geo);
+        task.update(100,"added to geo",force);        
+      }
+    }
+    task.update(99,"RemoveDuplV",force);
+
+    extr.removeDuplV();
+    task.done();
+    
+    return extr;
+    
+  }
 
   public static UGeo box(float w,float h,float d) {
     return box(1).scale(w,h,d);
@@ -87,7 +226,7 @@ public class UGeoGenerator extends UMB {
     UVertexList vl,vl2;
     
     vl=UVertexList.circle(w, 4).rotZ(HALF_PI*0.5f).reverse();
-    
+//    vl=new UVertexList();
 //    vl=new UVertexList().add(-w,-w).add(w,-w).
 //        add(w,w).add(-w,w);
     vl2=vl.copy().translate(0,0,w);

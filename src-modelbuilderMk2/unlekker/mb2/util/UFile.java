@@ -168,15 +168,19 @@ public class UFile implements UConst {
     
     try {
       ArrayList<String> l=list(path,pre,ext);
+      UMB.log(l);
       if(l.size()<1) return -1;
         
-      s=noExt(l.get(l.size()-1));
-      s=s.substring(s.indexOf(' '));
-      i=UMB.parseInt(s);
+      int n=l.size()-1;
+      int res=-1;
+      do {
+        res=UMB.max(getNumber(l.get(n--)),res);
+      } while(n>-1);
       
+      return res;      
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+//      e.printStackTrace();
       i=-1;
     }
     
@@ -188,6 +192,19 @@ public class UFile implements UConst {
   ///////////////////////////////
   // File streams
   
+  private static int getNumber(String s) {
+    s=noExt(s);
+    int pos=s.length()-1;
+    if(Character.isDigit(s.charAt(pos))) {
+      while(pos>0 && Character.isDigit(s.charAt(pos-1))) pos--;
+      s=s.substring(pos);
+      return UMB.parseInt(s);
+    }
+    return -1000;
+  }
+
+
+
   public static OutputStream getOutputStream(String filename) {
     return getOutputStream(filename,false);
   }
@@ -353,7 +370,7 @@ public class UFile implements UConst {
     String path;
     
     path=fixPath(name);
-    UMB.log("name in: "+name+" > "+path);
+//    UMB.log("name in: "+name+" > "+path);
     
     if(isAbsolutePath(path)) return path;
     
@@ -361,7 +378,7 @@ public class UFile implements UConst {
     path=getPath(path);
     
     File f=new File(path+name);    
-    UMB.log("path = "+path+" \nname="+name+" "+f.isAbsolute());
+//    UMB.log("path = "+path+" \nname="+name+" "+f.isAbsolute());
 
     
     if(!f.isAbsolute()) {

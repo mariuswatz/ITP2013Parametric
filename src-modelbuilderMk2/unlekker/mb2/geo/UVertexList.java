@@ -3,6 +3,8 @@ package unlekker.mb2.geo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import processing.core.PVector;
@@ -50,6 +52,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   
   public UVertexList copy() {
     UVertexList cvl=new UVertexList();
+    cvl.setOptions(options);
     for(UVertex vv:v) cvl.add(vv);
     return cvl;
   }
@@ -65,7 +68,96 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     for(UVertex vv:v) cvl.add(vv);
     return cvl;
   }
+  
+  
+  public UVertexList setOptions(int opt) {
+    options=opt;
+//    log(optionStr());
+    return this;
+  }
 
+  public UVertexList enable(int opt) {
+    options=options|opt;
+    return this;
+  }
+
+  // Sorting the ArrayList
+  /**
+   * <p>Returns a new UVertexList containing the UVertex instances
+   * from this list, sorted by the angle between each vertex and the centroid.
+   * The result should be a valid polygon. The sorting is done in 2D in the XY
+   * plane.</p>  
+   * 
+   * <p>Code based on solution by Daniel Shiffman, http://www.shiffman.net.</p>
+   *
+   * @return
+   */
+  public UVertexList sortAsPolygon() {
+    UVertexList vl=new UVertexList();//.enable(NODUPL);
+    
+    UVertex c=centroid(),tmp=new UVertex();
+    
+    ArrayList<Float> a=new ArrayList<Float>();
+    for(UVertex vv:v) {
+      tmp.set(vv).sub(c);
+      a.add(tmp.angleXY()+PI);
+    }
+    
+    log(min(a)*RAD_TO_DEG+" "+max(a)*RAD_TO_DEG);
+    
+    int n=a.size();
+    
+    // As long as it's not empty
+    while (n>0) {
+      // Let's find the one with the highest angle
+      float biggestAngle = UNAN;
+      
+      int cnt=0,id=0;
+      for(float f:a) {
+        if(f>biggestAngle || biggestAngle==UNAN) {
+          biggestAngle=f;
+          id=cnt;
+        }
+        cnt++;
+      }
+      
+      vl.add(v.get(id));
+      a.set(id, -1000f);
+      n=0; 
+      for(float f:a) n+=(f>-0.5f ? 1 : 0);
+//      log("n "+n+" "+id+" "+nf(biggestAngle*RAD_TO_DEG));
+    }
+    
+    if(isClosed()) vl.close();
+    
+    return vl;
+  }
+
+
+  /**
+   * <p>Determines the winding order of this vertex list by calculating the area of the polygon
+   * it represents.Only works in the XY plane. The area calculation is <code>Area = Area + (X2 - X1) * (Y2 + Y1) / 2)</code>.</p>
+   * 
+   *  <p>Code by Jonathan Cooper, found at <a href="http://forums.esri.com/Thread.asp?c=2&f=1718&t=174277#513372">
+   *  http://forums.esri.com/Thread.asp?c=2&f=1718&t=174277#513372</a>.</p>
+   * @return
+   */
+   public boolean isClockwise(){
+     UVertex pt1 = first();
+     UVertex firstPt = pt1;
+     UVertex lastPt = null;
+     double area = 0.0;
+     for(int i=1; i<size(); i++) {
+       
+       UVertex pt2 = v.get(i);
+       area += (((pt2.x - pt1.x) * (pt2.y + pt1.y)) / 2);
+       pt1 = pt2;
+       lastPt = pt1;
+     }
+     area += (((firstPt.x - lastPt.x) * (firstPt.y + lastPt.y)) / 2);
+     return area < 0;
+   }
+ 
   /**
    * Produces a new UVertexList containing the delta vector for each position in this
    * list, so that for a given index==[0..n-2] the delta equals <code>get(index+1).copy().sub(get(index));</code>
@@ -391,7 +483,89 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
    * @return
    */
   public UVertex dim() {
-    return bb().dim;
+    return bb().dim();
+  }
+
+  /**
+   * Reorders the list so that whichever vertex is closest to 
+   * <code>vv</code> becomes the first point in the list.
+   * @param vv
+   * @return
+   */
+  public UVertexList reorderToPoint(UVertex vv) {
+    int closest=closestID(vv);
+    
+    shiftOrder(-closest);
+    
+    return this;
+  }
+
+  public UVertexList reorderToAngle(float a,int plane) {
+    float minD=Float.MAX_VALUE;
+    int closest=-1,cnt=0;
+    
+    cnt=isClosed() ? v.size()-1 : v.size();
+    
+    for(int i=0; i<cnt; i++) {
+      float cmp=abs(a-v.get(i).angle2D(plane));
+      if(cmp<minD) {
+        minD=cmp;
+        closest=i;
+      }
+    }
+    
+    
+    shiftOrder(-closest);
+    
+    return this;
+  }
+
+  
+  public UVertexList shiftOrder(int shift) {
+    ArrayList<UVertex> tmp=new ArrayList<UVertex>();
+    boolean wasClosed=isClosed();
+    if(wasClosed) unclose();
+    
+    if(shift<0) {
+      shift=-shift;
+      while((shift--)>0) {
+        tmp.add(first());
+        v.remove(0);
+      }
+      for(UVertex vt:tmp) v.add(vt);
+    }
+    else {
+      while((shift--)>0) {
+        tmp.add(last());
+        v.remove(size()-1);
+      }
+      for(UVertex vt:tmp) v.add(vt);
+    }
+    
+    if(wasClosed) close();
+
+    return this;
+  }
+  
+  public UVertex closest(UVertex pt) {
+    return get(closestID(pt));
+  }
+
+  public int closestID(UVertex pt) {
+    int closest=-1;
+    float minDist=Float.MAX_VALUE;
+    
+    int cnt=0;
+    for(UVertex tmp:v) {
+      float d=tmp.distSq(pt);
+      if(d<minDist) {
+        closest=cnt;
+        minDist=d;
+      }
+      cnt++;
+    }
+
+    return closest;
   }
 
   
@@ -775,7 +949,11 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   }
 
   public UVertexList scale(float mx,float my,float mz) {
-    for(UVertex vv:v) vv.mult(mx,my,mz);
+    if(isClosed()) {
+      for(int i=0; i<size()-1; i++) v.get(i).mult(mx,my,mz);
+    }
+    else for(UVertex vv:v) vv.mult(mx,my,mz);
+    
     return this;    
   }
 
@@ -789,7 +967,9 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
 
   public UVertexList scaleInPlace(float mx,float my,float mz) {
     UVertex c=centroid();
-    for(UVertex vv:v) vv.sub(c).mult(mx,my,mz).add(c);
+    translate(-c.x,-c.y,-c.z);
+    scale(mx,my,mz);
+    translate(c);
     return this;    
   }
 
@@ -833,43 +1013,91 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   
   public UVertexList rotXInPlace(float a) {
     UVertex c=centroid();    
-    for(UVertex vv:v) vv.sub(c).rotX(a).add(c);
+    translate(-c.x,-c.y,-c.z);
+    rotX(a);
+    translate(c);
     return this;    
   }
 
   public UVertexList rotYInPlace(float a) {
     UVertex c=centroid();    
-    for(UVertex vv:v) vv.sub(c).rotY(a).add(c);
+    translate(-c.x,-c.y,-c.z);
+    rotY(a);
+    translate(c);
+    
     return this;    
   }
 
   public UVertexList rotZInPlace(float a) {
     UVertex c=centroid();    
-    for(UVertex vv:v) vv.sub(c).rotZ(a).add(c);
+    translate(-c.x,-c.y,-c.z);
+    rotZ(a);
+    translate(c);
     return this;    
   }
 
   
   public UVertexList rotX(float deg) {
     bb=null;
-    for(UVertex vv:v) vv.rotAxis(X, deg);
+    if(isClosed()) {
+      for(int i=0; i<size()-1; i++) v.get(i).rotAxis(X,deg);
+    }
+    else for(UVertex vv:v) vv.rotAxis(X, deg);
     return this;
   }
 
   public UVertexList rotY(float deg) {
     bb=null;
-    for(UVertex vv:v) vv.rotAxis(Y, deg);
+    if(isClosed()) {
+      for(int i=0; i<size()-1; i++) v.get(i).rotAxis(Y,deg);
+    }
+    else for(UVertex vv:v) vv.rotAxis(Y, deg);
     return this;
   }
 
   public UVertexList rotZ(float deg) {
     bb=null;
-    for(UVertex vv:v) vv.rotAxis(Z, deg);
+    if(isClosed()) {
+      for(int i=0; i<size()-1; i++) v.get(i).rotAxis(Z,deg);
+    }
+    else for(UVertex vv:v) vv.rotAxis(Z, deg);
+    return this;
+  }
+
+  public UVertexList mergeClose(float dist) {
+    int n=size();
+    int n2=n/2;
+    dist=dist*dist;
+    
+    int merged=0;
+    
+    for(int i=0; i<n2; i++) {
+      UVertex vv=v.get(i);
+      for(int j=i+1; j<n; j++) {
+        UVertex v2=v.get(j);
+        if(vv!=v2){
+          float d=vv.distSq(v.get(j));
+          if(d<dist) {
+//            v.set(j, vv);
+            v2.set(vv);
+            merged++;
+          }
+        }
+      }
+    }
+    
+//    log("merged: "+merged+"/"+size());
+    return this;
+  }
+  
+  
+  public UVertexList unclose() {
+    if(isClosed()) v.remove(v.size()-1);
     return this;
   }
 
   public UVertexList close() {
-    if(!isClosed()) add(first());
+    if(!isClosed()) v.add(first());
     return this;
   }
 
@@ -879,6 +1107,16 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   
   public boolean contains(UVertex vv) {
     return v.contains(vv);
+  }
+  
+  public boolean hasDuplicates() {
+    int cnt=0;
+    for(UVertex vv:v) {
+      int index=indexOf(vv);
+      if(index<cnt) return true;
+      cnt++;
+    }
+    return false;
   }
   
   /**
@@ -902,9 +1140,10 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
    * @return
    */
   public UVertexList removeDupl(boolean doDelete) {
-    int id=0;
+    int id=0,cnt=0,pre=size();
     
     UTask task=new UTask("removeDupl");
+    
 //    enable(NODUPL);
     while(id<v.size()) {
       int index=indexOf(v.get(id));
@@ -912,6 +1151,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
         
         if(doDelete) { // REMOVE FROM LIST
           v.remove(id);
+          cnt++;
 //          id--;
         }
         else { // REPLACE WITH REFERENCE TO FIRST INSTANCE
@@ -920,12 +1160,35 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
       }
       else id++;
     }    
-    
+//    if(cnt>0) log("cnt "+cnt+" "+pre+" "+str());
     task.done();
     
     return this;
   }
   
+  public int[] removeDuplID() {
+    int[] id=new int[size()];
+    int i=0,cnt=0,pre=size();
+    ArrayList<UVertex> l=new ArrayList<UVertex>();
+    
+    while(i<pre) {
+      UVertex vv=v.get(i);
+      int index=l.indexOf(vv);
+      if(index<0) {
+        l.add(vv);
+        index=l.size()-1;
+      }
+      id[i++]=index;
+    }    
+    
+    v.clear();
+    v.addAll(l);
+//    if(cnt>0) log("cnt "+cnt+" "+pre+" "+str());
+    
+
+    return id; 
+  }
+
   //////////////////////////////////////////
   // UV methods
 

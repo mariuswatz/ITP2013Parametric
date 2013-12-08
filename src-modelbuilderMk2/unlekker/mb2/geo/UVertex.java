@@ -264,8 +264,18 @@ public class UVertex extends UMB  {
     return v2;
   }
 
+ public float angle2D(int plane) {
+   if(plane==XY) return PApplet.atan2(-y, x);
+   if(plane==XZ) return PApplet.atan2(-z, x);
+   return PApplet.atan2(-z, y);
+ }
+
  public float angleXY() {
    return PApplet.atan2(-y, x);
+ }
+
+ public float angleXY2() {
+   return -PApplet.atan2(-y, x);
  }
 
   public UVertex abs() {
@@ -379,7 +389,9 @@ public class UVertex extends UMB  {
   }
 
   /**
-   * Simplistic distance calculation.
+   * Simplistic distance calculation, also known as the 
+   * <a href="http://en.wiktionary.org/wiki/Manhattan_distance">Manhattan distance</a>.
+   * 
    * Useful in many cases where real distance calculation is overkill
    * @param v1
    * @return Absolute value <code>abs(v1.x-x)+abs(v1.y-y)+abs(v1.z-z)</code>

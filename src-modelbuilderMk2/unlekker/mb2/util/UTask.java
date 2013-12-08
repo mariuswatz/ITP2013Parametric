@@ -129,10 +129,14 @@ public class UTask extends UMB {
   }
 
   public void update(float perc) {
-    update(perc, null);
+    update(perc, null,false);
   }
 
   public void update(float perc,String msg) {
+    update(perc,null,false);
+  }
+  
+  public void update(float perc,String msg,boolean force) {
     ev.add(new UTaskEvent(perc,msg));
     
     long tt=ev.get(ev.size()-1).t;
@@ -142,10 +146,10 @@ public class UTask extends UMB {
     
     float tSinceLast=elapsed-tLast;
     
-    if(tSinceLast>1000) {
+    if(tSinceLast>500 || force) {
       
       if(firstMsg) {
-        log(name+": "+ev.get(0).str());
+        logDivider(NEWLN+name+": "+ev.get(0).str());
         firstMsg=false;
       }
       
