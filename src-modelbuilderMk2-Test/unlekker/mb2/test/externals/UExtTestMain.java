@@ -1,10 +1,12 @@
-package unlekker.mb2.externals;
+package unlekker.mb2.test.externals;
 
 import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.pdf.PGraphicsPDF;
 import unlekker.mb2.util.UMB;
+import unlekker.mb2.externals.UGeomerative;
+import unlekker.mb2.externals.UPoly2Tri;
 import unlekker.mb2.geo.*;
 import geomerative.*;
 
@@ -121,7 +123,7 @@ public class UExtTestMain extends PApplet {
   }
   
   public static void main(String[] args) {
-    PApplet.main("unlekker.mb2.externals.UExtTestMain");
+    PApplet.main("unlekker.mb2.test.externals.UExtTestMain");
 
   }
 

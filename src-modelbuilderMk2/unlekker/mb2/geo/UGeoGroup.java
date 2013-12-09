@@ -153,11 +153,26 @@ public class UGeoGroup extends UMB implements Iterable<UFace> {
     int n=parent.sizeF();
     return parent.getF(rndInt(n));
   }
-  
+
+  public UFace getF(int id) {
+    return faces.get(id);
+  }
+
   public ArrayList<UFace> getF() {
     return faces;
   }
-  
+
+  public ArrayList<UQuad> getQ() {
+    if(type!=QUAD_STRIP) return null;
+    ArrayList<UQuad> q=new ArrayList<UQuad>();
+    
+    for(int i=0; i<size(); i+=2) {
+      q.add(new UQuad(getF(i), getF(i+1)));
+    }
+    
+    return q;
+  }
+
   public ArrayList<Integer> getVID() {
     long t=System.currentTimeMillis();
     ArrayList<Integer> l=new ArrayList<Integer>();

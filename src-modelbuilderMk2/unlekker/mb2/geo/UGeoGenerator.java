@@ -7,27 +7,177 @@ import unlekker.mb2.util.UMB;
 import unlekker.mb2.util.UTask;
 
 public class UGeoGenerator extends UMB {
-  static HashMap<String, UGeo> proto;
+  static protected HashMap<String, UGeo> proto;
+  static protected ArrayList<String> prototypeNames;
   
   static {
     proto=new HashMap<String, UGeo>();
+    prototypeNames=new ArrayList<String>();
+    
+    initPlatonics();
   }
   
-  public static UGeo sphere(float rad,int res) {
-    String key="sph"+res;
-    
-    if(proto.containsKey(key)) {
-      return proto.get(key);
+  public static UGeo getPrototype(String name) {
+    name=name.toLowerCase();
+    if(proto.containsKey(name)) {
+//      logf("Prototype '%s' found.",name);
+      return proto.get(name).copy();
     }
     
-    UGeo geo=new UGeo();
+    return null;
+  }
+  
+  /**
+   * <p>Returns a geodesic sphere, which starts out as an
+   * icosahedron that is subdivided as many times as specified by
+   * <code>level</code>. All vertices are then normalized so that they
+   * lie on the surface of a sphere.</p>
+   * 
+   * <p>The number of faces generated for levels [0..4] are 
+   * respectively [20, 80, 320, 1280,5120]. Levels above 4 are
+   * not recommended.</p>
+   * @param diam The diameter of the resulting geometry.
+   * @param level
+   * @return
+   */
+  public static UGeo geodesicSphere(float diam,int level) {
+    String key="geodesicSph"+level;
+    UGeo geo=getPrototype(key);
+    if(geo!=null) return geo.scaleToDim(diam);
+
+    geo=getPrototype("icosahedron");
+    
+    while(level>0) {
+      geo=USubdivision.subdivide(geo, UMB.SUBDIVMIDEDGES);
+      for(UVertex vv:geo.getV()) vv.norm();
+      level--;
+    }
+    
+    geo.taint().check();
+    addPrototype(key, geo);
+
+    return geo.copy().scaleToDim(diam);
+  }
+  
+  private static void initPlatonics() {
+    float [] vert;
+    int vID[];
+    UGeo geo;
+    
+ // [dodecahedron.stl f=36 v=20]
+    vert=new float[] {-20.7933f,-18.0276f,17.7034f,-12.8987f,-11.0452f,0.7057f,-6.1863f,-26.8468f,28.1368f,6.5874f,-15.5492f,0.6340f,-14.6365f,8.8788f,0.8111f,-27.4103f,-2.4188f,28.3139f,-16.8928f,-1.5913f,45.3050f,10.7359f,-25.3151f,17.5874f,-3.7757f,-16.6887f,45.1956f,16.8927f,1.5913f,0.6950f,3.7757f,16.6887f,0.8044f,-23.6051f,14.2103f,17.8739f,-10.7359f,25.3151f,28.4126f,-6.5874f,15.5492f,45.3660f,14.6365f,-8.8788f,45.1890f,12.8987f,11.0453f,45.2943f,23.6051f,-14.2102f,28.1261f,6.1863f,26.8468f,17.8632f,27.4103f,2.4188f,17.6861f,20.7933f,18.0276f,28.2966f};
+    vID=new int[] {0,1,2,1,3,2,4,3,1,5,4,1,5,1,0,5,0,6,0,2,6,2,7,8,2,3,7,6,2,8,3,9,7,10,9,3,4,10,3,11,10,4,5,11,4,5,12,11,5,6,12,6,8,13,6,13,12,8,7,14,13,8,15,8,14,15,7,9,16,7,16,14,17,18,9,10,17,9,9,18,16,12,17,10,11,12,10,12,13,17,13,15,19,13,19,17,15,14,16,15,18,19,15,16,18,17,19,18};
+
+    geo=new UGeo();
+    for(int i=0; i<vert.length; i+=3) {
+      geo.addVertex(new UVertex(vert[i],vert[i+1],vert[i+2]));
+    }
+    for(int i=0; i<vID.length; i+=3) {
+      geo.addFace(vID[i],vID[i+2],vID[i+1]);
+    }
+
+    addPrototype("dodecahedron",geo);
+    
+    
+    // [icosahedron.stl f=20 v=12]
+    vert=new float[] {7.5381f,-15.5002f,-0.2372f,9.5297f,14.4336f,-0.1917f,27.9378f,-1.8504f,17.0122f,12.3956f,-25.1569f,27.7477f,17.3893f,-1.1913f,45.0888f,15.6180f,23.2770f,27.8213f,-17.3892f,1.1913f,-0.0888f,-15.6180f,-23.2770f,17.1787f,-12.3956f,25.1569f,17.2523f,-9.5297f,-14.4336f,45.1917f,-7.5381f,15.5002f,45.2372f,-27.9378f,1.8504f,27.9878f};
+    vID=new int[] {0,1,2,0,2,3,3,2,4,5,4,2,1,5,2,6,0,7,7,0,3,6,1,0,6,8,1,8,5,1,7,3,9,9,3,4,9,4,10,10,4,5,8,10,5,11,6,7,11,8,6,11,7,9,11,10,8,11,9,10};
+    
+    geo=new UGeo();
+    for(int i=0; i<vert.length; i+=3) {
+      geo.addVertex(new UVertex(vert[i],vert[i+1],vert[i+2]));
+    }
+    for(int i=0; i<vID.length; i+=3) {
+      geo.addFace(vID[i],vID[i+2],vID[i+1]);
+    }
+
+    addPrototype("icosahedron",geo);
+
+    
+    
+    // [octahedron.stl f=8 v=6]
+    vert=new float[] {11.5470f,-20f,0f,11.5470f,20f,0f,23.0940f,0f,32.6598f,-11.5470f,20f,32.6598f,-23.0940f,0f,0f,-11.5470f,-20f,32.6598f};
+    vID=new int[] {0,1,2,3,2,1,4,3,1,4,1,0,5,0,2,4,0,5,5,2,3,4,5,3};
+    
+    geo=new UGeo();
+    for(int i=0; i<vert.length; i+=3) {
+      geo.addVertex(new UVertex(vert[i],vert[i+1],vert[i+2]));
+    }
+    for(int i=0; i<vID.length; i+=3) {
+      geo.addFace(vID[i],vID[i+2],vID[i+1]);
+    }
+
+    addPrototype("octahedron",geo);
+    
+    // [tetrahedron.stl f=4 v=4]
+    vert=new float[] {-17.2510f,-30.0620f,0.0064f,-17.4484f,29.9377f,-0.0182f,34.6114f,0.1089f,-0.1305f,0.0880f,0.0153f,48.9423f};
+    vID=new int[] {0,1,2,3,2,1,0,3,1,0,2,3};
+
+    geo=new UGeo();
+    for(int i=0; i<vert.length; i+=3) {
+      geo.addVertex(new UVertex(vert[i],vert[i+1],vert[i+2]));
+    }
+    for(int i=0; i<vID.length; i+=3) {
+      geo.addFace(vID[i],vID[i+2],vID[i+1]);
+    }
+
+    addPrototype("tetrahedron",geo);
+
+  }
+
+  public static boolean hasPrototype(String name) {
+    return proto.containsKey(name.toLowerCase());    
+  }
+
+  public static void addPrototype(String name, UGeo model) {
+    if(hasPrototype(name)) {
+      logf("Already contains prototype '%s'",name);
+    }
+    else {
+      prototypeNames.add(name);
+      proto.put(name.toLowerCase(), model.center().scaleToDim(100));
+    }
+  }
+  
+  /**
+   * Returns a list of the names prototype geometries currently 
+   * available. The platonic solids can be found using "dodecahedron",
+   * "icosahedron","octahedron" and "tetrahedron". (Yes, cube has been omitted.)
+   * @return
+   */
+  static public ArrayList<String> listPrototypes() {
+    return prototypeNames;
+  }
+
+  public static UGeo sphere(float diam,int res) {
+    String key="sph"+res;
+    
+    UGeo geo=getPrototype(key);
+    if(geo!=null) return geo.scaleToDim(diam);
+    
+    geo=new UGeo();
     UVertex top,bottom;
     
     UVertexList l=UVertexList.arc(1, -HALF_PI, HALF_PI, res);
-    top=l.first();
-    bottom=l.last();
     
-    l.remove(0).remove(l.size()-1);
+    l.clear();
+    
+    
+    float ext=1f-1f/(float)((res-1));
+    for(int i=0; i<res; i++) {
+      float t=map(i,0,res-1,-ext,ext);
+      
+      float x=circleXforY(t);
+      log(nf(t)+" "+nf(x)+" "+nf(RAD_TO_DEG*Math.asin(t)));
+      l.add(x,t);
+    }
+
+    top=new UVertex(0,-1,0);
+    bottom=new UVertex(0,1,0);
+//    top=l.first();
+//    bottom=l.last();
+//    
+//    l.remove(0).remove(l.size()-1);
     
     ArrayList<UVertexList> stack=new ArrayList<UVertexList>();
     for(int i=0; i<res; i++) {
@@ -38,10 +188,11 @@ public class UGeoGenerator extends UMB {
     
     geo.quadstrip(stack);
     geo.triangleFan(UVertexList.crossSection(0, stack),top);
-    geo.triangleFan(UVertexList.crossSection(stack.get(0).size()-1, stack),bottom,true);
+    geo.triangleFan(UVertexList.crossSection(
+        stack.get(0).size()-1, stack),bottom,true);
     
-    proto.put(key, geo);
-    return geo.copy().scale(rad);
+    addPrototype(key, geo);
+    return geo.copy().scaleToDim(diam);
   }
   
   public static UGeo meshPlane(float w,float h,int steps) {

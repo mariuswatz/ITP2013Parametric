@@ -19,7 +19,7 @@ public class UFace extends UMB  {
   public static int globalID=0;
 
   public UGeo parent;
-  public int ID;  
+  public int ID,vertexCount;  
   public int vID[];
   public UVertex v[];
   
@@ -32,6 +32,7 @@ public class UFace extends UMB  {
   
   public UFace() {
     ID=globalID++;
+    vertexCount=3;
     vID=new int[] {-1,-1,-1};
     col=Integer.MAX_VALUE;
   }
@@ -70,12 +71,7 @@ public class UFace extends UMB  {
   
   public boolean contains(UVertex vv) {
     getV();
-    if(v[0]==vv) return true;
-    if(v[1]==vv) return true;
-    if(v[2]==vv) return true;
-//    if(v[0].equals(vv)) return true;
-//    if(v[1].equals(vv)) return true;
-//    if(v[2].equals(vv)) return true;
+    for(UVertex vt:v) if(vt.equals(vv)) return true;
     return false;
   }
 
@@ -175,11 +171,9 @@ public class UFace extends UMB  {
   }
 
   private int[] getVID(UVertex vv[]) {
-    vID=new int[] {
-        parent.addVertex(vv[0]),  
-        parent.addVertex(vv[1]),  
-        parent.addVertex(vv[2])
-    };
+    vID=new int[vertexCount];
+    int cnt=0;
+    for(UVertex vt:vv) vID[cnt++]=parent.addVertex(vt);
     v=null;
     
     return vID;
@@ -275,7 +269,7 @@ public class UFace extends UMB  {
   public UVertex[] getV() {
     if(parent==null || v!=null) return v;
     
-    if(v==null) v=new UVertex[vID.length];
+    if(v==null) v=new UVertex[vertexCount];
  
     int id=0;    
     for(int vid:vID) v[id++]=parent.getVertex(vid);
@@ -357,7 +351,7 @@ public class UFace extends UMB  {
   }
 
   public UFace set(UFace v) {
-    vID=new int[v.vID.length];
+    vID=new int[v.vertexCount];
     int cnt=0;
     for(int i:v.vID) vID[cnt++]=i;
     

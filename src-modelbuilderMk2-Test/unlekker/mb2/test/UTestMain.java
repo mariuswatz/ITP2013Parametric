@@ -46,7 +46,9 @@ public class UTestMain extends PApplet {
     tests=new ArrayList<UTest>();
 
     tests.add(new UTestVertexList());
+    tests.add(new UTestQuadGroup());
     
+    tests.add(new UTestPrimitives());
     tests.add(new UTestExtrude());
     tests.add(new UTestHeading03());
     tests.add(new UTestMath());
@@ -62,7 +64,6 @@ public class UTestMain extends PApplet {
     tests.add(new UTestEdgeList02());
     
 //  tests.add(new UTestSTL()); 
-    tests.add(new UTestPrimitives());
 
     tests.add(new UTestTriangulate());
 //    tests.add(new UTestSTLColor()); 
@@ -87,13 +88,7 @@ public class UTestMain extends PApplet {
     }
     theTest=tests.get(id);
     
-    try {
       initTest();
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      exit();
-    }
   }
 
   public void draw() {
@@ -168,8 +163,15 @@ public class UTestMain extends PApplet {
   }
 
   private void initTest() {
-    UMB.logDivider(theTest.name);
-    theTest.init();
+    try {
+
+      UMB.logDivider(theTest.name);
+      theTest.init();
+  } catch (Exception e) {
+    // TODO Auto-generated catch block
+    e.printStackTrace();
+    exit();
+  }
     
   }
 

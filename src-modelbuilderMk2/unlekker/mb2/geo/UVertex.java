@@ -346,7 +346,7 @@ public class UVertex extends UMB  {
         nf(z*RAD_TO_DEG,1));  }
 
   public String toString() {
-    return toString(2);
+    return strData();
   }
   public String toString(int prec) {
     return String.format(FSTRXYZ,

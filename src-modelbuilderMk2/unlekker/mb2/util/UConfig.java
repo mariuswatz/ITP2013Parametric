@@ -56,7 +56,7 @@ public class UConfig extends Properties {
   }
 
   public String get(String id) {
-    return getProperty(id);
+    return getProperty(id.toLowerCase());
   }
 
   public boolean getBool(String id) {

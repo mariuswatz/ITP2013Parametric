@@ -949,6 +949,7 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
   }
 
   public UVertexList scale(float mx,float my,float mz) {
+    bb=null;
     if(isClosed()) {
       for(int i=0; i<size()-1; i++) v.get(i).mult(mx,my,mz);
     }
@@ -1320,6 +1321,11 @@ public class UVertexList extends UMB implements Iterable<UVertex> {
     
     return "["+strBufDispose(buf)+"]";
   }
+  
+  public String dataCompact() {
+    return str(v,',',ENCLSQ);
+  }
+
 
   public UVertexList reverse() {
     Collections.reverse(v);

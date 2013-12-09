@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0050)file:///C:/users/marius/appdata/local/temp/16.html -->
+<!-- saved from url=(0050)file:///C:/users/marius/appdata/local/temp/28.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="utf-8"><style>html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 
 body{
@@ -128,6 +128,21 @@ See the Code &amp; Form blog for a <a href="http://workshop.evolutionzone.com/it
 Contact e-mail: marius at mariuswatz dot com<br>
 Class hours: Mondays 6:00pm – 8:55pm</p>
 <h2 id="december-08">December 08</h2>
+<p>New:</p>
+<ul>
+<li>UGeo.getQ(), UGeoGroup.getQ(): Returns UQuad face data from UGeoGroups of type QUADS or QUAD_STRIP. UQuad extends
+UFace, and most standard functions inherited from UFace should work as is. I haven't had a chance to look over the code in detail, so there might be some glitches.</li>
+<li>UGeoGenerator.geodesicSphere(): Creates geodesic sphere by subdividing an icosahedron to a specified level.</li>
+<li>geodesicSphere prototypes: Some standard mesh types are now stored internally for reuse, for instance spheres and geodesics. Pre-generated platonic solids are also included. </li>
+<li>The new methods related to prototypes are: UGeoGenerator.getPrototype(), UGeoGenerator.listPrototypes(), UGeoGenerator.addProtoType()</li>
+<li></li>
+</ul>
+<p>Fixes:</p>
+<ul>
+<li>Bug in ASCII STL import</li>
+<li>Bugs in UGeoGenerator (scale() was used instead of scaleToDim())</li>
+</ul>
+<h2 id="december-08_1">December 08</h2>
 <p>New:</p>
 <ul>
 <li>Added package: unlekker.mb2.externals. This will contain utility classes for interfacing ModelbuilderMk2 with other libraries, converting data structures as needed and giving access to useful tools not provided by ModelbuilderMk2 itself.</li>

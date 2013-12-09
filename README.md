@@ -9,6 +9,22 @@ Class hours: Mondays 6:00pm – 8:55pm
 
 New:
 
+- UGeo.getQ(), UGeoGroup.getQ(): Returns UQuad face data from UGeoGroups of type QUADS or QUAD_STRIP. UQuad extends
+UFace, and most standard functions inherited from UFace should work as is. I haven't had a chance to look over the code in detail, so there might be some glitches.
+- UGeoGenerator.geodesicSphere(): Creates geodesic sphere by subdividing an icosahedron to a specified level.
+- geodesicSphere prototypes: Some standard mesh types are now stored internally for reuse, for instance spheres and geodesics. Pre-generated platonic solids are also included. 
+- The new methods related to prototypes are: UGeoGenerator.getPrototype(), UGeoGenerator.listPrototypes(), UGeoGenerator.addProtoType()
+- 
+
+Fixes:
+
+- Bug in ASCII STL import
+- Bugs in UGeoGenerator (scale() was used instead of scaleToDim())
+
+## December 08
+
+New:
+
 - Added package: unlekker.mb2.externals. This will contain utility classes for interfacing ModelbuilderMk2 with other libraries, converting data structures as needed and giving access to useful tools not provided by ModelbuilderMk2 itself.
 - unlekker.mb2.externals.UGeomerative: Converts data structures from the [Geomerative library by Ricard Marxer](https://github.com/rikrd/geomerative/). Geomerative is useful for reading SVG files and creating vertex outlines of the geometry they contain.
 - unlekker.mb2.externals.UPoly2Tri: Interface to [Poly2Tri-java by Wu Liang](http://sites-final.uclouvain.be/mema/Poly2Tri/), making it possible to triangulate both simple (single-contour) and compound (contour with holes) polygons into a valid UGeo mesh. Especially useful for converting RPolygon geometry from Geometry to UGeo.

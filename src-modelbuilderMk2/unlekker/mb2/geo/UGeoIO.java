@@ -117,7 +117,7 @@ public class UGeoIO extends UMB {
               
 //              UMB.log(tok);
               tokid=1;
-              if(tok[tokid].length()<1 || !Character.isDigit(tok[tokid].charAt(0))) tokid++;
+//              if(tok[tokid].length()<1 || !Character.isDigit(tok[tokid].charAt(0))) tokid++;
               v[i].set(
                   UMB.parseFloat(tok[tokid++]),
                   UMB.parseFloat(tok[tokid++]),

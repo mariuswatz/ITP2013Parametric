@@ -62,12 +62,14 @@ public class UMB implements UConst {
   
   static {
     if(!libraryPrinted) {
+      UMBStartTime=System.currentTimeMillis();
       UMB.logDivider(VERSION);
       UMB.log(CREDIT);
       UMB.logDivider();
       
       libraryPrinted=true;
     }
+    
   }
 
   //////////////////////////////////////////////////
@@ -533,6 +535,7 @@ public class UMB implements UConst {
     return pvertex(varr,false);
   }
 
+  
   public static UMB pvertex(UVertexList vl) {
     return pvertex(vl,false);
   }
@@ -879,6 +882,7 @@ public class UMB implements UConst {
   static public final float circleXforY(float y) {
     float val=0;
     
+    if(y<-(1-EPSILON) || y>(1-EPSILON)) return 0;
     val=(float)Math.asin(y);
     
     return (float)Math.cos(val);
@@ -1072,6 +1076,8 @@ public class UMB implements UConst {
    * Static copy of unlekker.util.Rnd for easy random number generation.
    */
   public static URnd rnd=new URnd(System.currentTimeMillis());
+
+  private static long UMBStartTime;
   
   public static void setRnd(URnd rnd) {
     UMB.rnd=rnd;
@@ -1336,6 +1342,7 @@ public class UMB implements UConst {
   public static String timeStr(long t) {
     int tmp;
     StringBuffer buf=strBufGet();
+    t=t-UMBStartTime;
     
     int hr=(int)(t/HOURMSEC);
     t-=hr*HOURMSEC;
@@ -1344,13 +1351,19 @@ public class UMB implements UConst {
     int s=(int)(t/SECONDMSEC);
     
     String str=strf(TIMESTR,hr,m,s);
+    str="";
+    
+    if(hr>0) str+=nf(hr,2)+":";
+      str+=strf("%s:%s",nf(m,2),nf(s,2));
+    
 //      buf.append(nf(hr,2)).append(':').append(nf(m,2)).append(':').append(nf(s,2));
 //      return buf.toString();
     return str;
   }
 
   public static String timeStr() {
-    return timeStr2(Calendar.getInstance());//.getTimeInMillis());
+    return timeStr(System.currentTimeMillis());
+//    return timeStr2(Calendar.getInstance());//.getTimeInMillis());
   }
   
   public static String timeStr2(Calendar c) {
@@ -1424,7 +1437,7 @@ public class UMB implements UConst {
    * @return Formatted number string
    */
   static public String nf(float num) {
-    return nf(num,0,3);
+    return nf(num,1,3);
   }
 
   static public String nf(float num,int prec) {

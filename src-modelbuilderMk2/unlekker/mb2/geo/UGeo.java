@@ -54,9 +54,9 @@ public class UGeo extends UMB  {
 
   public UGeo(UGeo v) {
     this();
-    log("UGeo(UGeo v)UGeo(UGeo v) "+str());
 
     set(v);
+    log("UGeo(UGeo v)UGeo(UGeo v) "+str());
   }
 
   /** Returns a copy of this UGeo instance.
@@ -272,7 +272,7 @@ public class UGeo extends UMB  {
    task.update(10,"set(UGeo model) "+model.str()+" "+model.getV().str()+" "+ vl.str());
    
    faces=new ArrayList<UFace>();
-   int cnt=0,n=model.sizeF()/20;
+   int cnt=0,n=max(1,model.sizeF()/20);
    for(UFace ff:model.getF()) {
      addFace(ff.vID);     
      last(faces).setColor(ff.col);
@@ -462,7 +462,7 @@ public class UGeo extends UMB  {
 
     boolean debug=false;
     
-    int n=0,nmod=sizeV()/30;
+    int n=0,nmod=max(1,sizeV()/30);
     UVertex vn=new UVertex();
     for(UVertex vv:getV()) {
       n=0; 
@@ -630,6 +630,17 @@ public class UGeo extends UMB  {
   
   public ArrayList<UFace> getF() {
     return faces;
+  }
+
+  public ArrayList<UQuad> getQ() {
+    ArrayList<UQuad> quad=new ArrayList<UQuad>();
+    
+    for(UGeoGroup g:groups) {
+      ArrayList<UQuad> tmp=g.getQ();
+      if(tmp!=null) quad.addAll(tmp);
+    }
+    
+    return quad;
   }
 
 //  public ArrayList<UFace> getF() {
@@ -1086,7 +1097,7 @@ public class UGeo extends UMB  {
   public UGeo addFace(UVertex vv[]) {
     int vID[]=new int[] {
         addVertex(vv[0]),
-        addVertex(vv[10]),
+        addVertex(vv[1]),
         addVertex(vv[2])
     };
     
@@ -1565,6 +1576,33 @@ public class UGeo extends UMB  {
     removeDupl();
     taint();
     return this;
+  }
+
+  public ArrayList<String> dataCompact() {
+    return dataCompact(null);
+  }
+
+  public ArrayList<String> dataCompact(String name) {
+    if(name==null) name=UGEO;
+    
+    ArrayList<String> s=new ArrayList<String>();
+    s.add("["+name+" f="+sizeF()+" v="+sizeV()+"]");
+    String str=vl.dataCompact();    
+    s.add(str);
+    
+    StringBuffer buf=strBufGet();
+    int cnt=0,n=sizeF()-1;
+    
+    for(UFace ff:getF()) {
+      if((cnt++)>0) buf.append(',');
+      buf.append(ff.vID[0]).append(',');
+      buf.append(ff.vID[1]).append(',');
+      buf.append(ff.vID[2]);
+    }
+    
+    s.add("["+strBufDispose(buf)+"]");
+    
+    return s;
   }
   
 }

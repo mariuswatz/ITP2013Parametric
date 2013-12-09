@@ -12,6 +12,7 @@ import unlekker.mb2.util.UMB;
 public class UTestQuadGroup extends UTest {
   UVertexList vl;
   UGeo geo;
+  ArrayList<UQuad> quad;
   
   public void init() {
     if(main.nav==null) main.nav=new UNav3D();
@@ -20,12 +21,28 @@ public class UTestQuadGroup extends UTest {
     geo=new UGeo().quadstrip(vl,vl.copy().translate(0,100,0));
     geo.center();
     
+    quad=geo.getQ();
+    log("quads: "+quad.size());
+    log("v: "+quad.get(0).getV().length);
+    
+    for(UQuad q:quad) {
+      q.translate(0,rnd(50),0);
+      q.setColor(p.color(255,rnd(255),0));
+    }
+
+    for(UFace q:geo.getF()) {
+      
+      q.setColor(p.color(0,255,rnd(255)));
+    }
+
+    geo.enable(COLORFACE);
+    log(hex(geo.getF(10).col)+" "+geo.getF(10).col);
+    
     UMB.log("groups "+geo.sizeGroup()+" f="+geo.sizeF()+
         " v="+geo.sizeV()+
-        " | "+UMB.str(geo.getGroupID(0)));
-    for(int i=0; i<geo.sizeF(); i++) {
-      UMB.log(UMB.str(geo.getF(i).vID));
-    }
+        " | "+geo.getGroup(0).str());
+    
+    
     
   }
 
@@ -34,22 +51,21 @@ public class UTestQuadGroup extends UTest {
     p.lights();
     main.nav.doTransforms();
     
+    
     p.stroke(100);
     p.strokeWeight(1);
-    p.fill(255);
-    geo.draw();
     
-    ArrayList<UVertex[]> res=geo.getGroupQuadV(0);
+    for(UQuad q:quad) {
+      p.fill(q.col);
+      q.draw().drawNormal(20);
+    }
+
+    p.noFill();
+    p.fill(p.color(255));
+
+    p.translate(0,150,0);
+    geo.draw().drawNormals(20);
     
-    int id=(p.frameCount/50)%(res.size());
-    int vid1[]=geo.getF(id*2).vID;
-    int vid2[]=geo.getF(id*2+1).vID;
-    if(p.frameCount%100==0)
-      UMB.log(id+" q="+res.size()+" group="+
-          UMB.str(geo.getGroupID(0))+
-        " vid="+UMB.str(vid1)+" "+UMB.str(vid2));
-    p.fill(255,0,0);
-    UMB.pquad(res.get(id));
     
   }
 

@@ -5,23 +5,27 @@
 package unlekker.mb2.test;
 
 import java.awt.Frame;
+import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import unlekker.mb2.geo.UFace;
 import unlekker.mb2.geo.UGeo;
+import unlekker.mb2.geo.UGeoGenerator;
+import unlekker.mb2.geo.UGeoIO;
 import unlekker.mb2.geo.UIntersections;
 import unlekker.mb2.geo.UNav3D;
 import unlekker.mb2.geo.USubdivision;
 import unlekker.mb2.geo.UTriangulate;
 import unlekker.mb2.geo.UVertex;
 import unlekker.mb2.geo.UVertexList;
+import unlekker.mb2.util.UFile;
 import unlekker.mb2.util.UMB;
 
 public class UTestPrimitives extends UTest {
   UGeo geo,geo2;
   long last=0;
-  
+  int level=0;
   UFace fn;
   
   public void init() {
@@ -31,43 +35,31 @@ public class UTestPrimitives extends UTest {
 //    UMB.log(geo.bb().str());
     
 
-    geo=new UGeo();
-    geo.disable(NODUPL);
-    geo.add(UGeo.box(100).translate(-200,0,0));
-    UMB.log(geo.bb().str());
-    logDivider();
-    UMB.log(geo.strGroup());
-    
-    for(int i=0; i<geo.sizeF(); i++) {
-      if(i%2==0) geo.getF(i).setColor(pcolor(255,0,0));
-      else geo.getF(i).setColor(pcolor(255,255,255));
-    }
-    
-    geo.add(UGeo.cyl(100, 200, 20).setColor(pcolor(0,255,255)));
-
-//    geo.center();
-//    geo.enable(geo.COLORFACE);
-
-
     if(rndBool()) 
       geo2=UGeo.box(100).translate(-200,0,0);
 
     else geo2=UGeo.cyl(100, 200, 20).setColor(pcolor(0,255,255));
     geo2.translate(0,450,0);
 
-    for(UFace ff:geo.getF()) {
-      ff.normal(true);
-      
-    }
-//    USubdivision.subdivide(geo, UMB.SUBDIVMIDEDGES);
     
-    fn=new UFace(null, 
-        new UVertex(0,0),
-        new UVertex(0,100),
-        new UVertex(100,0));
-    fn.normal();
-        
-    geo.writeSTL(p.sketchPath("Prim.stl"));
+    geo=UGeoGenerator.geodesicSphere(100, level);
+    logf("level %d - f %d",level,geo.sizeF());
+    log(geo.str()+" "+geo.bb().str());
+    level=(level+1)%5;
+    
+    geo=UGeoGenerator.sphere(100, rndInt(10)*2+4);
+//    USubdivision.subdivide(geo, SUBDIVCENTROID);
+//    geo.vertexNormals();
+//    
+//    for(int i=0; i<geo.sizeF(); i+=3) {
+//      int id=geo.getF(i).vID[2];
+//      UVertex v=geo.getV(id);
+//      UVertex vn=geo.getVNormal(id);
+//      v.add(vn.copy().mult(rnd(2,15)));
+//    }
+  
+    log(UGeoGenerator.listPrototypes());
+//    geo=UGeoGenerator.get("icosahedron");
   }
   
   public void draw() {
@@ -78,18 +70,18 @@ public class UTestPrimitives extends UTest {
 
     p.noFill();
     p.stroke(255,150,0);
-    geo.drawNormals(40);
-    geo2.drawNormals(40);
 
-    p.stroke(100);
     p.fill(200);
 //    p.noStroke();
     geo.draw();
-    geo2.draw();
+    if(p.mousePressed) {
+      p.stroke(255,100,0);
+
+      geo.drawVertexNormals(5).drawNormals(2);
+    }
     
-    fn.draw();
-    fn.drawNormal(50);
-//    if(p.keyPressed) {
+    
+    //    if(p.keyPressed) {
 //      if(p.millis()-last>1000) {
 //        geo=USubdivision.subdivide(geo, UMB.SUBDIVMIDEDGES);
 //        for(UFace f:geo.getF()) {
@@ -102,9 +94,18 @@ public class UTestPrimitives extends UTest {
 //    }
 
   }
+  
+  public void save(String filename) {
+    geo.writeSTL(filename+".stl");
+  }
+
 
   public void keyPressed(char key) {
     if(key=='r') geo.reverseNormals(); 
+    if(key=='t') {
+      UFace f=rnd(geo.getF());
+      f.translate(new UVertex(f.normal().copy().mult(rnd(10,30))));
+    }
   }
   
 }
