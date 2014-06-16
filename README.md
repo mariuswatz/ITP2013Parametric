@@ -1,4 +1,4 @@
-**Looking for ModelbuilderMk2? Its new home is [github.com/mariuswatz/modelbuilderMk2](https://github.com/mariuswatz/modelbuilderMk2). This repo is just a historical archive.**
+*ModelbuilderMk2 is now maintained at [github.com/mariuswatz/modelbuilderMk2](https://github.com/mariuswatz/modelbuilderMk2). This repo is just a historical archive.*
 
 
 ## ITP, NYU Fall 2013: Parametric Design for Digital Fabrication
