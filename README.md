@@ -1,4 +1,7 @@
-# ITP, NYU Fall 2013: Parametric Design for Digital Fabrication
+**Looking for ModelbuilderMk2? Its new home is [github.com/mariuswatz/modelbuilderMk2](https://github.com/mariuswatz/modelbuilderMk2). This repo is just a historical archive.**
+
+
+## ITP, NYU Fall 2013: Parametric Design for Digital Fabrication
 
 Class for NYU ITP, Fall 2013. Instructor is [Marius Watz](http://mariuswatz.com).<br />
 See the Code & Form blog for a [detailed description](http://workshop.evolutionzone.com/itp-2013-parametric-design-for-digital-fabrication/)<br />
@@ -29,6 +32,7 @@ New:
 - unlekker.mb2.externals.UPoly2Tri: Interface to [Poly2Tri-java by Wu Liang](http://sites-final.uclouvain.be/mema/Poly2Tri/), making it possible to triangulate both simple (single-contour) and compound (contour with holes) polygons into a valid UGeo mesh. Especially useful for converting RPolygon geometry from Geometry to UGeo.
 - UVertexList/UFace.isClockwise: Checks to see if face or vertex list is ordered in clockwise order.
 
+----------------
 
 ## December 06
 
